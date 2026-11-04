@@ -25,4 +25,6 @@
 
 ## 验证
 
-HarmonyOS Hvigor `assembleHap` 已通过；日志 `.tmp/heritage-build.log`。项目未配置签名，输出为未签名 HAP，未进行真机运行验收。插画文件已逐张目视检查。修改仅针对根项目 `E:/demo01`，没有改动嵌套的另一套 `demo01/` 应用。
+HarmonyOS Hvigor `assembleHap` 已通过（构建命令见根 README §2；构建日志写在本地 `.tmp/`，该目录不入库）。
+项目未配置签名，输出为未签名 HAP，未进行真机运行验收。插画文件已逐张目视检查。
+修改仅针对本项目根目录（即本仓库根），没有改动嵌套的另一套 `demo01/` 应用。

@@ -1,10 +1,12 @@
 # 黄河记忆 · 演示 SOP（标准操作流程）
 
-> 版本：2026-11-04　对应包：`entry-default-unsigned.hap` 59,715,470 B（56.95 MiB，debug 构建、无签名 profile；
-> 其中彩陶转台灰模帧 120 张 = 1.32 MiB，按器型 5×24 全在包里，`index.json` 带映射表）
+> 版本：2026-11-04　对应包：`entry-default-unsigned.hap` 76,960,068 B（73.4 MiB，debug 构建、无签名 profile；
+> 体积随 rawfile 素材增减而变，装包前跟当天构建出来的文件大小比一遍）
 > 对应代码：`5cde07f`（题字字号 px→vp）/ `27d72b7`（转台罩层两遍绘制 + 堵住底下 Web 层漏像）
 > / `f2d8408`（3D工坊文案）/ `ffcdfc9`（沙盘注面板）/ `4f5f3f9`（工坊改名）
 > / `ca17c13`（河小导看门狗 25s→60s + 超时话术）
+> / `d7d344f`（河小导换机自排错：地址留空、设置页「测一下」、会话号自愈、失败现场留档）
+> / `50ef368`（tools 本机差异收进 hh_env.py）
 > 适用：HarmonyOS 模拟器 Mate 90 Pro（1280×2832）单机演示；真机与跨端差异见 §5。
 
 ---
@@ -28,29 +30,34 @@
 
 ## 1. T-1 天：把包和模拟器弄成可演示状态
 
+先把三个变量按本机改一遍，下面所有命令都用它们（换电脑只改这三行）：
+
 ```bash
-# 1) 构建（实测 4.5–15 s）
-cd C:/Users/16078/Desktop/hunxiao/demo01
-DEVECO_SDK_HOME="C:/Program Files/Huawei/DevEco Studio/sdk" \
-"C:/Program Files/Huawei/DevEco Studio/tools/node/node.exe" \
-"C:/Program Files/Huawei/DevEco Studio/tools/hvigor/bin/hvigorw.js" \
---mode module -p product=default -p buildMode=debug assembleHap
+PROJ="<本项目根目录>"                          # 就是这个仓库所在的路径
+DEVECO="C:/Program Files/Huawei/DevEco Studio" # DevEco Studio 安装目录
+HDC="$DEVECO/sdk/default/openharmony/toolchains/hdc.exe"
+
+cd "$PROJ"
+# 1) 构建（实测 3.4–15 s）
+DEVECO_SDK_HOME="$DEVECO/sdk" "$DEVECO/tools/node/node.exe" \
+  "$DEVECO/tools/hvigor/bin/hvigorw.js" \
+  --mode module -p product=default -p buildMode=debug assembleHap
 
 # 2) 起模拟器（hdc list targets 返回 [Empty] 时）
-"C:/Program Files/Huawei/DevEco Studio/tools/emulator/Emulator.exe" \
+"$DEVECO/tools/emulator/Emulator.exe" \
   -start "Mate 90 Pro" \
-  -instancePath "C:/Users/16078/AppData/Local/Huawei/Emulator/deployed" \
-  -imageRoot "C:/Users/16078/AppData/Local/Huawei/Sdk"
+  -instancePath "$HOME/AppData/Local/Huawei/Emulator/deployed" \
+  -imageRoot "$HOME/AppData/Local/Huawei/Sdk"
 
-# 3) 装包（路径必须相对项目根，绝对路径会拼坏）
-HDC="C:/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/toolchains/hdc.exe"
-"$HDC" install -r entry/build/default/outputs/default/entry-default-signed.hap
+# 3) 装包（仓库里没有签名配置，产出的是 unsigned 包）
+"$HDC" install -r entry/build/default/outputs/default/entry-default-unsigned.hap
 ```
 
 **验证打包是否含最新改动**（不要只看构建成功）：
 
 ```bash
-python -c "import zipfile,io; z=zipfile.ZipFile('entry/build/default/outputs/default/entry-default-signed.hap'); \
+cd "$PROJ"
+python -c "import zipfile,io; z=zipfile.ZipFile('entry/build/default/outputs/default/entry-default-unsigned.hap'); \
 s=[io.BytesIO(z.read(n)).read().decode('utf-8','replace') for n in z.namelist() if n.endswith('sandtable/index.html')][0]; \
 print('注面板新标题在包里:', '关于这张沙盘' in s)"
 ```
@@ -63,7 +70,7 @@ T-1 天必须完整走一遍 §3 动线，**不要留到当天**。
 
 - [ ] 模拟器已开机并解锁到桌面（不是熄屏）
 - [ ] `hdc list targets` 有 `127.0.0.1:5555`
-- [ ] 装的是当天构建的包（比对当天 hap 大小与 mtime；2026-11-04 这次是 59,715,470 B）
+- [ ] 装的是当天构建的包（比对当天 hap 大小与 mtime；2026-11-04 这次是 76,960,068 B）
 - [ ] 沙盘四段各点一遍，画面都动过（rAF 节流，点完等 10–15 秒再看）
 - [ ] 3D 工坊 1/6 → 6/6 切一遍，每件的底部信息条都出字
 - [ ] 彩陶工坊进去看一眼读数那行：必须是「转台序列 · 3D 不可用」，且预览位**有纸底**
@@ -71,7 +78,11 @@ T-1 天必须完整走一遍 §3 动线，**不要留到当天**。
 - [ ] 河小导**先问一句预热**：本机 Ollama 已设 `OLLAMA_KEEP_ALIVE=-1`（模型常驻，闲置不再卸载），
       首字实测从 30–40 秒降到 13 秒；但重启电脑/Ollama 后第一次仍要预热一次
 - [ ] 河小导设置里是 `http://10.0.2.2/v1` + Dify 的 `app-` 开头 Key（模拟器里 127.0.0.1 是模拟器自己，
-      填它必连不上；一键改回来：`python tools/set_dify_cfg.py "http://10.0.2.2/v1"`）
+      填它必连不上；**新装的包地址是空的**，这是 `d7d344f` 起的有意行为，必须先填一次；
+      一键改回来：`python tools/set_dify_cfg.py "http://10.0.2.2/v1"`）
+- [ ] 在设置页点一次「**测一下**」：正常应回「通了，xxms。地址和 Key 都能用。」（本机实测 57ms–1.1s）。
+      它只打 Dify 的 `/v1/parameters`，不消耗模型额度，也不影响后面的问答；
+      回「连不上」就说明 Dify 或容器没起，先按设置页那行「最近一次失败」的原因查，别上台才试
 - [ ] 本机 Ollama 在跑（`ollama ps` 有 bge-m3/qwen2.5 且 UNTIL=Forever），Dify 容器没卡死
 - [ ] 手机静音、通知栏清空；演示机不接其他任务
 - [ ] 断网自测一次（可选但推荐）：本包地图/沙盘/3D 全离线，拔网线不影响
@@ -276,6 +287,14 @@ F=$("$HDC" shell uitest dumpLayout | tr -d '\r' | sed 's/.*://')
 # 然后再点进 3D 工坊，1.5 秒内就打完了
 ```
 
+看河小导每一次问答的实际耗时与失败原因（`d7d344f` 起 AiService 全打在这个 tag 上）：
+
+```bash
+cd "$PROJ" && python tools/hh_env.py            # 先确认脚本认得这台机器的 hdc 和设备
+"$HDC" shell hilog -x | grep HH_AI             # 提问/首字/答完/失败四行，含状态码与用时
+python tools/probe_ui_check.py                  # 自动点设置页「测一下」并把屏幕上那句结论读回来
+```
+
 ---
 
 ## 7. 演示前最后一遍自检（5 分钟）
@@ -287,5 +306,5 @@ F=$("$HDC" shell uitest dumpLayout | tr -d '\r' | sed 's/.*://')
 5. 彩陶工坊：读数那行写着「转台序列 · 3D 不可用」，画面在慢慢转；换一次配色（龙山黑）
    器物要**肉眼可见地变黑**（主色 #b1876a → #5d5b57），换器型（瓶）包围盒要收窄
 6. 彩陶题字点「河」，转到正面能看见字压在腹部；转过去就没了，这是对的（正面 ±60° 才露字）
-7. 河小导一问一答跑通一次
+7. 河小导：设置页「测一下」回「通了」→ 关掉设置一问一答跑通一次
 8. 回到首页，停在首页待命

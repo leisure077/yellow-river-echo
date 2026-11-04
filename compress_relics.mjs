@@ -2,9 +2,8 @@
 /**
  * 3D 文物工坊 · 第 1 步：离线资产流水线（只写 .tmp，不动 rawfile）
  *
- * 用法：
- *   node compress_relics.mjs
- *   RELIC_SRC="D:/somewhere" node compress_relics.mjs
+ * 用法（RELIC_SRC 必填，指向六件原始 glb 所在目录）：
+ *   RELIC_SRC="D:/gltf-src" node compress_relics.mjs
  *
  * 流程：
  *   舞蹈纹砖   metalrough → quantize → meshopt
@@ -26,7 +25,15 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const TOOLS = join(ROOT, '.tmp', 'gltf-tools');
 const CLI = join(TOOLS, 'node_modules', '@gltf-transform', 'cli', 'bin', 'cli.js');
-const SRC = process.env.RELIC_SRC || 'C:/Users/16078/Downloads';
+// 原始扫描件所在的目录。故意不预设有默认值：这些 glb 只在当初下载它们的那台机器上，
+// 写死一个本机路径到别的电脑上只会变成"找不到文件"，不如第一次跑就让人指明。
+const SRC = process.env.RELIC_SRC;
+if (!SRC) {
+  console.error('要指定原始 glb 的目录，例如：\n' +
+    '  RELIC_SRC="D:/gltf-src" node compress_relics.mjs\n' +
+    '（Windows cmd 下先 set RELIC_SRC=D:/gltf-src 再跑）');
+  process.exit(1);
+}
 const TMP = join(ROOT, '.tmp', 'relics');
 const WORK = join(TMP, 'work');
 const OUT = join(TMP, 'out');

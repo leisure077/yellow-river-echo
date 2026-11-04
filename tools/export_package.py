@@ -24,9 +24,9 @@ git archive 只按 git 索引出内容，这些天然进不去。
                     hap 里带着本轮新增的那几句。前五条只证明"包里没脏东西"，
                     这一条才证明"它能编，而且编出来的就是包里这份代码"。
 """
-import io
 import os
 import re
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -247,7 +247,6 @@ def _hsize(b):
 
 # 产物里必须有这几句：本轮改的排错入口确实被打进了 hap，而不是只改了源码
 SENTINELS = ["测一下", "最近一次失败", "HH_AI"]
-BUILD_DIR = os.path.join(OUT_DIR, "buildcheck")
 
 
 def deveco_root():
@@ -268,20 +267,37 @@ def deveco_root():
     return d
 
 
-def verify(path):
+def _wipe(d):
+    """先删干净，才配叫"干净目录"。
+
+    Windows 上构建产物路径能叠到二百多字符，普通 rmtree 会卡在"目录非空"，
+    所以加 \\?\ 前缀走长路径接口；还删不掉就明确报错，不清不楚地复用旧目录，
+    验出来的"能编"可能是上一份缓存编的。
+    """
+    if not os.path.isdir(d):
+        return
+    target = d if os.name != "nt" else "\\\\?\\" + os.path.abspath(d)
+    try:
+        shutil.rmtree(target)
+    except Exception:
+        shutil.rmtree(d, ignore_errors=True)
+    if os.path.isdir(d):
+        raise SystemExit("删不掉 %s（多半是被占用），关掉 DevEco 或换个目录再跑" % d)
+
+
+def verify(path, ref):
     """把包解压到一个干净目录，只按 README §2 那条命令重新构建。
 
     这一步才是"组委会可复现项目编译运行"的正面证据：前面五项断言只证明包里
     没有脏东西，证明不了它能编。构建日志原样留着，失败时看最后二十行。
     """
     print("\n== 6 复现构建：解压后直接编 ==")
-    import shutil
-    if os.path.isdir(BUILD_DIR):
-        shutil.rmtree(BUILD_DIR, ignore_errors=True)
-    os.makedirs(BUILD_DIR)
-    zipfile.ZipFile(path).extractall(BUILD_DIR)
-    n = sum(len(f) for _, _, f in os.walk(BUILD_DIR))
-    print("已解压 %d 个文件到 %s" % (n, BUILD_DIR))
+    build_dir = os.path.join(OUT_DIR, "buildcheck-" + ref[:7])
+    _wipe(build_dir)
+    os.makedirs(build_dir)
+    zipfile.ZipFile(path).extractall(build_dir)
+    n = sum(len(f) for _, _, f in os.walk(build_dir))
+    print("已解压 %d 个文件到 %s" % (n, build_dir))
 
     dev = deveco_root()
     node = os.path.join(dev, "tools", "node", "node.exe" if os.name == "nt" else "node")
@@ -292,7 +308,7 @@ def verify(path):
     env = dict(os.environ, DEVECO_SDK_HOME=os.path.join(dev, "sdk"))
     r = subprocess.run([node, wjs, "--mode", "module", "-p", "product=default",
                         "-p", "buildMode=debug", "assembleHap"],
-                       cwd=BUILD_DIR, env=env, capture_output=True,
+                       cwd=build_dir, env=env, capture_output=True,
                        text=True, encoding="utf-8", errors="replace", timeout=1800)
     log = (r.stdout or "") + (r.stderr or "")
     ok = "BUILD SUCCESSFUL" in log
@@ -305,7 +321,7 @@ def verify(path):
         return False
 
     haps = []
-    for dirpath, _, filenames in os.walk(os.path.join(BUILD_DIR, "entry", "build")):
+    for dirpath, _, filenames in os.walk(os.path.join(build_dir, "entry", "build")):
         haps += [os.path.join(dirpath, f) for f in filenames if f.endswith(".hap")]
     if not haps:
         print("✗ 构建说成功但找不到 .hap 产物")
@@ -353,7 +369,7 @@ def main():
         return 1
     print("\n五项断言全过，这个包可以交。")
     if "--verify" in args:
-        if not verify(path):
+        if not verify(path, ref):
             print("\n断言过了但复现构建没过 —— 也别交。")
             return 1
     else:

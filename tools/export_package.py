@@ -51,17 +51,18 @@ JUNK = [
     (r"(^|/)dist/", "前端产物 dist/"),
 ]
 
-# 2) 凭据与本机痕迹：对每个文件的文本内容做匹配（二进制按字节读，跳过）
+# 2) 凭据与本机痕迹：对每个文件的文本内容做匹配（二进制按字节读，跳过）。
+# 每条可以带第三个参数限定后缀：签名口令字段只在意配置文件——它是"评委机器上没有证书
+# 文件、构建直接失败"的信号，文档里提这个名字不算泄漏（README 就在描述这条规则本身）。
 LEAKS = [
-    (rb"app-[A-Za-z0-9_-]{16,}", "Dify App Key 原文"),
-    (rb"sk-[A-Za-z0-9_-]{16,}", "智谱/OpenAI 风格 Key 原文"),
-    (rb"LTAI[A-Za-z0-9]{8,}", "阿里云 AccessKey"),
-    (rb"-----BEGIN [A-Z ]*PRIVATE KEY-----", "私钥"),
-    # 这两条写成 [Pp] 是为了不让本脚本自己的源码把自己判成泄漏（规则文本里就带着这个单词）
-    (rb"key[Pp]assword", "签名密钥口令字段"),
-    (rb"store[Pp]assword", "签名库口令字段"),
-    (rb"\.ohos[/\\]config", "本机签名证书目录"),
-    (rb"[A-Za-z]:[/\\]Users[/\\]", "本机绝对路径（写死到别人机器上就断了）"),
+    (rb"app-[A-Za-z0-9_-]{16,}", "Dify App Key 原文", None),
+    (rb"sk-[A-Za-z0-9_-]{16,}", "智谱/OpenAI 风格 Key 原文", None),
+    (rb"LTAI[A-Za-z0-9]{8,}", "阿里云 AccessKey", None),
+    (rb"-----BEGIN [A-Z ]*PRIVATE KEY-----", "私钥", None),
+    (rb"key[Pp]assword", "签名密钥口令字段", (".json5", ".json")),
+    (rb"store[Pp]assword", "签名库口令字段", (".json5", ".json")),
+    (rb"\.ohos[/\\]config", "本机签名证书目录", None),
+    (rb"[A-Za-z]:[/\\]Users[/\\]", "本机绝对路径（写死到别人机器上就断了）", None),
 ]
 
 # 跳过内容扫描的二进制目录/后缀：图片、模型、字体这些不参与凭据判断
@@ -181,7 +182,9 @@ def check(path, ref):
         if n.lower().endswith(SKIP_EXT):
             continue
         data = z.read(n)
-        for pat, label in LEAKS:
+        for pat, label, only in LEAKS:
+            if only and not n.lower().endswith(only):
+                continue
             m = re.search(pat, data)
             if m:
                 leaks.append((label, n, m.group(0)[:12]))

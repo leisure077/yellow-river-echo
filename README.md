@@ -115,8 +115,8 @@ python tools/export_package.py --check .tmp/pkg/yellow-river-echo-src-xxxxxxx.zi
 「清理编译生成文件、缓存文件，保证组委会可复现项目编译运行」：
 
 1. 产物与缓存——`build/`、`oh_modules/`、`.hvigor`、`__pycache__/`、`*.hap`、`*.log`、`shots/`、`.tmp/`、`local.properties` 一律不许出现；
-2. 凭据与本机痕迹——Dify App Key、`sk-` 开头的 Key、阿里云 AK、私钥、`keyPassword`/`storePassword`、
-   本机证书目录、写死的 `C:/Users/...` 路径，逐个文件扫；
+2. 凭据与本机痕迹——Dify App Key、`sk-` 开头的 Key、阿里云 AK、私钥、签名口令字段、
+   本机证书目录、写死到别人机器上就断了的盘符 + 用户目录绝对路径，逐个文件扫；
 3. 签名配置——`build-profile.json5` 的 `signingConfigs` 必须是 `[]`；
 4. 复现必需文件——工程配置、`AppScope/app.json5`、`entry/src/main/module.json5`、README、dify/README 少一个就判不过；
 5. 体积——只报数和最大的几项，不判分。

@@ -23,8 +23,8 @@ function marker(p, i) {
   const label = p.name, width = Math.max(138, label.length * 24 + 30);
   return `<g class="pin ${p.demo?'service-pin':''}" transform="translate(${p.x},${p.y})" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(label)}" onclick="poi('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' ')poi('${p.id}')">
     <g class="pin-pop" style="animation-delay:${i*65}ms"><g class="pin-scale">
-      <ellipse cy="13" rx="26" ry="8" fill="#3b4d4433"/>
-      <path d="M-25-48 A32 32 0 1 1 50 0 L0 8Z" fill="${p.demo?'#648b80':'#aa8246'}" stroke="#fffaf0" stroke-width="6"/>
+      <circle class="building-hit" cx="0" cy="0" r="24" fill="transparent"/><circle class="building-anchor" cx="0" cy="0" r="7" fill="#edf1eb" stroke="#526f78" stroke-width="3"/><path d="M0 0 V-20" stroke="#526f78" stroke-width="3"/>
+      <path d="M-25-48 A32 32 0 1 1 50 0 L0 8Z" fill="${p.demo?'#71877c':'#657f88'}" stroke="#fffaf0" stroke-width="6"/>
       <text x="0" y="-36" text-anchor="middle" fill="white" style="font-size:27px">${symbol}</text>
       <rect x="${-width/2}" y="14" width="${width}" height="39" rx="18" fill="#fffbee" stroke="#d6c5a6" stroke-width="2"/>
       <text x="0" y="41" text-anchor="middle" fill="#504637" style="font-size:23px;font-weight:600">${esc(label)}</text>

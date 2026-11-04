@@ -114,6 +114,28 @@ def fill(idx, text):
     return False
 
 
+def open_settings():
+    """把界面弄回能点 设置 的样子再进卡片。
+    问完一句之后页面是滚到底的、键盘还弹着，表头的 设置 不在屏上，
+    所以先收键盘（keyEvent 2）再往下划回顶部，最多试 3 次。
+    """
+    for _ in range(3):
+        if by_text("接入设置"):
+            return True
+        s = by_text("设置")
+        if s:
+            tap(s[2], s[3])
+            time.sleep(1.2)
+            if by_text("接入设置"):
+                return True
+            continue
+        sh("uitest uiInput keyEvent 2")
+        time.sleep(0.8)
+        sh("uinput -T -m 640 900 640 2200 800")
+        time.sleep(1.0)
+    return False
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     base = sys.argv[1]
@@ -125,13 +147,9 @@ def main():
     assert key.startswith("app-"), "拿到的不是 Dify 的 app- 开头 Key"
 
     # 1. 打开设置卡片
-    if not by_text("接入设置"):
-        s = by_text("设置")
-        if not s:
-            print("找不到 设置 入口，请确认停在河小导全屏页")
-            return 1
-        tap(s[2], s[3])
-        time.sleep(1.2)
+    if not open_settings():
+        print("进不去设置卡片：请确认停在河小导全屏页（首页右上角「问」→ 去全屏 ›）")
+        return 1
     print("设置卡片已打开")
 
     # 2. 两个输入框按屏幕顺序：上面是地址，下面是 Key

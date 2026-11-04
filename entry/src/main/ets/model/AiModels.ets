@@ -63,3 +63,14 @@ export interface DifyStreamEvent {
   message?: string;
   metadata?: DifyMeta;
 }
+
+// 设置页「测一下」的结果：只描述能不能连上，不带回答内容
+export interface ProbeResult {
+  ok: boolean;
+  // HTTP 状态码；0 表示根本没拿到状态码（DNS/连接/超时）
+  code: number;
+  // 整次探测耗时，毫秒
+  ms: number;
+  // 给设置页直接显示的一句话
+  msg: string;
+}

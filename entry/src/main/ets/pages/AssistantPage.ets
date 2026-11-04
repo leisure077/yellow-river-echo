@@ -1,5 +1,5 @@
 import { router } from '@kit.ArkUI';
-import { ChatTurn, Citation } from '../model/AiModels';
+import { ChatTurn, Citation, ProbeResult } from '../model/AiModels';
 import { AiStore } from '../service/AiStore';
 import { AiService, StreamHandle } from '../service/AiService';
 import { AiContext } from '../service/AiContext';
@@ -35,6 +35,10 @@ struct AssistantPage {
   @State clearAsk: boolean = false;
   @State live: string = '';
   @State liveOn: boolean = false;
+  // 「测一下」的自检结果只出现在设置卡片里，不打扰游客
+  @State probing: boolean = false;
+  @State probeMsg: string = '';
+  @State lastFail: string = '';
   private scroller: Scroller = new Scroller();
   private handle: StreamHandle | null = null;
   private timer: number = -1;
@@ -70,6 +74,7 @@ struct AssistantPage {
     this.base = s.baseUrl;
     this.apiKey = s.appKey;
     this.personal = s.personalOn;
+    this.lastFail = s.lastFail;
     this.toBottom();
   }
 
@@ -212,9 +217,14 @@ struct AssistantPage {
     if (this.streamErr.length > 0) {
       this.err = text.length > 0 ? this.streamErr + '（回答已中断）' : this.streamErr;
       this.lastQ = this.askQ;
+      // 状态码和耗时是服务里同步记下的，设置卡片展开时给排错的人看
+      this.lastFail = store.lastFail;
     } else if (text.length === 0) {
       this.err = AiService.ERR_EMPTY;
       this.lastQ = this.askQ;
+      this.lastFail = store.lastFail;
+    } else {
+      this.lastFail = store.lastFail;
     }
     this.live = '';
     this.rawTarget = '';
@@ -238,6 +248,58 @@ struct AssistantPage {
     await AiStore.get().saveSettings(this.base, this.apiKey);
     this.cfgOpen = false;
     this.err = '';
+  }
+
+  // 设置页的「测一次」：地址和 Key 用当前输入框里的值（没保存也能测），
+  // 只打一次 /v1/parameters，不消耗模型额度，也不留下问答记录。
+  probeOnce(): void {
+    if (this.probing) {
+      return;
+    }
+    this.probing = true;
+    this.probeMsg = '正在试…';
+    AiService.get().probe(this.base, this.apiKey).then((r: ProbeResult): void => {
+      this.probing = false;
+      this.probeMsg = r.msg;
+      // 连上的话，之前那次失败的现场也就不必再提了
+      if (r.ok) {
+        this.lastFail = '';
+      }
+    }).catch((e: Error): void => {
+      this.probing = false;
+      this.probeMsg = '没测成：' + e.message;
+    });
+  }
+
+  // 地址里的 127.0.0.1 只在一种情况下是对的：本机用 hdc 端口转发把服务映射进设备。
+  // 别人第一次接的时候最容易踩这个坑，所以只提醒、不拦（拦了会把 rport 用法堵死）。
+  addrHint(): string {
+    let b = this.base.trim().toLowerCase();
+    if (b.length === 0) {
+      return '填 Dify 的 /v1 地址。本机自建：模拟器里填 http://10.0.2.2/v1；'
+        + '真机走局域网填电脑的 IP，走 USB 转发（hdc rport）才填 http://127.0.0.1:端口/v1。';
+    }
+    if (b.indexOf('127.0.0.1') >= 0 || b.indexOf('localhost') >= 0) {
+      return '注意：127.0.0.1 指的是这台设备自己。模拟器里请用 http://10.0.2.2/v1；'
+        + '真机只有做了 hdc 端口转发时才能用 127.0.0.1。';
+    }
+    return '';
+  }
+
+  // App Key 是一长串，输入框窄、又是密文显示，最容易漏粘。这里只看长度和前缀，绝不回显内容。
+  // 本机这套 Dify 的 Key 实测 28 字（app- + 24），所以只把「短到不可能是整串」当异常。
+  keyHint(): string {
+    let k = this.apiKey.trim();
+    if (k.length === 0) {
+      return '在 Dify 应用的「访问 API」页复制 App Key（app- 开头一整串），整段粘贴进来。';
+    }
+    if (!k.startsWith('app-')) {
+      return '看着不像 Dify 的 App Key：它应以 app- 开头，多半是粘掉了开头。';
+    }
+    if (k.length < 12) {
+      return '这一串只有 ' + k.length + ' 字，不像整串（本机 Dify 发的是 28 字）：重新整段复制粘贴。';
+    }
+    return '';
   }
 
   askTip(s: string): void {
@@ -284,6 +346,10 @@ struct AssistantPage {
         .onClick((): void => {
           this.cfgOpen = !this.cfgOpen;
           this.err = '';
+          this.probeMsg = '';
+          this.clearAsk = false;
+          // 只刷新排错现场，不回灌输入框：用户可能刚改了地址还没点保存
+          this.lastFail = AiStore.get().lastFail;
         })
     }
     .width('100%')
@@ -304,7 +370,7 @@ struct AssistantPage {
           .fontSize(fs(this.ts, 11))
           .fontColor(SUB)
           .width('100%')
-        TextInput({ placeholder: 'https://api.dify.ai/v1', text: this.base })
+        TextInput({ placeholder: '例如 http://10.0.2.2/v1（模拟器打本机 Dify）', text: this.base })
           .height(40)
           .fontSize(fs(this.ts, 12))
           .backgroundColor('#FBF6EC')
@@ -313,6 +379,13 @@ struct AssistantPage {
           .onChange((v: string): void => {
             this.base = v;
           })
+        if (this.addrHint().length > 0) {
+          Text(this.addrHint())
+            .fontSize(fs(this.ts, 10))
+            .fontColor(SUB)
+            .lineHeight(fs(this.ts, 14))
+            .width('100%')
+        }
 
         Text('App Key')
           .fontSize(fs(this.ts, 11))
@@ -328,6 +401,45 @@ struct AssistantPage {
           .onChange((v: string): void => {
             this.apiKey = v;
           })
+        if (this.keyHint().length > 0) {
+          Text(this.keyHint())
+            .fontSize(fs(this.ts, 10))
+            .fontColor(SUB)
+            .lineHeight(fs(this.ts, 14))
+            .width('100%')
+        }
+
+        // 自检只打一次 /v1/parameters：不调模型、不占额度，专门给换电脑的人定位「哪一段没通」
+        Row({ space: 10 }) {
+          Text(this.probing ? '试中…' : '测一下')
+            .fontSize(fs(this.ts, 12))
+            .fontColor(this.probing ? SUB : RIVER)
+            .textAlign(TextAlign.Center)
+            .width(88)
+            .height(34)
+            .borderRadius(17)
+            .border({ width: 1, color: this.probing ? LINE : RIVER })
+            .onClick((): void => {
+              this.probeOnce();
+            })
+          if (this.probeMsg.length > 0) {
+            Text(this.probeMsg)
+              .fontSize(fs(this.ts, 10))
+              .fontColor(this.probeMsg.indexOf('通了') >= 0 ? RIVER : CLAY)
+              .lineHeight(fs(this.ts, 14))
+              .layoutWeight(1)
+          }
+          Blank()
+        }
+        .width('100%')
+
+        if (this.lastFail.length > 0) {
+          Text('最近一次失败：' + this.lastFail + '（只给排错看，不影响使用）')
+            .fontSize(fs(this.ts, 10))
+            .fontColor(SUB)
+            .lineHeight(fs(this.ts, 14))
+            .width('100%')
+        }
 
         Row({ space: 10 }) {
           Column({ space: 3 }) {

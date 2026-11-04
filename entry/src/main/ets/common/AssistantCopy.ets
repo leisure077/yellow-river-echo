@@ -60,14 +60,21 @@ export function errCopyOf(raw: string): ErrCopy {
   if (has(t, '地址不对') || has(low, '404')) {
     return { line: '按这个地址找不到档案室，确认填的是 Dify 的 /v1 地址。', sub: tailOf(t) };
   }
+  // 连连接层面就没通：地址填错、Dify 没起、端口没转发，都走这一条。
+  // 这条必须排在下面"翻得有点久"前面——http 在连不上的时候也会回一句 Operation timeout，
+  // 先按超时判就会把"地址不对"说成"模型慢"，让人往错的方向查。
+  // 旧文案里的"没网/够不着云端"在本机自建部署下也不成立，所以直接点名地址和自检按钮。
+  if (has(t, '连不上') || has(low, 'resolve host') || has(low, 'offline') || has(low, 'network')
+    || has(low, 'connection') || has(low, 'connect')) {
+    return {
+      line: '河小导够不着档案室：这个地址现在连不上。看看 Dify 是否在跑，或在设置里点「测一下」。',
+      sub: tailOf(t)
+    };
+  }
   // 看门狗到点（60s 没新字节）。本地部署下最常见的原因是模型刚被卸载、正在重新装载，
   // 不是网络断了，所以话术只说"翻得久"，并把重试的口子留给用户；旧文案里的"云端"也不成立。
   if (has(low, 'timeout') || has(t, '超时') || has(t, '没有响应') || has(t, '没有回应')) {
     return { line: '档案翻得有点久，河小导先等到这儿。再问一次试试，问题短一点会更快。', sub: tailOf(t) };
-  }
-  if (has(low, 'resolve host') || has(low, 'offline') || has(low, 'network')
-    || has(low, 'connection') || has(low, 'connect') || has(t, '连不上')) {
-    return { line: '这会儿像是没网，河小导够不着云端档案。检查一下网络再试试？', sub: tailOf(t) };
   }
   if (has(t, '模型侧报错') || has(t, '模型没有返回')) {
     return { line: '档案室那边答不上来，我换个说法再试试。', sub: tailOf(t) };

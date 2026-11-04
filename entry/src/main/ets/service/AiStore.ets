@@ -11,11 +11,16 @@ export class AiStore {
     return AiStore.inst;
   }
 
-  baseUrl: string = 'https://api.dify.ai/v1';
+  // 地址不给默认值：换一台电脑、换一套 Dify，能通的地方的都不一样
+  // （本机局域网 IP / 模拟器的 10.0.2.2 / 云端域名），预填一个反而会让人以为不用改。
+  baseUrl: string = '';
   appKey: string = '';
   personalOn: boolean = false;
   conversationId: string = '';
   turns: ChatTurn[] = [];
+  // 最近一次失败的「状态码 · 耗时 · 一句原因」，只在设置卡片里给排错的人看；
+  // 不存 Key、不存问题、不存回答。
+  lastFail: string = '';
   // 游客是否已经用过助手：没用过时，首页「问」挂红点、悬浮球挂引导气泡
   askSeen: boolean = false;
 
@@ -33,6 +38,7 @@ export class AiStore {
     this.askSeen = (this.p.getSync('askSeen', false) as boolean) === true;
     AppStorage.setOrCreate('assistantSeen', this.askSeen);
     this.conversationId = this.p.getSync('conversationId', '') as string;
+    this.lastFail = this.p.getSync('lastFail', '') as string;
     let raw = this.p.getSync('turns', '[]') as string;
     try {
       this.turns = JSON.parse(raw) as ChatTurn[];
@@ -144,6 +150,44 @@ export class AiStore {
   async setConversation(id: string): Promise<void> {
     this.conversationId = id;
     await this.persist();
+  }
+
+  // 失败现场先改内存再落盘：设置卡片紧接着就要显示，不能等 flush。
+  // note 只放 Dify 给的一句原因（截断），里面不会有 Key。
+  markFail(code: number, ms: number, note: string): void {
+    let head = code > 0 ? 'HTTP ' + code : '没拿到状态码';
+    let tail = note.trim();
+    if (tail.length > 60) {
+      tail = tail.substring(0, 60) + '…';
+    }
+    this.lastFail = head + ' · ' + ms + 'ms' + (tail.length > 0 ? ' · ' + tail : '');
+    if (this.p === null) {
+      return;
+    }
+    this.p.put('lastFail', this.lastFail).then((): void => {
+      if (this.p !== null) {
+        this.p.flush();
+      }
+    }).catch((e: Error): void => {
+      console.warn('lastFail save: ' + e.message);
+    });
+  }
+
+  clearLastFail(): void {
+    if (this.lastFail.length === 0) {
+      return;
+    }
+    this.lastFail = '';
+    if (this.p === null) {
+      return;
+    }
+    this.p.put('lastFail', '').then((): void => {
+      if (this.p !== null) {
+        this.p.flush();
+      }
+    }).catch((e: Error): void => {
+      console.warn('lastFail clear: ' + e.message);
+    });
   }
 
   pushTurn(turn: ChatTurn): void {

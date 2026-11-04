@@ -13,11 +13,6 @@ class ExperienceBridge {
   back(): void { router.back(); }
   // 应用里只有一张行程页 pages/RoutePage（原本指向 pages/JourneyPage，那一页从未存在，点它没反应）。
   journey(): void { router.pushUrl({ url: 'pages/RoutePage' }); }
-  panorama(id: string): void {
-    if (id === 'longmen' || id === 'kaifeng') {
-      router.pushUrl({ url: 'pages/PanoramaPage', params: { id: id } });
-    }
-  }
   private bytes(data: string): Uint8Array {
     if (!data.startsWith('data:image/png;base64,') || data.length > 12000000) { throw new Error('无效的明信片'); }
     return new util.Base64Helper().decodeSync(data.substring(22));
@@ -92,7 +87,7 @@ struct ExperiencePage {
         .zoomAccess(false)
         .onInterceptRequest((event): WebResourceResponse =>
           this.localResource(event.request.getRequestUrl()) as WebResourceResponse)
-        .javaScriptProxy({ object: this.bridge, name: 'Native', methodList: ['back', 'journey', 'panorama', 'saveImage', 'shareImage'], controller: this.controller })
+        .javaScriptProxy({ object: this.bridge, name: 'Native', methodList: ['back', 'journey', 'saveImage', 'shareImage'], controller: this.controller })
         .onScroll((ev: OnScrollEvent): void => {
           // Web 给的是绝对位置，只有真的动了才发信号；80ms 一次足够
           let now = Date.now();

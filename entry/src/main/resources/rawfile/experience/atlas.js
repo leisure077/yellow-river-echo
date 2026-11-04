@@ -22,14 +22,13 @@ function marker(p, i) {
   const symbol = {建筑:'⌂',展览:'▤',餐饮:'♨',文创:'▣',卫生间:'WC',游客服务:'i'}[p.cat];
   const label = p.name, width = Math.max(138, label.length * 24 + 30);
   return `<g class="pin ${p.demo?'service-pin':''}" transform="translate(${p.x},${p.y})" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(label)}" onclick="poi('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' ')poi('${p.id}')">
-    <g class="pin-pop" style="animation-delay:${i*65}ms">
-      <ellipse cy="13" rx="26" ry="8" fill="#3b4d4433"/>
-      <path d="M-25-48 A32 32 0 1 1 50 0 L0 8Z" fill="${p.demo?'#648b80':'#aa8246'}" stroke="#fffaf0" stroke-width="6"/>
+    <g class="pin-pop" style="animation-delay:${i*65}ms"><g class="pin-scale">
+      <circle class="building-hit" cx="0" cy="0" r="24" fill="transparent"/><circle class="building-anchor" cx="0" cy="0" r="7" fill="#edf1eb" stroke="#526f78" stroke-width="3"/><path d="M0 0 V-20" stroke="#526f78" stroke-width="3"/>
+      <path d="M-25-48 A32 32 0 1 1 50 0 L0 8Z" fill="${p.demo?'#71877c':'#657f88'}" stroke="#fffaf0" stroke-width="6"/>
       <text x="0" y="-36" text-anchor="middle" fill="white" style="font-size:27px">${symbol}</text>
       <rect x="${-width/2}" y="14" width="${width}" height="39" rx="18" fill="#fffbee" stroke="#d6c5a6" stroke-width="2"/>
       <text x="0" y="41" text-anchor="middle" fill="#504637" style="font-size:23px;font-weight:600">${esc(label)}</text>
-      ${p.panorama?'<g transform="translate(25,-86)"><rect width="78" height="30" rx="15" fill="#247d79"/><text x="39" y="21" text-anchor="middle" fill="white" style="font-size:20px">360°</text></g>':''}
-    </g></g>`;
+    </g></g></g>`;
 }
 function svgMap(night=false,mini=false) {
   const points = mini ? mapPOIs.filter(p=>p.cat==='建筑') : pois();
@@ -59,7 +58,7 @@ function mapPage() {
       <button class="routeBtn" onclick="routeList()">游览<br>路线</button>
       <div class="map-caption" aria-live="polite">${captionText()}</div>
     </div><div id="results"></div>
-    ${category==='发现'?'<div class="discover-strip"><button onclick="poi(\'longmen\')"><b>云上龙门</b><span>360° 实拍漫游 ›</span></button><button onclick="show(\'footprints\')"><b>黄河明信片</b><span>收藏旅行的片刻 ›</span></button></div>':''}</div>`;
+    ${category==='发现'?'<div class="discover-strip"><button onclick="show(\'footprints\')"><b>黄河明信片</b><span>收藏旅行的片刻 ›</span></button></div>':''}</div>`;
   attachPan();
   if (!pois().length) document.querySelector('#results').innerHTML='<p class="empty-map">此城市暂无该类标记，试试“全部”或其他分类。</p>';
 
@@ -103,7 +102,6 @@ function poiDetail(p) {
   sheet(`<div class="poi-heading"><small>${esc(p.city)} / ${esc(p.cat)} ${p.demo?'· 服务点':'· 文化地标'}</small><h2>${esc(p.name)}</h2></div>
     <p>${esc(p.intro||'该服务点由平台标注，营业信息以现场为准。')}</p>
     <p class="muted">${p.demo?'':'地标名称与简介依据公开资料整理；插画与位置经过艺术编排。'}</p>
-    ${p.panorama?`<button class="pano-open" onclick="openPanorama('${p.panorama}')">360° 真实实景 · 点击进入 ↗</button><p class="muted">${esc(panoramas[p.panorama].credit)} 需联网。</p>`:'<p class="pano-unavailable">暂无可用的真实全景；待接入实拍素材。</p>'}
     <div class="row"><button onclick="toggleFavorite('${p.id}')">${favorites.includes(p.id)?'取消收藏':'收藏地标'}</button><button onclick="checkin('${p.id}')">记录足迹</button></div>
     ${source?`<details><summary>资料来源</summary><p>${esc(source.name)}<br><span class="source-url">${esc(source.url)}</span><br>核对日期：2026-10-29</p></details>`:''}`);
 }
@@ -128,8 +126,7 @@ function routeList(){
 // 「长卷查看」= 切回离线手绘长卷并按线路镜头放大，与真实底图各走各的动线。
 function viewRouteInAtlas(i){localStorage.setItem('hh-map-mode','offline');selectRoute(i);}
 function selectRoute(i){if(!routes[i])return;selectedRoute=i;selectedPOI='';category='建筑';city='全部';scale=1;offset={x:0,y:0};closeSheet();show('map');if(routes[i].demo){scale=2.3;offset={x:ATLAS_W/2-350*scale,y:ATLAS_H*.44-880*scale};applyTransform(true)}}
-function atlasIntro(){sheet('<h2>一卷看见黄河文明</h2><p>函谷关、龙门石窟、炎黄二帝塑像、开封铁塔与戚城遗址，在山水手绘中串联起五城记忆。</p><p>点分类，标记依次浮现；点地标，地图居中放大。带 360° 标签的地点可联网进入公开实拍全景。</p><p class="muted">山水与建筑外形经艺术化处理，可用于行前的文化浏览与路线构思。</p><button onclick="closeSheet()">开始探索</button>')}
-function openPanorama(id){const p=panoramas[id];if(!p)return;if(window.Native?.panorama){Native.panorama(id);return}sheet(`<h2>${esc(p.title)}</h2><p>${esc(p.credit)}</p><p>在原站查看可保留完整全景操作及作者信息。</p><a class="pano-link" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">打开真实全景 ↗</a>`)}
+function atlasIntro(){sheet('<h2>一卷看见黄河文明</h2><p>函谷关、龙门石窟、炎黄二帝塑像、开封铁塔与戚城遗址，在山水手绘中串联起五城记忆。</p><p>点分类，标记依次浮现；点地标，地图居中放大。</p><p class="muted">山水与建筑外形经艺术化处理，可用于行前的文化浏览与路线构思。</p><button onclick="closeSheet()">开始探索</button>')}
 function travel(){category='发现';city='全部';mapPage()}
 function footprintMap(){
  const ids=['hangu','longmen','qicheng','emperors','iron-tower'];

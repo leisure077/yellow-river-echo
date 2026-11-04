@@ -1,3 +1,4 @@
+window.inkAtlasLevels={"spring": 3, "winter": 3, "autumn": 3, "summer": 3};
 // Local raster pyramid: no external map engine, geographic tiles or AK requests.
 loadBaidu=function(){};
 const baseMapPage=mapPage;
@@ -13,21 +14,22 @@ function layoutAtlasPins(){
   const x=p.x*scale+offset.x,y=p.y*scale+offset.y,w=Math.max(138,p.name.length*24+30);
   const hidden=p.id!==selectedPOI&&boxes.some(b=>Math.abs(b.x-x)<(b.w+w)/2+10&&Math.abs(b.y-y)<110);
   node.style.visibility=hidden?'hidden':'visible';
-  node.querySelector('.pin-pop')?.setAttribute('transform',`scale(${1/scale})`);
+  node.querySelector('.pin-scale')?.setAttribute('transform',`scale(${1/scale})`);
   if(!hidden)boxes.push({x,y,w});
  }
 }
 let tileFrame=0;
 function refreshTiles(){cancelAnimationFrame(tileFrame);tileFrame=requestAnimationFrame(()=>{
  const host=document.querySelector('#rasterTiles');if(!host)return;
- const level=Math.max(0,Math.min(3,Math.ceil(Math.log2(Math.max(.125,scale)))+2));
+ const maxLevel=window.inkAtlasLevels?.[atlasSeason] ?? 3;
+ const level=Math.max(0,Math.min(maxLevel,Math.ceil(Math.log2(Math.max(.125,scale)))+3));
  const factor=2**(3-level),step=256*factor,w=Math.ceil(1024/factor),h=Math.ceil(1536/factor);
  const minX=Math.max(0,Math.floor(-offset.x/scale/step)-1),maxX=Math.min(Math.ceil(w/256)-1,Math.floor((1024-offset.x)/scale/step)+1);
  const minY=Math.max(0,Math.floor(-offset.y/scale/step)-1),maxY=Math.min(Math.ceil(h/256)-1,Math.floor((1536-offset.y)/scale/step)+1);
  const keep=new Set();
  for(let x=minX;x<=maxX;x++)for(let y=minY;y<=maxY;y++){
  const id=`${atlasSeason}-${level}-${x}-${y}`;keep.add(id);if(host.querySelector(`[data-tile="${id}"]`))continue;
- const im=document.createElementNS('http://www.w3.org/2000/svg','image');im.dataset.tile=id;im.setAttribute('href',`seasons/${atlasSeason}/${level}/${x}/${y}.jpg`);im.setAttribute('x',x*step);im.setAttribute('y',y*step);im.setAttribute('width',Math.min(step,1024-x*step));im.setAttribute('height',Math.min(step,1536-y*step));host.append(im);
+ const im=document.createElementNS('http://www.w3.org/2000/svg','image');im.dataset.tile=id;im.setAttribute('preserveAspectRatio','none');im.setAttribute('href',`seasons/${atlasSeason}/${level}/${x}/${y}.jpg`);im.setAttribute('x',x*step);im.setAttribute('y',y*step);im.setAttribute('width',Math.min(step,1024-x*step));im.setAttribute('height',Math.min(step,1536-y*step));host.append(im);
  }
  for(const im of [...host.children])if(!keep.has(im.dataset.tile))im.remove();
  layoutAtlasPins();
@@ -47,10 +49,10 @@ function paintWeather(host){host.querySelector('.season-weather')?.remove();cons
  if(atlasSeason!=='summer')for(let i=0;i<14;i++){let flake=document.createElement('i');flake.style.cssText=`left:${(i*37)%100}%;animation-delay:-${i*.8}s;animation-duration:${8+i%5}s`;layer.append(flake)}host.append(layer);
 }
 const seasonStyle=document.createElement('style');seasonStyle.textContent=`
-.season-button{position:absolute;left:12px;bottom:15px;width:60px;height:60px;padding:0;border-radius:50%;background:#fff9e9ed;color:#725733;border:2px solid #d5c39b;box-shadow:0 3px 14px #463b3430;z-index:6;font-size:12px}
-.atlas-map .map-caption{left:83px;bottom:18px}.atlas-map .zoom-tools{bottom:90px}
+.season-button{position:absolute;left:10px;bottom:12px;width:38px;height:38px;padding:0;border-radius:50%;background:#fff9e9ed;color:#725733;border:2px solid #d5c39b;box-shadow:0 3px 14px #463b3430;z-index:6;font-size:12px}
+.atlas-map .map-caption{left:58px;bottom:14px}.atlas-map .zoom-tools{bottom:90px}
 #rasterTiles{transition:filter .8s ease}
-#mapScene .pin-pop{animation:none!important;transform-origin:0 0}
+#mapScene .pin-scale{transform-origin:0 0}
 .atlas-title{display:none!important}
 .season-weather{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2}
 .season-weather i{position:absolute;top:-10px;width:6px;height:9px;border-radius:70% 10% 70% 10%;background:#f2b7c6;animation:seasonFall linear infinite}
@@ -59,3 +61,6 @@ const seasonStyle=document.createElement('style');seasonStyle.textContent=`
 @keyframes seasonFall{to{transform:translate(35px,850px) rotate(260deg);opacity:.1}}
 @media(prefers-reduced-motion:reduce){.season-weather{display:none}#rasterTiles{transition:none}}
 `;document.head.append(seasonStyle);
+
+// Ink-blue architectural labels stay visually aligned with the painted buildings.
+const inkStyle=document.createElement("style");inkStyle.textContent=`.pin .pin-scale{transition:opacity .2s}.pin:hover .building-anchor,.pin:focus .building-anchor{fill:#fff5cf;stroke:#465f69}#rasterTiles image{image-rendering:auto}.season-button{color:#526f78;border-color:#9caeac}`;document.head.append(inkStyle);

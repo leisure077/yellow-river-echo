@@ -203,13 +203,16 @@ export class AiService {
       settle();
     });
 
-    // http 没有 error 事件：连接中途断掉时 dataEnd 也不会来，靠看门狗兜底
+    // http 没有 error 事件：连接中途断掉时 dataEnd 也不会来，靠看门狗兜底。
+    // 窗口给到 60s：本机 Dify + Ollama 冷态（embedding 模型被卸载后重新装回显存）实测
+    // 首字 34.5s，设了 OLLAMA_KEEP_ALIVE=-1 后是 13s，但重启过电脑就会退回前者；
+    // 25s 会把这种"还在查"的请求误判成网络断了。真断了 60s 也一样能兜住。
     watchdog = setInterval((): void => {
       if (finished) {
         return;
       }
-      if (Date.now() - lastData > 25000) {
-        fail('网络中断或长时间没有响应');
+      if (Date.now() - lastData > 60000) {
+        fail('长时间没有回应');
       }
     }, 2000);
 

@@ -60,8 +60,10 @@ export function errCopyOf(raw: string): ErrCopy {
   if (has(t, '地址不对') || has(low, '404')) {
     return { line: '按这个地址找不到档案室，确认填的是 Dify 的 /v1 地址。', sub: tailOf(t) };
   }
-  if (has(low, 'timeout') || has(t, '超时') || has(t, '没有响应')) {
-    return { line: '云端翻档案有点慢，先等几秒，或者换个短一点的问题。', sub: tailOf(t) };
+  // 看门狗到点（60s 没新字节）。本地部署下最常见的原因是模型刚被卸载、正在重新装载，
+  // 不是网络断了，所以话术只说"翻得久"，并把重试的口子留给用户；旧文案里的"云端"也不成立。
+  if (has(low, 'timeout') || has(t, '超时') || has(t, '没有响应') || has(t, '没有回应')) {
+    return { line: '档案翻得有点久，河小导先等到这儿。再问一次试试，问题短一点会更快。', sub: tailOf(t) };
   }
   if (has(low, 'resolve host') || has(low, 'offline') || has(low, 'network')
     || has(low, 'connection') || has(low, 'connect') || has(t, '连不上')) {

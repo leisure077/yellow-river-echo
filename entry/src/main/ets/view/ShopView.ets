@@ -140,13 +140,13 @@ export struct ShopView {
     Column() {
       Stack({ alignContent: Alignment.Bottom }) {
         Column() {
-          ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 1 })
+          ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 1, img: g.img })
         }
         .width('100%')
         .height(134)
 
         Row({ space: 6 }) {
-          Text(this.cartIds.indexOf(g.id) >= 0 ? '✓ 已入清单' : '＋ 加清单')
+          Text(this.cartIds.indexOf(g.id) >= 0 ? '♥ 已在清单' : '♡ 收藏')
             .fontSize(fs(this.ts, 10))
             .fontColor(this.cartIds.indexOf(g.id) >= 0 ? CLAY : INK)
             .padding({ left: 7, right: 7, top: 3, bottom: 3 })

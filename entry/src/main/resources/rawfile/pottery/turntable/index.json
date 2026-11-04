@@ -1,0 +1,88 @@
+{
+  "frames": 24,
+  "canvas": [
+    512,
+    640
+  ],
+  "degStep": 15,
+  "ext": "webp",
+  "enc": "image/webp q=0.99",
+  "shapes": {
+    "guan": {
+      "key": "guan",
+      "label": "罐",
+      "frames": 24,
+      "symmetric": false,
+      "topPx": 77,
+      "botPx": 488,
+      "maxHalfPx": 236,
+      "rimHalfPx": 102,
+      "band": [
+        0.32,
+        0.6
+      ],
+      "ms": 1343
+    },
+    "pen": {
+      "key": "pen",
+      "label": "盆",
+      "frames": 24,
+      "symmetric": true,
+      "topPx": 77,
+      "botPx": 488,
+      "maxHalfPx": 236,
+      "rimHalfPx": 236,
+      "band": [
+        0.32,
+        0.6
+      ],
+      "ms": 1257
+    },
+    "hu": {
+      "key": "hu",
+      "label": "壶",
+      "frames": 24,
+      "symmetric": false,
+      "topPx": 77,
+      "botPx": 488,
+      "maxHalfPx": 194,
+      "rimHalfPx": 77,
+      "band": [
+        0.42,
+        0.7
+      ],
+      "ms": 1100
+    },
+    "ping": {
+      "key": "ping",
+      "label": "瓶",
+      "frames": 24,
+      "symmetric": true,
+      "topPx": 77,
+      "botPx": 488,
+      "maxHalfPx": 161,
+      "rimHalfPx": 56,
+      "band": [
+        0.48,
+        0.76
+      ],
+      "ms": 1071
+    },
+    "ding": {
+      "key": "ding",
+      "label": "鼎式",
+      "frames": 24,
+      "symmetric": false,
+      "topPx": 77,
+      "botPx": 488,
+      "maxHalfPx": 174,
+      "rimHalfPx": 154,
+      "band": [
+        0.16,
+        0.44
+      ],
+      "ms": 1150
+    }
+  },
+  "totalBytes": 1385722
+}

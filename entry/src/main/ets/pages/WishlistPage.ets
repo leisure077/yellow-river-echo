@@ -330,7 +330,7 @@ struct WishlistPage {
         this.toggleOne(g.id);
       })
       Stack() {
-        ArtCover({ palette: g.palette, shape: 'box', seed: 1 })
+        ArtCover({ palette: g.palette, shape: 'box', seed: 1, img: g.img })
       }
       .width(68).height(68).borderRadius(9).clip(true)
       .onClick((): void => {
@@ -420,7 +420,7 @@ struct WishlistPage {
   likeRow(g: Goods) {
     Row({ space: 8 }) {
       Stack() {
-        ArtCover({ palette: g.palette, shape: 'pot', seed: 2 })
+        ArtCover({ palette: g.palette, shape: 'pot', seed: 2, img: g.img })
       }
       .width(60).height(60).borderRadius(9).clip(true)
       .onClick((): void => {
@@ -523,7 +523,7 @@ struct WishlistPage {
         if (this.groups.length === 0) {
           Column({ space: 8 }) {
             Text('清单还是空的').fontSize(fs(this.ts, 15)).fontColor(INK)
-            Text('文创卡片上点「＋ 加清单」就加进这里').fontSize(fs(this.ts, 12)).fontColor(SUB)
+            Text('文创卡片上点「♡ 收藏」就加进这里').fontSize(fs(this.ts, 12)).fontColor(SUB)
             Text('去挑几件').fontSize(fs(this.ts, 13)).fontColor(Color.White)
               .padding({ left: 16, right: 16, top: 8, bottom: 8 })
               .backgroundColor(CLAY).borderRadius(18)

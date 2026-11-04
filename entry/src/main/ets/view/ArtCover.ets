@@ -1,6 +1,6 @@
 import { fs, paletteOf, Palette } from '../common/Theme';
 
-// 程序化封面：按器型现画，不占包体，也不会在列表刷新时反复解码大图。
+// 商品封面：给了 img 就贴实拍图，没给才按器型现画（不占包体，也不会在列表刷新时反复解码大图）。
 // shape 取值：pot jar ding tile stele tower cave scroll coin box bridge kiln
 @Component
 export struct ArtCover {
@@ -9,6 +9,7 @@ export struct ArtCover {
   @Prop @Watch('repaint') palette: string = 'yangshao';
   @Prop @Watch('repaint') shape: string = 'pot';
   @Prop @Watch('repaint') seed: number = 0;
+  @Prop @Watch('repaint') img: string = '';
   @Prop label: string = '';
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
@@ -193,13 +194,20 @@ export struct ArtCover {
 
   build() {
     Stack({ alignContent: Alignment.BottomStart }) {
-      Canvas(this.ctx)
-        .width('100%')
-        .height('100%')
-        .backgroundColor(paletteOf(this.palette).paper)
-        .onReady((): void => {
-          this.paint();
-        })
+      if (this.img.length > 0) {
+        Image($rawfile(this.img))
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Cover)
+      } else {
+        Canvas(this.ctx)
+          .width('100%')
+          .height('100%')
+          .backgroundColor(paletteOf(this.palette).paper)
+          .onReady((): void => {
+            this.paint();
+          })
+      }
       if (this.label.length > 0) {
         Text(this.label)
           .fontSize(fs(this.ts, 10))

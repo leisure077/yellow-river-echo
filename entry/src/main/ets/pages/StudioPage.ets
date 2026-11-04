@@ -1,21 +1,21 @@
 import { router } from '@kit.ArkUI';
-import { INK, SUB, PAPER, CLAY, LINE, fs, coverRes, paletteOf } from '../common/Theme';
-import { goBack, params, goPlayer, goCourses, goRelic, goSandtable } from '../common/Nav';
+import { INK, SUB, PAPER, CLAY, LINE, fs, coverRes, colorRowOf } from '../common/Theme';
+import { goBack, params, goRelic, goSandtable } from '../common/Nav';
 import { PatternBg } from '../view/PatternBg';
 import { ContentRepo } from '../service/ContentRepo';
 import { RelicBrowser } from '../view/RelicBrowser';
 import { Course } from '../model/Models';
-import { colorRowOf } from './ColorPage';
+import { CourseRow } from '../view/CourseRow';
 
-// 「创意工坊」独立模块：页顶栏三个页签——观文物 / 切工坊 / 选教程
+// 「数字文物」独立模块：页顶栏三个页签——观文物 / 创意坊 / 选教程
 // 观文物是内嵌的查询面板（搜索 + 分类年代颜色筛选 + 两列结果），
-// 切工坊放 3D 文物展台与工坊入口，选教程是分类胶囊 + 教程列表
+// 创意坊放 3D 文物展台与工坊入口，选教程是分类胶囊 + 教程列表
 interface ExhibitRec {
   img: string;
   key: string;
 }
 
-// 六件展品：实物示意图 + 对应色键，与颜色工坊六色一一对上
+// 六件展品：实物示意图 + 对应色键，色键用来取展台下方的色名与说法
 const SHOW: ExhibitRec[] = [
   { img: 'relic_caitao', key: 'yangshao' },
   { img: 'relic_heitao', key: 'longshan' },
@@ -25,8 +25,7 @@ const SHOW: ExhibitRec[] = [
   { img: 'relic_tianqing', key: 'song' }
 ];
 const CATS: string[] = ['全部', '手作', '讲读', '影像'];
-const CAT_NAMES: string[] = ['全部', '手作', '讲读', '影像'];
-const TABS: string[] = ['观文物', '切工坊', '选教程'];
+const TABS: string[] = ['观文物', '创意坊', '选教程'];
 
 @Entry
 @Component
@@ -77,6 +76,11 @@ export struct StudioPage {
     }
   }
 
+  // 选教程当前分类下的课程，与课程影像页取的是同一份数据
+  courses(): Course[] {
+    return ContentRepo.get().coursesOf(this.cat);
+  }
+
   build() {
     Stack() {
       PatternBg()
@@ -93,7 +97,7 @@ export struct StudioPage {
           .borderRadius(17)
           .onClick(goBack)
         Blank()
-        Text('创意工坊')
+        Text('数字文物')
           .fontSize(fs(this.ts, 18))
           .fontWeight(FontWeight.Bold)
           .fontColor(INK)
@@ -104,7 +108,7 @@ export struct StudioPage {
       .width('100%')
       .padding({ left: 14, right: 14, top: 10, bottom: 6 })
 
-      // 页顶栏：观文物 / 切工坊 / 选教程
+      // 页顶栏：观文物 / 创意坊 / 选教程
       Row() {
         ForEach(TABS, (t: string, i: number): void => {
           Column({ space: 5 }) {
@@ -148,6 +152,8 @@ export struct StudioPage {
         }
         .layoutWeight(1)
         .scrollBar(BarState.Off)
+        // 课少的时候内容不满一屏，Scroll 默认会把它垂直居中，讲读/影像这种单课分类会掉到屏幕中间
+        .align(Alignment.Top)
         .edgeEffect(EdgeEffect.Spring)
       }
     }
@@ -267,17 +273,28 @@ export struct StudioPage {
     .padding({ top: 6 })
   }
 
-  // —— 工坊入口：陶艺工坊 / 颜色工坊，各带一句玩法说明 ——
+  // 卡片标题一律逐字排到四字宽、两端对齐：「3D工坊」开头是半角，整块排会短一截对不齐
+  @Builder
+  workTitle(t: string) {
+    Row() {
+      ForEach(t.split(''), (ch: string, i: number): void => {
+        Text(ch)
+          .fontSize(fs(this.ts, 15))
+          .fontWeight(FontWeight.Bold)
+          .fontColor(INK)
+      }, (ch: string, i: number): string => t + '_' + i)
+    }
+    .width(4 * fs(this.ts, 15) + 6)
+    .justifyContent(FlexAlign.SpaceBetween)
+  }
+
+  // —— 工坊入口：彩陶工坊 / 3D工坊 / 黄河沙盘，各带一句玩法说明 ——
   @Builder
   works() {
     Column({ space: 10 }) {
       Row() {
         Column({ space: 6 }) {
-          Text('陶艺工坊')
-            .fontSize(fs(this.ts, 15))
-            .fontWeight(FontWeight.Bold)
-            .fontColor(INK)
-            .letterSpacing(2)
+          this.workTitle('彩陶工坊')
           Text('拉坯 · 上彩 · 入窑，做一件自己的彩陶')
             .fontSize(fs(this.ts, 10))
             .fontColor(SUB)
@@ -304,42 +321,7 @@ export struct StudioPage {
 
       Row() {
         Column({ space: 6 }) {
-          Text('颜色工坊')
-            .fontSize(fs(this.ts, 15))
-            .fontWeight(FontWeight.Bold)
-            .fontColor(INK)
-            .letterSpacing(2)
-          Text('认矿物色 · 给线稿上彩，一色一类文物')
-            .fontSize(fs(this.ts, 10))
-            .fontColor(SUB)
-          Row({ space: 4 }) {
-            Text('进工坊')
-              .fontSize(fs(this.ts, 10))
-              .fontColor(CLAY)
-            Text('›')
-              .fontSize(fs(this.ts, 11))
-              .fontColor(CLAY)
-          }
-        }
-        .alignItems(HorizontalAlign.Start)
-        .layoutWeight(1)
-        .padding(12)
-        .backgroundColor('rgba(255,255,255,0.72)')
-        .borderRadius(12)
-        .border({ width: 1, color: LINE })
-        .onClick((): void => {
-          router.pushUrl({ url: 'pages/ColorPage' });
-        })
-      }
-      .width('100%')
-
-      Row() {
-        Column({ space: 6 }) {
-          Text('3D文物工坊')
-            .fontSize(fs(this.ts, 15))
-            .fontWeight(FontWeight.Bold)
-            .fontColor(INK)
-            .letterSpacing(2)
+          this.workTitle('3D工坊')
           Text('转一转 · 看黄河流域器物的釉色与纹样')
             .fontSize(fs(this.ts, 10))
             .fontColor(SUB)
@@ -366,11 +348,7 @@ export struct StudioPage {
 
       Row() {
         Column({ space: 6 }) {
-          Text('黄河沙盘')
-            .fontSize(fs(this.ts, 15))
-            .fontWeight(FontWeight.Bold)
-            .fontColor(INK)
-            .letterSpacing(2)
+          this.workTitle('黄河沙盘')
           Text('拖时间轴推演四段河史：治水 · 漕运 · 改道 · 安澜')
             .fontSize(fs(this.ts, 10))
             .fontColor(SUB)
@@ -399,20 +377,19 @@ export struct StudioPage {
     .padding({ left: 14, right: 14 })
   }
 
-  // —— 选教程：分类胶囊 + 教程列表 ——
+  // —— 选教程：分类胶囊 + 教程列表，行样式与课程影像页同一段代码 ——
   @Builder
   coursePick() {
     Column({ space: 10 }) {
       Scroll() {
         Row({ space: 8 }) {
-          ForEach(CATS, (c: string, i: number): void => {
-            Text(CAT_NAMES[i])
-              .fontSize(fs(this.ts, 10.5))
-              .fontColor(this.cat === c ? PAPER : INK)
-              .backgroundColor(this.cat === c ? CLAY : 'rgba(255,255,255,0.72)')
-              .borderRadius(13)
-              .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-              .border({ width: 1, color: this.cat === c ? CLAY : LINE })
+          ForEach(CATS, (c: string): void => {
+            Text(c)
+              .fontSize(fs(this.ts, 12))
+              .fontColor(c === this.cat ? Color.White : INK)
+              .padding({ left: 14, right: 14, top: 6, bottom: 6 })
+              .borderRadius(14)
+              .backgroundColor(c === this.cat ? CLAY : $r('app.color.card_bg'))
               .onClick((): void => {
                 this.cat = c;
               })
@@ -424,61 +401,28 @@ export struct StudioPage {
       .scrollBar(BarState.Off)
       .width('100%')
 
-      Column({ space: 8 }) {
-        ForEach(ContentRepo.get().coursesOf(this.cat), (c: Course): void => {
-          Row({ space: 10 }) {
-            Column()
-              .width(56)
-              .height(70)
-              .borderRadius(9)
-              .backgroundColor(paletteOf(c.palette).base)
-              .border({ width: 1, color: LINE })
-            Column({ space: 4 }) {
-              Text(c.title)
-                .fontSize(fs(this.ts, 12))
-                .fontWeight(FontWeight.Medium)
-                .fontColor(INK)
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-              Text(c.level + ' · ' + c.minutes + ' 分钟')
-                .fontSize(fs(this.ts, 9.5))
-                .fontColor(SUB)
-              Row({ space: 4 }) {
-                Text('看教程')
-                  .fontSize(fs(this.ts, 9.5))
-                  .fontColor(CLAY)
-                Text('›')
-                  .fontSize(fs(this.ts, 10.5))
-                  .fontColor(CLAY)
-              }
-            }
-            .alignItems(HorizontalAlign.Start)
-            .layoutWeight(1)
-          }
+      if (ContentRepo.get().courses.length === 0) {
+        Column({ space: 6 }) {
+          Text('课程数据包未随包提供').fontSize(fs(this.ts, 14)).fontColor(INK)
+          Text('遗址档案与彩陶工坊不受影响').fontSize(fs(this.ts, 11)).fontColor(SUB)
+        }
+        .width('100%')
+        .padding({ left: 14, right: 14 })
+        .margin({ top: 40 })
+      } else if (this.courses().length === 0) {
+        Text('这一类暂时没有课程').fontSize(fs(this.ts, 13)).fontColor(SUB)
           .width('100%')
-          .padding(10)
-          .backgroundColor('rgba(255,255,255,0.72)')
-          .borderRadius(12)
-          .border({ width: 1, color: LINE })
-          .onClick((): void => {
-            goPlayer(c.id);
-          })
-        }, (c: Course): string => 'row_' + c.id)
+          .padding({ left: 14, right: 14 })
+          .margin({ top: 40 })
+      } else {
+        Column({ space: 8 }) {
+          ForEach(this.courses(), (c: Course, i: number): void => {
+            CourseRow({ course: c, seed: i + 1 })
+          }, (c: Course): string => 'row_' + c.id)
+        }
+        .width('100%')
+        .padding({ left: 14, right: 14 })
       }
-      .width('100%')
-      .padding({ left: 14, right: 14 })
-
-      Row({ space: 4 }) {
-        Text('打开完整教程列表')
-          .fontSize(fs(this.ts, 10))
-          .fontColor(CLAY)
-        Text('›')
-          .fontSize(fs(this.ts, 11))
-          .fontColor(CLAY)
-      }
-      .onClick((): void => {
-        goCourses();
-      })
     }
     .width('100%')
     .padding({ top: 6 })

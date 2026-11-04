@@ -317,6 +317,23 @@ export class StudioStore {
     this.save('cartLines', this.cartLines);
   }
 
+  // 商品包换过一批时，本机存的旧 id 已经点不到东西，却还在清单数字里凑数。
+  // 启动时拿现在的商品表过一遍，对不上的直接抹掉。
+  pruneGoods(alive: string[]): void {
+    let lk = this.likes.filter((x: string): boolean => alive.indexOf(x) >= 0);
+    let ct = this.cart.filter((x: string): boolean => alive.indexOf(x) >= 0);
+    let cl = this.cartLines.filter((l: CartLine): boolean => alive.indexOf(l.id) >= 0);
+    if (lk.length === this.likes.length && ct.length === this.cart.length && cl.length === this.cartLines.length) {
+      return;
+    }
+    this.likes = lk;
+    this.cart = ct;
+    this.cartLines = cl;
+    this.save('likes', this.likes);
+    this.save('cart', this.cart);
+    this.save('cartLines', this.cartLines);
+  }
+
   isFollowed(nick: string): boolean {
     return this.followed.indexOf(nick) >= 0;
   }
@@ -334,6 +351,20 @@ export class StudioStore {
   markPostRead(id: string): void {
     if (this.readPosts.indexOf(id) < 0) {
       this.readPosts.push(id);
+      this.save('readPosts', this.readPosts);
+    }
+  }
+
+  // 首页邮件角标：点进去就把整条动态流一次标完，只落一次盘，不一条条写
+  markFeedRead(ids: string[]): void {
+    let added = 0;
+    for (let id of ids) {
+      if (this.readPosts.indexOf(id) < 0) {
+        this.readPosts.push(id);
+        added++;
+      }
+    }
+    if (added > 0) {
       this.save('readPosts', this.readPosts);
     }
   }

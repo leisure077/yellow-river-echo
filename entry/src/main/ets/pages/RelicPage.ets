@@ -13,7 +13,7 @@ class RelicBridge {
 // 增减文物或调整顺序时要一起改，否则路由带进来的 id 会被打回第一件
 const MAX_RELIC_ID: number = 5;
 
-// 3D文物工坊：网页只负责转模型，ArkWeb 把 rawfile 挂在同一个 https 源下，
+// 3D工坊：网页只负责转模型，ArkWeb 把 rawfile 挂在同一个 https 源下，
 // 这样 ES module 的 import、GLB 的 fetch 和宿主的本地文件是同一套路径。
 @Entry
 @Component

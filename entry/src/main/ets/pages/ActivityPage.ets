@@ -498,7 +498,7 @@ struct ActivityPage {
   prizeCard(g: Goods) {
     Column({ space: 10 }) {
       Column() {
-        ArtCover({ palette: g.palette, shape: 'box', seed: this.dice, label: g.cat })
+        ArtCover({ palette: g.palette, shape: 'box', seed: this.dice, label: g.cat, img: g.img })
       }
       .width('100%')
       .height(150)

@@ -9,8 +9,8 @@ interface ChipArg {
   act: () => void;
 }
 
-// 「观文物」查询面板：搜索 + 分类 / 年代 / 颜色三组多选，结果两列排开，点卡片浮出文物小传。
-// 做成组件而不是页面，是因为创意工坊把它放在顶栏第一个页签里；条目都是随包通识数据，不指认馆藏实物。
+// 「观文物」查询面板：搜索 + 分类 / 年代多选、颜色单选，结果两列排开，点卡片浮出文物小传。
+// 做成组件而不是页面，是因为数字文物把它放在顶栏第一个页签里；条目与照片都随包，见 RelicRepo。
 @Component
 export struct RelicBrowser {
   @StorageLink('textScale') ts: number = 1;
@@ -86,7 +86,8 @@ export struct RelicBrowser {
       Text(c.name).fontSize(fs(this.ts, 9)).fontColor(this.colors.indexOf(c.key) >= 0 ? CLAY : SUB)
     }
     .onClick((): void => {
-      this.colors = this.flip(this.colors, c.key);
+      // 颜色只单选：点一个顶掉上一个，再点同一个才取消
+      this.colors = this.colors.indexOf(c.key) >= 0 ? [] : [c.key];
     })
   }
 
@@ -94,7 +95,7 @@ export struct RelicBrowser {
   relicCell(r: Relic, i: number) {
     Column({ space: 5 }) {
       Column() {
-        ArtCover({ palette: r.palette, shape: r.shape, seed: i + 1, label: r.cat })
+        ArtCover({ palette: r.palette, shape: r.shape, seed: i + 1, label: r.cat, img: r.img })
       }
       .width('100%').height(104).borderRadius(10).clip(true)
 
@@ -139,7 +140,7 @@ export struct RelicBrowser {
       Column({ space: 10 }) {
         Column() {
           ArtCover({ palette: this.openRelic()!.palette, shape: this.openRelic()!.shape,
-            seed: 3, label: this.openRelic()!.cat })
+            seed: 3, label: this.openRelic()!.cat, img: this.openRelic()!.img })
         }
         .width(150).height(150).borderRadius(14).clip(true)
 
@@ -166,6 +167,11 @@ export struct RelicBrowser {
             Text(RelicRepo.get().colorName(this.openRelic()!.palette)).fontSize(fs(this.ts, 12)).fontColor(INK)
           }
           .width('100%')
+          Row() {
+            Text('藏地').fontSize(fs(this.ts, 11)).fontColor(SUB).width(44)
+            Text(this.openRelic()!.hold).fontSize(fs(this.ts, 12)).fontColor(INK).layoutWeight(1)
+          }
+          .width('100%').alignItems(VerticalAlign.Top)
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
@@ -216,7 +222,7 @@ export struct RelicBrowser {
 
         Scroll() {
           Column({ space: 12 }) {
-            // 筛选栏：分类 / 年代 / 颜色三组，组内多选，组间取交集
+            // 筛选栏：分类 / 年代组内多选，颜色只单选，组间取交集
             Column({ space: 8 }) {
               this.groupHead('分类')
               Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {

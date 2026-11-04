@@ -73,8 +73,10 @@ struct GoodsDetailPage {
   @Builder
   shot(i: number) {
     Column() {
+      // 实拍图只有一张，不再假装有正面/侧面/细节三个角度
       ArtCover({ palette: this.g!.palette, shape: this.shapeOf(this.g!.id), seed: i + 1,
-        label: ANGLES[i % ANGLES.length] })
+        img: this.g!.img,
+        label: this.g!.img.length > 0 ? '' : ANGLES[i % ANGLES.length] })
     }
     .width('100%')
     .height(320)
@@ -124,12 +126,16 @@ struct GoodsDetailPage {
         Stack({ alignContent: Alignment.TopStart }) {
           Swiper() {
             this.shot(0)
-            this.shot(1)
-            this.shot(2)
+            if (this.g!.img.length === 0) {
+              this.shot(1)
+              this.shot(2)
+            }
           }
           .width('100%')
           .height(320)
           .loop(false)
+          // 只剩一张实拍图时别再挂一个翻页圆点
+          .indicator(this.g!.img.length === 0)
 
           Text('‹ 返回')
             .fontSize(fs(this.ts, 14))
@@ -214,8 +220,7 @@ struct GoodsDetailPage {
                   StudioStore.get().toggleLike(this.g!.id);
                 })
 
-              // 这颗是进清单的，跟旁边那颗「点赞」不是一回事，别都写成收藏
-              Text(this.inCart() ? '✓ 已入清单' : '＋ 加清单')
+              Text(this.inCart() ? '♥ 已收藏' : '♡ 收藏')
                 .fontSize(fs(this.ts, 12))
                 .fontColor(this.inCart() ? CLAY : INK)
                 .padding({ left: 12, right: 12, top: 7, bottom: 7 })

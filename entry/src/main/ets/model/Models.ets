@@ -120,6 +120,8 @@ export interface Goods {
   likes: number;
   tags: string[];
   palette: string;
+  // 有实拍图就走图，留空才让 ArtCover 现画
+  img: string;
   spec: SpecKV[];
   story: string;
   source: string;

@@ -225,7 +225,7 @@ struct RelicTile {
   }
 }
 
-// 首页照故宫式排布：通栏海报 → 「黄河续响平台」大卡（实景打卡 / 创意工坊双卡 + 我的档案行）
+// 首页照故宫式排布：通栏海报 → 「黄河续响平台」大卡（实景打卡 / 数字文物双卡 + 我的档案行）
 // → 八枚功能印章宫格（两排，一排四枚）→ 为你推荐 → 文创市集。被四段版收掉的入口（测验、课程、
 // 知识网络）全部在宫格里回来，另加行程与颜色两个新工坊。河工、同步两枚已撤出首页，
 // 侧栏里仍然进得去。
@@ -252,7 +252,7 @@ export struct HomeView {
 
   aboutToAppear(): void {
     this.reload();
-    // 创意工坊卡里的中央文物缓摆，暗示进去是个能转的 3D 展台
+    // 数字文物卡里的中央文物缓摆，暗示进去是个能转的 3D 展台
     animateTo({
       duration: 5200, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
@@ -318,6 +318,15 @@ export struct HomeView {
     return StudioStore.get().unread(ContentRepo.get().feed().length);
   }
 
+  // 点开邮件图标就当这一屏动态都看过了，角标跟着收掉
+  readFeed(): void {
+    let ids: string[] = [];
+    for (let p of ContentRepo.get().feed()) {
+      ids.push(p.id);
+    }
+    StudioStore.get().markFeedRead(ids);
+  }
+
   doSearch(): void {
     goList(this.kw, '', '', '');
   }
@@ -337,7 +346,7 @@ export struct HomeView {
       { kind: 'seal', title: '河图洛书', act: (): void => { goCheckin(); } },
       { kind: 'route', title: '行程规划', act: (): void => { goRoute(); } },
       { kind: 'lantern', title: '沿河活动', act: (): void => { this.openFirstEvent(); } },
-      { kind: 'pot', title: '创意工坊', act: (): void => { goStudio(1); } },
+      { kind: 'pot', title: '数字文物', act: (): void => { goStudio(1); } },
       { kind: 'slips', title: '趣味自测', act: (): void => { goQuiz('home'); } },
       { kind: 'net', title: '知识网络', act: (): void => { goTopic(); } },
       { kind: 'brush', title: '收藏笔记', act: (): void => { goArchive(1); } }
@@ -427,6 +436,7 @@ export struct HomeView {
       .width(32)
       .height(32)
       .onClick((): void => {
+        this.readFeed();
         switchTab(2);
       })
     }
@@ -633,17 +643,17 @@ export struct HomeView {
     })
   }
 
-  // 创意工坊入口卡：整卡一个入口，卡里三件文物做微缩 3D 展台（中央件缓摆），
+  // 数字文物入口卡：整卡一个入口，卡里三件文物做微缩 3D 展台（中央件缓摆），
   // 底色调成纸色让文物边缘自然融进卡面，点整卡进展台页
   @Builder
   workshopCard() {
     Column({ space: 6 }) {
-      Text('创意工坊')
+      Text('数字文物')
         .fontSize(fs(this.ts, 15))
         .fontColor(INK)
         .fontWeight(FontWeight.Bold)
         .letterSpacing(1)
-      Text('3D 展台 · 陶艺 · 教程')
+      Text('3D 展台 · 彩陶 · 教程')
         .fontSize(fs(this.ts, 9))
         .fontColor(SUB)
       Stack({ alignContent: Alignment.Center }) {
@@ -851,12 +861,12 @@ export struct HomeView {
     .alignItems(HorizontalAlign.Start)
   }
 
-  // 文创市集：商品没有实拍图，用程序化封面顶上
+  // 文创市集：商品有实拍图就贴图，没图的才让 ArtCover 现画
   @Builder
   shopCard(g: Goods, i: number) {
     Column({ space: 5 }) {
       Column() {
-        ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 2, label: g.cat })
+        ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 2, label: g.cat, img: g.img })
       }
       .width('100%')
       .height(104)

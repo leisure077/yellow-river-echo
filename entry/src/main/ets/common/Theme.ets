@@ -134,6 +134,61 @@ export function paletteOf(key: string): Palette {
   return p === undefined ? (PALETTES.get('yangshao') as Palette) : p;
 }
 
+// 六色的演示口径称呼 + 一句话说法：色名跟着 PALETTES 的键走，
+// 数字文物展台下方那行字取的就是这一份。
+export interface ColorRow {
+  key: string;
+  name: string;
+  era: string;
+  saying: string;
+}
+
+const COLOR_ROWS: ColorRow[] = [
+  { key: 'yangshao', name: '仰韶红', era: '仰韶', saying: '彩陶的底色，是黄河泥在窑火里烧出来的红。' },
+  { key: 'longshan', name: '龙山黑', era: '龙山', saying: '黑陶靠渗碳烧成，黑得发亮，薄得透光。' },
+  { key: 'xiashang', name: '夏商青绿', era: '夏商', saying: '青铜刚铸出来是亮的青绿，锈了才沉成现在这样。' },
+  { key: 'zhou', name: '周玉色', era: '周', saying: '玉色是礼器的底子，温而不艳，压得住场面。' },
+  { key: 'hantang', name: '汉唐赭黄', era: '汉唐', saying: '赭黄是三彩釉里的主色，铅釉在火里流得开。' },
+  { key: 'song', name: '宋天青', era: '宋', saying: '天青是"雨过天晴云破处"的那一层青。' }
+];
+
+export function colorRowOf(key: string): ColorRow {
+  for (let r of COLOR_ROWS) {
+    if (r.key === key) {
+      return r;
+    }
+  }
+  return COLOR_ROWS[0];
+}
+
+// #RRGGBB → rgba(...)。转台给灰模帧罩釉色要用带透明度的色：
+// ArkUI 的 Canvas 只支持 Porter-Duff 十一种混合，没有 multiply，压暗提亮只能靠
+// 「半透明色 + source-atop」，灰模的明暗才透得出来。传进非 # 开头的值就原样返回。
+export function withAlpha(hex: string, a: number): string {
+  if (hex.length !== 7 || !hex.startsWith('#')) {
+    return hex;
+  }
+  let r = parseInt(hex.substring(1, 3), 16);
+  let g = parseInt(hex.substring(3, 5), 16);
+  let b = parseInt(hex.substring(5, 7), 16);
+  // alpha 一律写成 0~1 的小数：rgba() 的第四个分量按 CSS 口径是比例，
+  // 填 0~255 会被当成大于 1 直接夹成完全不透明，透明度看着就“没生效”。
+  let al = Math.round(Math.max(0, Math.min(1, a)) * 1000) / 1000;
+  return `rgba(${r},${g},${b},${al})`;
+}
+
+// #RRGGBB → 感知亮度（Rec.601 加权，0~255）。转台罩釉色时用它判断这套釉有多深：
+// 灰模是固定亮度的底，越深的釉越要压得实，否则黑陶罩出来变灰陶。
+export function hexLum(hex: string): number {
+  if (hex.length !== 7 || !hex.startsWith('#')) {
+    return 128;
+  }
+  let r = parseInt(hex.substring(1, 3), 16);
+  let g = parseInt(hex.substring(3, 5), 16);
+  let b = parseInt(hex.substring(5, 7), 16);
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
 export function eraPalette(era: string): string {
   if (era === '龙山') {
     return 'longshan';

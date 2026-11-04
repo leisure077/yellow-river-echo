@@ -1,4 +1,5 @@
 import { bundleManager, common } from '@kit.AbilityKit';
+import { Goods } from '../model/Models';
 import { SiteRepo } from './SiteRepo';
 import { ContentRepo } from './ContentRepo';
 import { MemoryStore } from './MemoryStore';
@@ -24,6 +25,8 @@ export class Boot {
     await ContentRepo.get().load(ctx);
     await MemoryStore.get().init(ctx);
     await StudioStore.get().init(ctx);
+    // 商品表换过一批，先把本机对旧商品的引用清掉，免得清单数字和列表对不上
+    StudioStore.get().pruneGoods(ContentRepo.get().goods.map((g: Goods): string => g.id));
     await AiStore.get().init(ctx);
     await SyncService.get().init(ctx, bn);
     Boot.done = true;

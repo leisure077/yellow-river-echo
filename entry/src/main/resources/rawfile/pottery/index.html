@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+  彩陶工坊 · 真 3D 主路径的外壳页。
+  控件全在 ArkTS 那一侧（PotteryPage 的五维按钮），这里只留一块 3D 舞台：
+  下面那张 2D 画布铺纸底和展示座，上面这张 WebGL 画布只画器物本身（器身以外全透明），
+  两层叠起来才和降级转台那张 Canvas 是同一个构图。
+  参数走 URL query 进来，之后由 ArkTS 调 window.__pot.set(...) 更新。
+-->
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>彩陶 3D</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    /* 拖动旋转吃掉的是 pointer 事件，不能让页面跟着滚走 */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  #bg, #gl {
+    position: absolute;
+    display: block;
+  }
+  #bg {
+    left: 0;
+    top: 0;
+    z-index: 1;
+  }
+  #gl {
+    z-index: 2;
+  }
+  /* stage 只是个定位用的空壳：宽高由 fit() 按 512:640 锁死并居中 */
+  #stage {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+  }
+  #err {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    z-index: 3;
+    display: none;
+    font: 12px/1.5 sans-serif;
+    color: #6b3f2a;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<canvas id="bg"></canvas>
+<canvas id="gl"></canvas>
+<div id="err"></div>
+<script type="module">
+  // 模块加载失败（rawfile 缺文件、语法错误）时页面上得有个交代，
+  // 宿主那边只能等到超时，看不到具体是哪一步炸了
+  window.addEventListener('error', (e) => {
+    const box = document.getElementById('err');
+    if (box) {
+      box.style.display = 'block';
+      box.textContent = '3D 页异常：' + (e.message || e.type);
+    }
+    window.__potErr = String(e.message || e.type);
+  });
+  import('./pottery.js').catch((e) => {
+    const box = document.getElementById('err');
+    if (box) {
+      box.style.display = 'block';
+      box.textContent = '3D 页加载失败：' + String(e && e.message ? e.message : e);
+    }
+    window.__potErr = String(e && e.message ? e.message : e);
+    if (window.Native && typeof window.Native.setMode === 'function') {
+      window.Native.setMode('fallback');
+    }
+  });
+</script>
+</body>
+</html>

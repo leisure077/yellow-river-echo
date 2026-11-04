@@ -274,7 +274,7 @@ export struct MineView {
   @Builder
   goodCell(g: Goods, idx: number) {
     Column({ space: 4 }) {
-      ArtCover({ palette: g.palette, shape: 'box', seed: idx, label: '' })
+      ArtCover({ palette: g.palette, shape: 'box', seed: idx, label: '', img: g.img })
         .width('100%').aspectRatio(1).borderRadius(10)
       Text(g.name).fontSize(fs(this.ts, 12)).fontColor(INK).maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis }).width('100%')

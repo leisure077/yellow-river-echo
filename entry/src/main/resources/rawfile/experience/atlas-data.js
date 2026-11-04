@@ -72,16 +72,12 @@ const mapSources = {
   qicheng: { name: '豫台视窗 · 戚城遗址', url: 'https://ytsc.rootinhenan.gov.cn/sitesources/ytsc/page_pc/hnly/fjms/article683e56795f2b40aeb6efad34a6f4875e.html' },
   museums: { name: '文化和旅游部 · 黄河文化博物馆群', url: 'https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/hn/202410/t20241023_955851.html' }
 };
-const panoramas = {
-  longmen: { title:'云上龙门 · 官方全景漫游', url:'https://demo4.museumcloud.com.cn/vrs/01', credit:'龙门石窟研究院；由景区官网“全景龙门”链接提供。实拍历史影像，非实时画面。' },
-  kaifeng: { title:'开封铁塔 · 实拍全景', url:'https://www.360cities.net/zh/image/kaifeng-tower-park-4-henan?pano_detail=true&portfolio_view=false', credit:'360Cities / Jacky Cheng；2007 年拍摄。以原站页面查看，图片版权归作者，非实时画面。' }
-};
 // site + uv：落在景区手绘图上的位置，u 自西向东、v 自北向南，均为 0~1 图幅比例（示意）。
 const mapPOIs = [
   { id:'hangu', name:'函谷关', city:'三门峡', cat:'建筑', x:260, y:245, lng:110.860, lat:34.550, site:'hangu', uv:[0.48,0.42], source:'hangu', intro:'位于灵宝的历史文化景区，以关隘文化和老子文化为主题。公开资料列有函谷关城楼、太初宫、道德天书等景点。', demo:false },
-  { id:'longmen', name:'龙门石窟', city:'洛阳', cat:'建筑', x:800, y:495, lng:112.466, lat:34.556, site:'longmen', uv:[0.46,0.42], source:'longmen', panorama:'longmen', intro:'龙门石窟位于洛阳，景区包括西山石窟、东山石窟、香山寺和白园。可从官方“云上龙门”进入实拍全景漫游。', demo:false },
+  { id:'longmen', name:'龙门石窟', city:'洛阳', cat:'建筑', x:800, y:495, lng:112.466, lat:34.556, site:'longmen', uv:[0.46,0.42], source:'longmen', intro:'龙门石窟位于洛阳，景区包括西山石窟、东山石窟、香山寺和白园。', demo:false },
   { id:'emperors', name:'炎黄二帝塑像', city:'郑州', cat:'建筑', x:285, y:795, lng:113.470, lat:34.950, site:'yellowriver', uv:[0.48,0.42], source:'zhengzhou', intro:'郑州黄河文化公园的代表性景观。公园位于黄河之滨，公开资料还列有五龙峰、岳山寺、大禹山、星海湖等景区。', demo:false },
-  { id:'iron-tower', name:'开封铁塔', city:'开封', cat:'建筑', x:790, y:1110, lng:114.375, lat:34.812, site:'tieta', uv:[0.48,0.30], source:'kaifeng', panorama:'kaifeng', intro:'建于北宋皇祐元年（1049 年）的琉璃塔。褐色琉璃砖呈铁色，是开封具有代表性的历史建筑。', demo:false },
+  { id:'iron-tower', name:'开封铁塔', city:'开封', cat:'建筑', x:790, y:1110, lng:114.375, lat:34.812, site:'tieta', uv:[0.48,0.30], source:'kaifeng', intro:'建于北宋皇祐元年（1049 年）的琉璃塔。褐色琉璃砖呈铁色，是开封具有代表性的历史建筑。', demo:false },
   { id:'qicheng', name:'戚城遗址', city:'濮阳', cat:'建筑', x:285, y:1350, lng:115.020, lat:35.760, site:'qicheng', uv:[0.50,0.50], source:'qicheng', intro:'濮阳的全国重点文物保护单位，地上可见古城残垣，地下保存多个历史时期的遗存。图中土垣为艺术化表现。', demo:false },
   { id:'miaodigou', name:'庙底沟仰韶文化博物馆', city:'三门峡', cat:'展览', x:345, y:345, lng:111.170, lat:34.780, source:'museums', intro:'河南黄河文化博物馆群中的文化展示场馆，聚焦仰韶文化。此处提供场馆文化入口，不发布未经核验的临展与开放时间。', demo:false },
   { id:'erlitou', name:'二里头夏都遗址博物馆', city:'洛阳', cat:'展览', x:695, y:610, lng:112.720, lat:34.600, source:'museums', intro:'位于洛阳的遗址博物馆，是了解早期王朝文化的窗口。长卷位置仅用于展示，不表示与龙门石窟相邻。', demo:false },

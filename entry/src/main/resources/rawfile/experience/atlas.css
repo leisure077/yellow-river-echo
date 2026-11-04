@@ -22,8 +22,6 @@ header h1{font-size:22px;letter-spacing:2px}header button{padding:8px 12px}
 .sheet>section{animation:sheetRise .25s ease-out;box-shadow:0 -10px 40px #362e2220}.sheet p{line-height:1.8;font-size:14px}
 @keyframes sheetRise{from{transform:translateY(40px);opacity:.3}to{transform:translateY(0);opacity:1}}
 .poi-heading h2{margin:8px 0 16px}.poi-heading small{letter-spacing:1px}
-.pano-open,.pano-link{display:block;text-align:center;background:#307b77;color:#fff;padding:15px 18px;border-radius:26px;width:100%;text-decoration:none}
-.pano-unavailable{background:#eee8d9;border-radius:12px;padding:12px;color:#897957;font-size:12px!important}
 details{margin-top:18px;padding-top:14px;border-top:1px solid #ddd2bc;color:#91816b;font-size:12px}.source-url{word-break:break-all;font-size:10px}
 .saved-place{display:block;background:#fffaf0;color:#64523c;border:1px solid #e1d4b8;border-radius:12px;width:100%;text-align:left;margin:10px 0}
 .discover-strip{display:flex;gap:12px;padding:14px 16px}.discover-strip button{display:grid;gap:7px;flex:1;text-align:left;background:#e9dfc9;color:#675232;border-radius:15px;padding:16px}.discover-strip span{font-size:11px}.empty-map{font-size:12px;text-align:center;color:#8e7960;padding:10px}
@@ -77,12 +75,6 @@ details{margin-top:18px;padding-top:14px;border-top:1px solid #ddd2bc;color:#918
 .route-acts .ghost{background:#fff;color:#8a7355;border:1px solid #decca8}
 .route-acts .primary{background:#a8823c;color:#fff8e8}
 .route-new{display:block;width:100%;height:50px;margin-top:14px;border-radius:16px;border:1px dashed #b98f43;background:#fffaf3;color:#8a6a2f;font-size:15px}
-
-/* 360° 实景全屏层 */
-#hhPano{position:fixed;inset:0;z-index:9999;display:none;background:#101010}
-#hhPanoView{position:absolute;inset:0}
-#hhPanoTip{position:absolute;left:0;right:0;bottom:26px;text-align:center;color:#fff8e8;font-size:13px;text-shadow:0 1px 4px #000}
-#hhPanoClose{position:absolute;top:18px;right:16px;z-index:10000;padding:8px 14px;border:0;border-radius:18px;background:#ffffffd9;color:#4a3a26;font-size:13px}
 body.night header h1{color:#392d27}
 .footprint-places{margin:16px 0;display:grid;gap:8px}
 .footprint-places details{border:1px solid #a995663d;border-radius:12px;padding:12px;background:#112631}

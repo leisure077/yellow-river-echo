@@ -13,7 +13,7 @@ function layoutAtlasPins(){
   const x=p.x*scale+offset.x,y=p.y*scale+offset.y,w=Math.max(138,p.name.length*24+30);
   const hidden=p.id!==selectedPOI&&boxes.some(b=>Math.abs(b.x-x)<(b.w+w)/2+10&&Math.abs(b.y-y)<110);
   node.style.visibility=hidden?'hidden':'visible';
-  node.querySelector('.pin-pop')?.setAttribute('transform',`scale(${1/scale})`);
+  node.querySelector('.pin-scale')?.setAttribute('transform',`scale(${1/scale})`);
   if(!hidden)boxes.push({x,y,w});
  }
 }
@@ -50,7 +50,7 @@ const seasonStyle=document.createElement('style');seasonStyle.textContent=`
 .season-button{position:absolute;left:12px;bottom:15px;width:60px;height:60px;padding:0;border-radius:50%;background:#fff9e9ed;color:#725733;border:2px solid #d5c39b;box-shadow:0 3px 14px #463b3430;z-index:6;font-size:12px}
 .atlas-map .map-caption{left:83px;bottom:18px}.atlas-map .zoom-tools{bottom:90px}
 #rasterTiles{transition:filter .8s ease}
-#mapScene .pin-pop{animation:none!important;transform-origin:0 0}
+#mapScene .pin-scale{transform-origin:0 0}
 .atlas-title{display:none!important}
 .season-weather{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2}
 .season-weather i{position:absolute;top:-10px;width:6px;height:9px;border-radius:70% 10% 70% 10%;background:#f2b7c6;animation:seasonFall linear infinite}

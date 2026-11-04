@@ -1,10 +1,14 @@
 # 探测：Dify 流式回答里是否混着推理文本（<think> 标签被 App 剥掉后剩下的裸文本）
 import json, re, sys, urllib.request
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+
 sys.stdout.reconfigure(encoding='utf-8')
 
-BASE = 'http://127.0.0.1/v1'
-KEY = open('.tmp/app_key.txt', encoding='utf-8').read().strip()
+BASE = hh_env.base()
+KEY = hh_env.app_key()
 
 CASES = [
     ('庙底沟', '庙底沟遗址有什么值得看的，我想给孩子讲彩陶'),

@@ -24,22 +24,31 @@ def exact(needle):
 
 
 def ensure_fullscreen():
-    """走到河小导全屏页。
-    注意不能用 keyEvent 2 当"收键盘"：在首页/悬浮窗上按返回会把页面直接退掉，
-    实测就这样把输入打进首页顶栏的搜索框，一句也没发出去。
+    """走到河小导全屏页，模拟器刚开机停在首页也能自己走进去。
+    两个坑都实测过：
+      - keyEvent 2 是「返回」，在首页/悬浮窗上按下去会把页面直接退掉，
+        所以收键盘这一手只在已经确认在河小导页（屏上有 设置）时才允许用；
+      - 首页右上角的入口和全屏页的发送键都叫「问」，只能靠位置分开：
+        入口在顶上（cy<400），发送键在底下（cy>2400）。
     """
-    for _ in range(4):
+    for _ in range(6):
         ins = ui.inputs()
-        if exact("设置") and ins and ins[-1][3] > 2400:
+        on_page = exact("设置") is not None
+        if on_page and ins and ins[-1][3] > 2400:
             return True
         g = ui.by_text("去全屏")
-        if g:
+        if g:                                     # 助手悬浮卡片：先进全屏
             ui.tap(g[2], g[3])
             time.sleep(1.2)
             continue
-        if ins and ins[-1][3] <= 2400:          # 键盘弹着，输入行被顶到上面
-            ui.sh("uitest uiInput keyEvent Back")
+        if on_page and ins and ins[-1][3] <= 2400:
+            ui.sh("uitest uiInput keyEvent Back")  # 键盘把输入行顶到上面了，先收键盘
             time.sleep(1.0)
+            continue
+        q = exact("问")
+        if q and q[3] < 400:                       # 首页右上角的入口
+            ui.tap(q[2], q[3])
+            time.sleep(1.2)
             continue
         return False
     return False

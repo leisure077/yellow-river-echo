@@ -3,8 +3,13 @@
 """
 import io, json, sys, threading, time, urllib.request
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+
 sys.stdout.reconfigure(encoding='utf-8')
-KEY = io.open('.tmp/app_key.txt', encoding='utf-8').read().strip()
+KEY = hh_env.app_key()
+BASE = hh_env.base()
 DUR = float(sys.argv[1]) if len(sys.argv) > 1 else 40
 N = int(sys.argv[2]) if len(sys.argv) > 2 else 6
 
@@ -17,7 +22,7 @@ def fire(i):
     while time.time() < stop:
         body = json.dumps({'inputs': {}, 'query': '第%d次压力请求 %d' % (i, time.time()),
                            'response_mode': 'blocking', 'user': 'flood-%d' % i}).encode()
-        req = urllib.request.Request('http://127.0.0.1/v1/chat-messages', data=body, headers={
+        req = urllib.request.Request(BASE + '/chat-messages', data=body, headers={
             'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json'})
         try:
             urllib.request.urlopen(req, timeout=90).read()

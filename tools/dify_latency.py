@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """量一下 Dify 侧流式问答的首字延迟 / 分片手感。
 只读：向 /v1/chat-messages 发 streaming 请求，统计每个 event 的时间戳。
-凭证从 .tmp/app_key.txt 读，绝不打印。
+地址与凭证走 hh_env：HH_DIFY_BASE/HH_APP_KEY > .tmp/app_key.txt > 本机 Dify 库，绝不打印。
 """
 import json
 import ssl
@@ -9,8 +9,12 @@ import sys
 import time
 import urllib.request
 
-BASE = "http://127.0.0.1/v1"
-KEY = open(".tmp/app_key.txt", encoding="utf-8").read().strip()
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+
+BASE = hh_env.base()
+KEY = hh_env.app_key()
 
 QUERIES = [
     ("遗址", "二里头遗址有什么值得看的？", ""),

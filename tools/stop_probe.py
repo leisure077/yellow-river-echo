@@ -5,23 +5,27 @@ uitest uiInput inputText 会拉起软键盘，输入行会被顶到上面去，
 固定坐标会点到键盘上，所以这里每次都从 dumpLayout 现查按钮中心。
 """
 import json
+import os
 import subprocess
 import sys
 import time
 
-HDC = r"C:/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/toolchains/hdc.exe"
-DEV = "127.0.0.1:5555"
-DUMP = r"C:\Users\16078\Desktop\hunxiao\demo01\.tmp\ui_dump.json"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # hdc 在哪、连哪台设备：环境变量 > 自动探测 > 明确报错
+
+DUMP = os.path.join(hh_env.ROOT, ".tmp", "stop_probe_dump.json")
 
 
 def run_shell(cmd):
-    return subprocess.run([HDC, "-t", DEV, "shell", cmd],
+    return subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "shell", cmd],
                           capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
 
 
 def tree():
     run_shell("uitest dumpLayout -p /data/local/tmp/ui.json")
-    subprocess.run([HDC, "-t", DEV, "file", "recv", "/data/local/tmp/ui.json", DUMP], capture_output=True)
+    os.makedirs(os.path.dirname(DUMP), exist_ok=True)
+    subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "file", "recv",
+                    "/data/local/tmp/ui.json", DUMP], capture_output=True)
     return json.load(open(DUMP, encoding="utf-8"))
 
 

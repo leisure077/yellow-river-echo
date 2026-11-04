@@ -1,12 +1,16 @@
 """直连智谱测首字延迟：对每个候选模型发一次流式请求，记录 TTFT / 总耗时 / 输出字数。
-只读操作，不改任何配置。Key 从 .tmp/zhipu_key.txt 读取，不打印。
+只读操作，不改任何配置。Key 走 hh_env（HH_ZHIPU_KEY > .tmp/zhipu_key.txt），不打印。
 """
 import io
 import json
 import time
 import urllib.request
 
-KEY = io.open('.tmp/zhipu_key.txt', encoding='utf-8').read().strip()
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+
+KEY = hh_env.zhipu_key()
 URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
 
 SYSTEM = '你是「黄河续响」平台的文化向导「河小导」，用中文口语回答，简短准确。'

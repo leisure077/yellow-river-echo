@@ -19,27 +19,30 @@
   appKey 省略时从本机 Dify 的 api_tokens 表里取，不落盘、不打印。
 """
 import json
+import os
 import re
 import subprocess
 import sys
 import time
 
-HDC = r"C:/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/toolchains/hdc.exe"
-DEV = "127.0.0.1:5555"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # hdc 路径、设备号、Dify Key 都按"环境变量 > 探测 > 报错"取，不写死
+
 PREFS = "/data/app/el2/100/base/com.example.demo01/haps/entry/preferences/hh_ai"
 
 
 def sh(args):
-    r = subprocess.run([HDC, "-t", DEV, "shell", args],
-                       capture_output=True, text=True, encoding="utf-8", errors="replace")
-    return (r.stdout or "") + (r.stderr or "")
+    return hh_env.shell(args)
 
 
 def rows():
     """dumpLayout 后返回 [(text, type, cx, cy)]，坐标一律取控件自己的 bounds 中心。"""
     sh("uitest dumpLayout -p /data/local/tmp/ui.json")
-    local = ".tmp/ui_dump.json"
-    subprocess.run([HDC, "-t", DEV, "file", "recv", "/data/local/tmp/ui.json", local],
+    local = os.path.join(hh_env.ROOT, ".tmp", "ui_dump.json")
+    os.makedirs(os.path.dirname(local), exist_ok=True)
+    os.makedirs(os.path.dirname(local), exist_ok=True)
+    subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "file", "recv",
+                    "/data/local/tmp/ui.json", local],
                    capture_output=True, text=True, encoding="utf-8", errors="replace")
     out = []
 
@@ -141,9 +144,9 @@ def main():
     base = sys.argv[1]
     key = sys.argv[2] if len(sys.argv) > 2 else None
     if key is None:
-        key = subprocess.run(["docker", "exec", "docker-db_postgres-1", "psql", "-U", "postgres",
-                              "-d", "dify", "-t", "-A", "-c", "select token from api_tokens limit 1"],
-                             capture_output=True, text=True).stdout.strip()
+        # 取 Key 的顺序：HH_APP_KEY > .tmp/app_key.txt > 本机 Docker 里的 Dify 库。
+        # 取不到会直接把三种给法打印出来，不会静默用错一把。
+        key = hh_env.app_key()
     assert key.startswith("app-"), "拿到的不是 Dify 的 app- 开头 Key"
 
     # 1. 打开设置卡片

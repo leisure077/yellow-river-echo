@@ -12,14 +12,15 @@ import os
 import subprocess
 import sys
 
-HDC = r"C:/Program Files/Huawei/DevEco Studio/sdk/default/openharmony/toolchains/hdc.exe"
-DEV = "127.0.0.1:5555"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # hdc 在哪、连哪台设备：环境变量 > 自动探测 > 明确报错
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_TMP = os.path.join(ROOT, ".tmp")
 
 
 def sh(args):
-    cmd = [HDC, "-t", DEV, "shell", args] if isinstance(args, str) else [HDC, "-t", DEV, "shell"] + list(args)
+    cmd = [hh_env.hdc(), "-t", hh_env.device(), "shell"]
+    cmd += [args] if isinstance(args, str) else list(args)
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     return (r.stdout or "") + (r.stderr or "")
 
@@ -30,7 +31,8 @@ def dump(kw=None):
         print("dumpLayout failed:", out.strip()[:300])
         return []
     local = os.path.join(LOCAL_TMP, "ui_dump.json")
-    subprocess.run([HDC, "-t", DEV, "file", "recv", "/data/local/tmp/ui.json", local],
+    subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "file", "recv",
+                    "/data/local/tmp/ui.json", local],
                    capture_output=True, text=True, encoding="utf-8", errors="replace")
     data = json.load(open(local, encoding="utf-8"))
     rows = []
@@ -83,7 +85,9 @@ def main():
         name = sys.argv[2]
         sh("snapshot_display -f /data/local/tmp/s.jpeg")
         local = os.path.join(ROOT, "shots", name + ".jpeg")
-        subprocess.run([HDC, "-t", DEV, "file", "recv", "/data/local/tmp/s.jpeg", local],
+        os.makedirs(os.path.dirname(local), exist_ok=True)
+        subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "file", "recv",
+                        "/data/local/tmp/s.jpeg", local],
                        capture_output=True, text=True, encoding="utf-8", errors="replace")
         print(local, os.path.getsize(local) if os.path.exists(local) else "MISSING")
     else:

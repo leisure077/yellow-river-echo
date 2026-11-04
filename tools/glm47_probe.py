@@ -1,10 +1,14 @@
 """直连智谱验证 glm-4.7-flash：thinking 关掉之后是否还漏推理文本、首字延迟多少。
-只读探测，不改任何配置。Key 从 .tmp/zhipu_key.txt 读，不打印。
+只读探测，不改任何配置。Key 走 hh_env（HH_ZHIPU_KEY > .tmp/zhipu_key.txt），不打印。
 """
 import io, json, re, sys, time, urllib.request
 
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+
 sys.stdout.reconfigure(encoding='utf-8')
-KEY = io.open('.tmp/zhipu_key.txt', encoding='utf-8').read().strip()
+KEY = hh_env.zhipu_key()
 URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
 
 CASES = [

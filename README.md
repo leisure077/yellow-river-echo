@@ -105,6 +105,7 @@ python tools/set_dify_cfg.py "http://10.0.2.2/v1"   # 一键写进 App 设置页
 
 ```bash
 python tools/export_package.py            # 从 HEAD 导出并跑五项断言
+python tools/export_package.py --verify   # 再加第六项：把包解压到干净目录重新构建一遍（约 20 秒）
 python tools/export_package.py --ref <sha|tag>
 python tools/export_package.py --check .tmp/pkg/yellow-river-echo-src-xxxxxxx.zip
 ```
@@ -121,8 +122,11 @@ python tools/export_package.py --check .tmp/pkg/yellow-river-echo-src-xxxxxxx.zi
 4. 复现必需文件——工程配置、`AppScope/app.json5`、`entry/src/main/module.json5`、README、dify/README 少一个就判不过；
 5. 体积——只报数和最大的几项，不判分。
 
-本次自查结果（提交点 `HEAD`，脚本原样输出）：**699 个文件，zip 64.4 MB / 解压后 76.0 MB**，
-五项断言全过；并且把导出的 zip 解压到干净目录、按 §2 的命令重新构建，确认能出 hap（见 §6）。
+本次自查结果（`python tools/export_package.py --verify` 的原样输出）：**701 个文件，zip 64.4 MB /
+解压后 76.0 MB**，五项断言全过；解压到干净目录后重新构建 `BUILD SUCCESSFUL in 19 s 887 ms`，
+产出 `entry-default-unsigned.hap` 76,960,068 B，构建过程明确打印
+`Will skip sign 'hos_hap'. No signingConfigs profile is configured`（空签名配置照样能编），
+产物字节码里验到本轮新增的「测一下」「最近一次失败」「HH_AI」——编出来的就是包里这份代码。
 
 ## 6. 已知限制（提前说明，别在决赛现场解释）
 

@@ -2,8 +2,9 @@
 """把提交源码包导出这一步变成"能跑的检查"，而不是"我看过目录，挺干净的"。
 
 用法：
-    python tools/export_package.py                 # 从 HEAD 导出并验
+    python tools/export_package.py                 # 从 HEAD 导出并验五项
     python tools/export_package.py --ref <sha|tag>  # 指定要交的那个提交
+    python tools/export_package.py --verify         # 再加第六项：解压重编一遍（要 DevEco，约 20s）
     python tools/export_package.py --check <path.zip>  # 只验已有的包，不重新导
 
 为什么用 git archive 而不是复制目录：工作树里常年放着 build/、oh_modules/、.hvigor、
@@ -19,6 +20,9 @@ git archive 只按 git 索引出内容，这些天然进不去。
                     否则评委拿到包第一步就 build 失败（证书在他们机器上不存在）
   4 复现必需文件  —— 少任何一个都编不起来
   5 体积          —— 只报数，不判分（组委会没给上限时，这个数字用来自己拍板）
+  6 复现构建（--verify）—— 把包解压到干净目录，只按 README 那条命令重新编一遍，再验产物
+                    hap 里带着本轮新增的那几句。前五条只证明"包里没脏东西"，
+                    这一条才证明"它能编，而且编出来的就是包里这份代码"。
 """
 import io
 import os
@@ -241,6 +245,85 @@ def _hsize(b):
     return "%d B" % b
 
 
+# 产物里必须有这几句：本轮改的排错入口确实被打进了 hap，而不是只改了源码
+SENTINELS = ["测一下", "最近一次失败", "HH_AI"]
+BUILD_DIR = os.path.join(OUT_DIR, "buildcheck")
+
+
+def deveco_root():
+    """从 hdc 的路径倒推 DevEco Studio 安装目录。
+
+    正常安装下 hdc 落在 <DevEco>/sdk/default/openharmony/toolchains/hdc.exe，
+    往上五层就是安装根目录；不在这里写死盘符，换机器跟着 HH_HDC 走。
+    """
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import hh_env
+        p = hh_env.hdc()
+    except Exception as e:
+        raise SystemExit("认不出这台机器的 DevEco/hdc，没法做复现构建。%s" % e)
+    d = os.path.normpath(p)
+    for _ in range(5):
+        d = os.path.dirname(d)
+    return d
+
+
+def verify(path):
+    """把包解压到一个干净目录，只按 README §2 那条命令重新构建。
+
+    这一步才是"组委会可复现项目编译运行"的正面证据：前面五项断言只证明包里
+    没有脏东西，证明不了它能编。构建日志原样留着，失败时看最后二十行。
+    """
+    print("\n== 6 复现构建：解压后直接编 ==")
+    import shutil
+    if os.path.isdir(BUILD_DIR):
+        shutil.rmtree(BUILD_DIR, ignore_errors=True)
+    os.makedirs(BUILD_DIR)
+    zipfile.ZipFile(path).extractall(BUILD_DIR)
+    n = sum(len(f) for _, _, f in os.walk(BUILD_DIR))
+    print("已解压 %d 个文件到 %s" % (n, BUILD_DIR))
+
+    dev = deveco_root()
+    node = os.path.join(dev, "tools", "node", "node.exe" if os.name == "nt" else "node")
+    wjs = os.path.join(dev, "tools", "hvigor", "bin", "hvigorw.js")
+    for p, what in ((node, "node"), (wjs, "hvigorw.js")):
+        if not os.path.exists(p):
+            raise SystemExit("DevEco 里找不到 %s（%s）；请确认 DevEco 根目录是 %s" % (what, p, dev))
+    env = dict(os.environ, DEVECO_SDK_HOME=os.path.join(dev, "sdk"))
+    r = subprocess.run([node, wjs, "--mode", "module", "-p", "product=default",
+                        "-p", "buildMode=debug", "assembleHap"],
+                       cwd=BUILD_DIR, env=env, capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", timeout=1800)
+    log = (r.stdout or "") + (r.stderr or "")
+    ok = "BUILD SUCCESSFUL" in log
+    print("构建 %s" % ("成功" if ok else "失败"))
+    for line in [ln for ln in log.splitlines() if "BUILD" in ln or "skip sign" in ln
+                 or "ERROR" in ln][:6]:
+        print("   " + line.strip())
+    if not ok:
+        print("\n".join(log.splitlines()[-20:]))
+        return False
+
+    haps = []
+    for dirpath, _, filenames in os.walk(os.path.join(BUILD_DIR, "entry", "build")):
+        haps += [os.path.join(dirpath, f) for f in filenames if f.endswith(".hap")]
+    if not haps:
+        print("✗ 构建说成功但找不到 .hap 产物")
+        return False
+    hap = max(haps, key=os.path.getsize)
+    print("产物 %s（%s）" % (hap, _hsize(os.path.getsize(hap))))
+    z = zipfile.ZipFile(hap)
+    blob = b"".join(z.read(n) for n in z.namelist() if n.endswith(".abc"))
+    miss = [s for s in SENTINELS if s.encode("utf-8") not in blob]
+    for s in SENTINELS:
+        print("   产物里含「%s」：%s" % (s, "否" if s in miss else "是"))
+    if miss:
+        print("✗ 这几句没进产物 —— 包里那份源码不是当前代码")
+        return False
+    print("复现构建通过：包解压 → 只按 README 的命令 → 出 hap → 新代码在产物里")
+    return True
+
+
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -269,6 +352,13 @@ def main():
         print("\n这个包别交。")
         return 1
     print("\n五项断言全过，这个包可以交。")
+    if "--verify" in args:
+        if not verify(path):
+            print("\n断言过了但复现构建没过 —— 也别交。")
+            return 1
+    else:
+        print("（还没做复现构建；加 --verify 让脚本解压本包并重新编一遍，"
+              "那才是\"组委会可复现\"的正面证据）")
     print("提醒：包里是 %s 的内容，此后任何改动都要重新跑本脚本再导一次。" % ref[:7])
     return 0
 

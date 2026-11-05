@@ -1,8 +1,11 @@
-import { router } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 import { MemoryStore } from '../service/MemoryStore';
 import { SyncService, DeviceRow, ConflictRow } from '../service/SyncService';
 import { SiteRepo } from '../service/SiteRepo';
-import { NoteRec } from '../model/Models';
+import { BackupService } from '../service/BackupService';
+import { StudioStore } from '../service/StudioStore';
+import { NoteRec, SnapshotRow, DirStat } from '../model/Models';
 import { fs, INK, SUB, LOESS, CLAY, RIVER, fmtTime } from '../common/Theme';
 
 interface MetricArg {
@@ -23,8 +26,17 @@ struct SyncPage {
   @State lastAt: number = 0;
   @State localOn: boolean = false;
   @State srvState: string = '';
+  @State snaps: SnapshotRow[] = [];
+  @State dirs: DirStat[] = [];
+  @State canUndo: boolean = false;
+  @State accN: number = 0;
+  // 演示时不想在手机上敲整条地址：拉过一次就把这条留着
+  @State snapUrl: string = 'http://10.0.2.2:8877/hhmem_latest.json';
 
   aboutToAppear(): void {
+    if (BackupService.lastUrl.length > 0) {
+      this.snapUrl = BackupService.lastUrl;
+    }
     this.sync();
   }
 
@@ -37,6 +49,52 @@ struct SyncPage {
     this.lastAt = s.lastSyncAt;
     this.localOn = s.localOnly;
     this.srvState = s.state;
+    this.accN = StudioStore.get().accounts.length;
+    let ctx = getContext(this) as common.UIAbilityContext;
+    this.snaps = BackupService.listSnapshots(ctx);
+    this.dirs = BackupService.probeDirs(ctx);
+    this.canUndo = MemoryStore.get().canUndoImport();
+  }
+
+  say(msg: string): void {
+    promptAction.showToast({ message: msg });
+    this.sync();
+  }
+
+  doExport(): void {
+    let ctx = getContext(this) as common.UIAbilityContext;
+    BackupService.exportSnapshot(ctx).then((m: string): void => {
+      this.say(m);
+    });
+  }
+
+  doPick(): void {
+    let ctx = getContext(this) as common.UIAbilityContext;
+    BackupService.restoreSnapshot(ctx).then((m: string): void => {
+      this.say(m);
+    });
+  }
+
+  doRestoreFrom(path: string): void {
+    let ctx = getContext(this) as common.UIAbilityContext;
+    BackupService.restoreFromPath(ctx, path).then((m: string): void => {
+      this.say(m);
+    });
+  }
+
+  doUndo(): void {
+    let ctx = getContext(this) as common.UIAbilityContext;
+    BackupService.undoRestore(ctx).then((m: string): void => {
+      this.say(m);
+    });
+  }
+
+  doFetch(): void {
+    let ctx = getContext(this) as common.UIAbilityContext;
+    this.say('正在从局域网取这份快照…');
+    BackupService.importFromUrl(ctx, this.snapUrl).then((m: string): void => {
+      this.say(m);
+    });
   }
 
   stateText(): string {
@@ -119,6 +177,110 @@ struct SyncPage {
             .scrollable(ScrollDirection.Horizontal)
             .scrollBar(BarState.Off)
             .width('100%')
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Start)
+          .padding(14)
+          .backgroundColor($r('app.color.card_bg'))
+          .borderRadius(12)
+
+          Column({ space: 8 }) {
+            Row() {
+              Text('备份快照 · 跨设备迁移').fontSize(fs(this.ts, 15)).fontColor(INK)
+                .fontWeight(FontWeight.Medium).layoutWeight(1)
+              Text('重新扫描').fontSize(fs(this.ts, 12)).fontColor(LOESS)
+                .onClick((): void => {
+                  this.sync();
+                })
+            }
+            .width('100%')
+            ForEach(this.dirs.slice(0, 6), (d: DirStat): void => {
+              Row({ space: 8 }) {
+                Text(d.readable ? '应用可读' : '应用读不到').fontSize(fs(this.ts, 11))
+                  .fontColor(d.readable ? RIVER : CLAY)
+                Text(d.dir).fontSize(fs(this.ts, 11)).fontColor(SUB).layoutWeight(1)
+                  .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                Text(d.count + ' 份').fontSize(fs(this.ts, 11)).fontColor(SUB)
+              }
+              .width('100%')
+            }, (d: DirStat): string => d.dir)
+            if (this.snaps.length === 0) {
+              Text('这台设备上还没有本机导出的快照。跨设备迁移：另一台设备点「导出快照」，'
+                + '电脑上跑 python tools/snap_bridge.py serve，这里直接点「拉取导入」。')
+                .fontSize(fs(this.ts, 12)).fontColor(SUB)
+            } else {
+              ForEach(this.snaps.slice(0, this.snaps.length), (s: SnapshotRow): void => {
+                Row({ space: 8 }) {
+                  Column({ space: 2 }) {
+                    Text(s.name).fontSize(fs(this.ts, 12)).fontColor(INK)
+                      .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                    Text(s.dir + ' · ' + s.size + ' B · ' + (s.at > 0 ? fmtTime(s.at) : '时间未知') +
+                      (s.mine ? ' · 本机导过' : ''))
+                      .fontSize(fs(this.ts, 11)).fontColor(SUB)
+                  }
+                  .alignItems(HorizontalAlign.Start)
+                  .layoutWeight(1)
+                  Text('恢复').fontSize(fs(this.ts, 12)).fontColor(LOESS)
+                    .onClick((): void => {
+                      this.doRestoreFrom(s.path);
+                    })
+                }
+                .width('100%')
+                .padding({ top: 4, bottom: 4 })
+              }, (s: SnapshotRow): string => s.path)
+            }
+            Text('从局域网拉另一台设备的快照（电脑上的服务起来后直接点「拉取导入」）')
+              .fontSize(fs(this.ts, 11)).fontColor(SUB)
+            Row({ space: 8 }) {
+              TextInput({ placeholder: 'http://10.0.2.2:8877/hhmem_latest.json', text: this.snapUrl })
+                .height(38)
+                .fontSize(fs(this.ts, 12))
+                .backgroundColor('#FBF6EC')
+                .borderRadius(10)
+                .border({ width: 1, color: $r('app.color.line') })
+                .layoutWeight(1)
+                .onChange((v: string): void => {
+                  this.snapUrl = v;
+                })
+              Button('拉取导入')
+                .fontSize(fs(this.ts, 13))
+                .backgroundColor(RIVER)
+                .onClick((): void => {
+                  this.doFetch();
+                })
+            }
+            .width('100%')
+            Scroll() {
+              Row({ space: 10 }) {
+                Button('导出快照')
+                  .fontSize(fs(this.ts, 13))
+                  .backgroundColor(CLAY)
+                  .onClick((): void => {
+                    this.doExport();
+                  })
+                Button('选择文件导入')
+                  .fontSize(fs(this.ts, 13))
+                  .backgroundColor($r('app.color.line'))
+                  .fontColor(INK)
+                  .onClick((): void => {
+                    this.doPick();
+                  })
+                if (this.canUndo) {
+                  Button('撤销上次恢复')
+                    .fontSize(fs(this.ts, 13))
+                    .backgroundColor($r('app.color.line'))
+                    .fontColor(CLAY)
+                    .onClick((): void => {
+                      this.doUndo();
+                    })
+                }
+              }
+            }
+            .scrollable(ScrollDirection.Horizontal)
+            .scrollBar(BarState.Off)
+            .width('100%')
+            Text('本机账号档案 ' + this.accN + ' 份；快照只带昵称/头像/创建时间，不带口令摘要')
+              .fontSize(fs(this.ts, 11)).fontColor(SUB)
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start)

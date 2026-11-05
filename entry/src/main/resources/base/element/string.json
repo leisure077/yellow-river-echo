@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "黄河续响"
+    },
+    {
+      "name": "perm_datasync_reason",
+      "value": "用于在手机与平板之间同步遗址收藏、笔记与阅读进度，实现跨设备接续与档案一致"
     }
   ]
 }

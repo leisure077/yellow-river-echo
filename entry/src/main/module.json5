@@ -17,7 +17,7 @@
       },
       {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
-        "reason": "$string:EntryAbility_desc",
+        "reason": "$string:perm_datasync_reason",
         "usedScene": {
           "abilities": ["EntryAbility"],
           "when": "always"

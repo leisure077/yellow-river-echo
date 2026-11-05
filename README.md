@@ -54,7 +54,7 @@ entry/         ArkTS 应用（页面/组件/服务/资源）
   src/main/resources/rawfile/  离线数据：3D 模型、地图瓦片、沙盘底图、课程影像
 server/        手机号短信/号码认证联调用的小型 Node 服务，演示主线不依赖
 dify/          AI 后端的复现说明、.env 模板、应用配置快照
-tools/         资产烘焙脚本 + hdc/uitest 自验脚本 + 提交包导出脚本
+tools/         资产烘焙脚本 + hdc/uitest 自验脚本 + 演示前一键预检 + 提交包导出脚本
 docs/          演示 SOP
 ```
 
@@ -63,6 +63,13 @@ docs/          演示 SOP
 链路三段：`App(http SSE) → Dify 1.13.2(Docker Compose, 宿主 :80) → 模型`，
 其中知识库向量化用**本机 Ollama 的 bge-m3**，生成回答用**智谱云端 glm-4.5-flash**。
 版本清单、起服务步骤、知识库建库参数、取 App Key 的 SQL，都在 [dify/README.md](dify/README.md)。
+
+换机器后第一件事是 `python tools/preflight.py`。它按顺序查这 8 项：Dify 容器在不在、
+`/v1/parameters` 拿当前 Key 能不能通、Ollama 是否响应、bge-m3 有没有常驻、目标设备连上了没、
+App 装没装、App 设置页里的地址指到哪、hap 是不是比源码旧。全绿 = 可以直接演示；
+黄灯 = 会撞慢（比如 bge-m3 掉了，冷启动首字会退回几十秒那一档）；红灯 = 连不通。
+退出码 0/2/1 分别对应三种情况，脚本永远只报 Key 的长度和前缀，不会把 App Key 打出来。
+`--quick` 只跑本机这 4 段（Dify / Ollama / bge-m3 / 地址），不碰设备，适合起服务时来回确认。
 
 换一台机器时最容易卡住的不是代码，是**地址**。App 设置页里的地址按设备在哪填：
 
@@ -123,18 +130,18 @@ python tools/export_package.py --check .tmp/pkg/yellow-river-echo-src-xxxxxxx.zi
 5. 体积——只报数和最大的几项，不判分。
 
 本次自查结果（`python tools/export_package.py --verify` 的原样输出；zip 精确字节数每次导出都会跟着
-内容变，交付前以脚本打印的那一行为准）：**701 个文件，zip 约 64.4 MiB / 解压后 76.0 MiB**
+内容变，交付前以脚本打印的那一行为准）：**703 个文件，zip 约 70.1 MB / 解压后 81.6 MB**
 （脚本的 MB 按 1024×1024 计），五项断言全过；解压到干净目录后重新构建 `BUILD SUCCESSFUL`
-（本机两次实测 19.9 s 与 34.1 s），产出 `entry-default-unsigned.hap` 76,960,068 B，构建过程明确打印
+（本机实测约 20 秒），产物 `entry-default-unsigned.hap` 约 79 MB，构建过程明确打印
 `Will skip sign 'hos_hap'. No signingConfigs profile is configured`（空签名配置照样能编，评委不需要我们的证书），
-产物字节码里验到本轮新增的「测一下」「最近一次失败」「HH_AI」——编出来的就是包里这份代码。
+产物字节码里验到「测一下」「最近一次失败」「HH_AI」——编出来的就是包里这份代码。
 
 ## 6. 已知限制（提前说明，别在决赛现场解释）
 
 | 事项 | 状态 |
 |---|---|
 | 模拟器上 3D 文物页 | 该模拟器镜像的 ArkWeb 关闭了 GPU/vulkan，跑不了 WebGL，因此走**离线转台帧**降级；真机渲染尚未在物理设备上验证 |
-| 河小导首字延迟 | Ollama 设 `OLLAMA_KEEP_ALIVE=-1`（模型常驻）后冷态首字实测 13.0s（不设是 34.5s），检索命中缓存后 1.1s |
+| 河小导首字延迟 | Ollama 设 `OLLAMA_KEEP_ALIVE=-1`（bge-m3 常驻）后 Dify 侧实测：冷态首字 14.5s、命中缓存后 1.45–2.2s；App 端到端首字对应为冷 23.9s / 热 6.1s（不含 KEEP_ALIVE 时冷态回到 34.5s 那一档） |
 | 生成模型在云端 | 换成 Ollama 的 `qwen2.5:1.5b` 就能完全离线复现，代价是回答质量明显下降，需自己权衡 |
 | 真机走 WiFi 连宿主 Dify | 本机 WLAN 的网络配置文件是 Public，Windows 默认拒绝入站；放行需要管理员权限，校园网若开 AP 隔离仍不通。推荐用 §4 的 USB 转发 |
 | 签名 | 仓库配置为空签名，出的是 unsigned debug hap；真机安装需自备对应签名 profile |

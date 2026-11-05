@@ -4,7 +4,6 @@ import { goDetail } from '../common/Nav';
 
 @Component
 export struct SiteCard {
-  
   @StorageLink('textScale') ts: number = 1;
   @Require @Prop site: SiteInfo;
   @Prop note: string = '';

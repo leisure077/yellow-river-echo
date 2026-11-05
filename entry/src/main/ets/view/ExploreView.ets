@@ -7,11 +7,9 @@ import { SiteCard } from './SiteCard';
 
 @Component
 export struct ExploreView {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') rev: number = 0;
   @State kw: string = '';
-  
   @State recs: Suggestion[] = [];
   @State recent: SiteInfo[] = [];
 

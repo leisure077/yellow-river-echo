@@ -13,7 +13,6 @@ const RIVER_PTS: number[][] = [
 @Entry
 @Component
 struct SplashPage {
-  
   @StorageLink('textScale') ts: number = 1;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);

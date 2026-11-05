@@ -20,7 +20,6 @@ struct ComposePage {
   @StorageLink('textScale') ts: number = 1;
   @State draft: string = '';
   @State topic: string = '';
-  
   @State photo: string = '';
   @State picking: boolean = false;
 
@@ -113,7 +112,6 @@ struct ComposePage {
 
         Scroll() {
           Column({ space: 12 }) {
-            
             Column({ space: 6 }) {
               Text('怎么发').fontSize(fs(this.ts, 12)).fontColor(INK).fontWeight(FontWeight.Medium)
               Text('① 写下你在河边看到的、想到的，一到两行最容易被回话；')

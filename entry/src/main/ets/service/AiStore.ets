@@ -14,9 +14,7 @@ export class AiStore {
   personalOn: boolean = false;
   conversationId: string = '';
   turns: ChatTurn[] = [];
-  
   lastFail: string = '';
-  
   askSeen: boolean = false;
 
   private p: preferences.Preferences | null = null;
@@ -40,14 +38,12 @@ export class AiStore {
     } catch (e) {
       this.turns = [];
     }
-    
     this.turns = this.turns.filter((t: ChatTurn): boolean =>
       !(t.role === 'ai' && t.failed === true));
     for (let t of this.turns) {
       if (t.citations === undefined) {
         t.citations = [];
       }
-      
       if (t.isAborted === undefined) {
         t.isAborted = false;
       }
@@ -82,7 +78,6 @@ export class AiStore {
     } else if (low.indexOf('events') >= 0 || name.indexOf('活动') >= 0) {
       type = 'events';
     } else {
-      
       return undefined;
     }
     if (type !== 'site') {

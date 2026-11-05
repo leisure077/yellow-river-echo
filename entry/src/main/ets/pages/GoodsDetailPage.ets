@@ -14,7 +14,6 @@ const ANGLES: string[] = ['正面', '侧面', '细节'];
 @Entry
 @Component
 struct GoodsDetailPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @State g: Goods | undefined = undefined;
@@ -71,7 +70,6 @@ struct GoodsDetailPage {
   @Builder
   shot(i: number) {
     Column() {
-      
       ArtCover({ palette: this.g!.palette, shape: this.shapeOf(this.g!.id), seed: i + 1,
         img: this.g!.img,
         label: this.g!.img.length > 0 ? '' : ANGLES[i % ANGLES.length] })
@@ -132,7 +130,6 @@ struct GoodsDetailPage {
           .width('100%')
           .height(320)
           .loop(false)
-          
           .indicator(this.g!.img.length === 0)
 
           Text('‹ 返回')

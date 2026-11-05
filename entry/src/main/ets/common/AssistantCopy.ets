@@ -1,8 +1,5 @@
-
 export interface ErrCopy {
-  
   line: string;
-  
   sub: string;
 }
 
@@ -52,7 +49,6 @@ export function errCopyOf(raw: string): ErrCopy {
   if (has(t, '地址不对') || has(low, '404')) {
     return { line: '按这个地址找不到档案室，确认填的是 Dify 的 /v1 地址。', sub: tailOf(t) };
   }
-  
   if (has(t, '连不上') || has(low, 'resolve host') || has(low, 'offline') || has(low, 'network')
     || has(low, 'connection') || has(low, 'connect')) {
     return {
@@ -60,7 +56,6 @@ export function errCopyOf(raw: string): ErrCopy {
       sub: tailOf(t)
     };
   }
-  
   if (has(low, 'timeout') || has(t, '超时') || has(t, '没有响应') || has(t, '没有回应')) {
     return { line: '档案翻得有点久，河小导先等到这儿。再问一次试试，问题短一点会更快。', sub: tailOf(t) };
   }

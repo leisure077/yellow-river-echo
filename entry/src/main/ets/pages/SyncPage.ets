@@ -13,7 +13,6 @@ interface MetricArg {
 @Entry
 @Component
 struct SyncPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('syncRev') @Watch('sync') syncRev: number = 0;
   @StorageLink('dataRev') rev: number = 0;

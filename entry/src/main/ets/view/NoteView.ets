@@ -8,11 +8,9 @@ import { goNote } from '../common/Nav';
 
 @Component
 export struct NoteView {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') rev: number = 0;
   @StorageLink('syncRev') syncRev: number = 0;
-  
   @State notes: NoteRec[] = [];
   @State organize: boolean = false;
   @State sel: string[] = [];

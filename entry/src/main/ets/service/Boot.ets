@@ -24,7 +24,6 @@ export class Boot {
     await ContentRepo.get().load(ctx);
     await MemoryStore.get().init(ctx);
     await StudioStore.get().init(ctx);
-    
     StudioStore.get().pruneGoods(ContentRepo.get().goods.map((g: Goods): string => g.id));
     await AiStore.get().init(ctx);
     await SyncService.get().init(ctx, bn);

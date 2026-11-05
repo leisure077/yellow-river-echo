@@ -20,7 +20,6 @@ const ROWS: FilterRow[] = [
 @Entry
 @Component
 struct ListPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') rev: number = 0;
   @State kw: string = '';
@@ -132,7 +131,6 @@ struct ListPage {
             Scroll() {
               Row({ space: 7 }) {
                 ForEach(row.options, (opt: string): void => {
-                  
                   Text(opt)
                     .fontSize(fs(this.ts, 12))
                     .fontColor(this.has(row.which, opt) ? Color.White : INK)

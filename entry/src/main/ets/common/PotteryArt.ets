@@ -1,5 +1,6 @@
 import { Palette } from './Theme';
 
+
 export const V_TOP: number = 0.12;
 export const V_BOT: number = 0.76;
 
@@ -311,7 +312,6 @@ export function drawWord(c: CanvasRenderer, p: Palette, word: string,
     return;
   }
   c.fillStyle = p.accent;
-  
   c.font = `${Math.round(size)}vp sans-serif`;
   c.textAlign = 'center';
   c.textBaseline = 'middle';
@@ -403,14 +403,12 @@ export function drawPedestal(c: CanvasRenderer, p: Palette, shape: string,
   pedestal: string, bot: number, w: number, h: number): void {
   let base = bot + h * 0.012;
   if (pedestal === '无') {
-    
     c.fillStyle = 'rgba(43,38,34,0.16)';
     c.beginPath();
     c.ellipse(w / 2, base + h * 0.012, w * 0.26, h * 0.026, 0, 0, Math.PI * 2);
     c.fill();
     return;
   }
-  
   c.fillStyle = 'rgba(43,38,34,0.12)';
   c.beginPath();
   c.ellipse(w / 2, base + h * 0.085, w * 0.36, h * 0.032, 0, 0, Math.PI * 2);
@@ -426,16 +424,13 @@ export function drawPedestal(c: CanvasRenderer, p: Palette, shape: string,
     c.fill();
     c.fillRect(w * 0.32, base + h * 0.05, w * 0.05, h * 0.04);
     c.fillRect(w * 0.63, base + h * 0.05, w * 0.05, h * 0.04);
-    
     c.fillStyle = '#7A5843';
     c.beginPath();
     c.ellipse(w / 2, base, w * 0.24, h * 0.02, 0, 0, Math.PI * 2);
     c.fill();
   } else if (pedestal === '圆几') {
-    
     let rx = w * 0.30;
     let ry = h * 0.024;
-    
     c.fillStyle = 'rgba(255,255,255,0.60)';
     for (let i = -1; i <= 1; i++) {
       let lx = w / 2 + i * rx * 0.62;
@@ -448,19 +443,16 @@ export function drawPedestal(c: CanvasRenderer, p: Palette, shape: string,
       c.closePath();
       c.fill();
     }
-    
     c.fillStyle = 'rgba(255,255,255,0.45)';
     c.fillRect(w / 2 - rx, base, rx * 2, h * 0.018);
     c.beginPath();
     c.ellipse(w / 2, base + h * 0.018, rx, ry, 0, 0, Math.PI * 2);
     c.fill();
-    
     c.fillStyle = 'rgba(255,255,255,0.78)';
     c.beginPath();
     c.ellipse(w / 2, base, rx, ry, 0, 0, Math.PI * 2);
     c.fill();
   } else {
-    
     let rx = w * 0.28;
     let bh = h * 0.06;
     c.fillStyle = 'rgba(255,255,255,0.45)';

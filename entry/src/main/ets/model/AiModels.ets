@@ -1,10 +1,8 @@
-
 export interface Citation {
   siteId: string;
   name: string;
   score: number;
   snippet: string;
-  
   type: string;
 }
 
@@ -62,10 +60,7 @@ export interface DifyStreamEvent {
 
 export interface ProbeResult {
   ok: boolean;
-  
   code: number;
-  
   ms: number;
-  
   msg: string;
 }

@@ -16,7 +16,6 @@ const DANGER: string = '#C0392B';
 
 @Component
 struct DrawerPicker {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('refresh') rev: number = 0;
   @State cur: number = 0;
@@ -74,7 +73,6 @@ struct Index {
   @StorageLink('textScale') ts: number = 1;
   @State ready: boolean = false;
   @State createOpen: boolean = false;
-  
   @State taps: number = 0;
   @State engineerUnlocked: boolean = false;
   private lastTap: number = 0;
@@ -124,7 +122,6 @@ struct Index {
 
   tapAvatar(): void {
     let now = Date.now();
-    
     if (now - this.lastTap > 1500) {
       this.taps = 0;
     }
@@ -236,7 +233,6 @@ struct Index {
           })
         }
         .width('100%')
-        
         .padding({ bottom: 16 })
       }
       .layoutWeight(1)
@@ -270,7 +266,6 @@ struct Index {
         .margin({ top: 10, bottom: 14 })
       Text('记点什么')
         .fontSize(fs(this.ts, 13)).fontColor(SUB)
-      
       Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
         Column() {
           this.createTile('✎', '写笔记', '挑一处遗址记两行', (): void => {
@@ -514,7 +509,6 @@ struct Index {
 
       if (this.signOutAsk) {
         Column() {
-          
           Column().layoutWeight(1)
             .width('100%')
             .onClick((): void => {

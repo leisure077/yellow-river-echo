@@ -1,14 +1,13 @@
 import { Palette } from './Theme';
 import { profileOf, grid, mixHex } from './PotteryArt';
 
+
 export interface ShotBox {
   c: CanvasRenderer;
   p: Palette;
   w: number;
   h: number;
-  
   ph: number;
-  
   t: number;
 }
 
@@ -121,12 +120,10 @@ function drawVessel(b: ShotBox, prof: number[][], morph: number, cx: number, top
     c.beginPath();
     c.ellipse(cx, top, rx, Math.max(rx * 0.16, 2), 0, 0, Math.PI * 2);
     c.fill();
-    
     c.fillStyle = mixHex(body, b.p.deep, 0.48);
     c.beginPath();
     c.ellipse(cx, top, rx * 0.86, Math.max(rx * 0.13, 1.6), 0, 0, Math.PI * 2);
     c.fill();
-    
     c.strokeStyle = 'rgba(255,252,244,0.42)';
     c.lineWidth = Math.max(b.h * 0.004, 1);
     c.beginPath();
@@ -214,7 +211,6 @@ function hands(b: ShotBox, cx: number, y: number, spread: number, alpha: number)
     c.save();
     c.translate(cx + s * spread, y);
     c.rotate(s * 0.30);
-    
     c.beginPath();
     c.moveTo(-pw * 0.78, -ph * 0.45);
     c.quadraticCurveTo(-pw * 0.92, -y * 0.5, -pw * 1.02, -up);
@@ -226,7 +222,6 @@ function hands(b: ShotBox, cx: number, y: number, spread: number, alpha: number)
     c.strokeStyle = line;
     c.lineWidth = lw;
     c.stroke();
-    
     c.lineCap = 'round';
     for (let k = 0; k < 4; k++) {
       let fx = (k - 1.5) * pw * 0.40;
@@ -239,7 +234,6 @@ function hands(b: ShotBox, cx: number, y: number, spread: number, alpha: number)
         c.stroke();
       }
     }
-    
     c.beginPath();
     c.ellipse(0, 0, pw, ph, 0, 0, Math.PI * 2);
     c.fillStyle = skin;
@@ -247,7 +241,6 @@ function hands(b: ShotBox, cx: number, y: number, spread: number, alpha: number)
     c.strokeStyle = line;
     c.lineWidth = lw;
     c.stroke();
-    
     for (let p = 0; p < 2; p++) {
       c.strokeStyle = p === 0 ? line : skin;
       c.lineWidth = p === 0 ? pw * 0.36 + lw * 2 : pw * 0.36;
@@ -294,7 +287,6 @@ function watermark(b: ShotBox, cx: number, cy: number, r: number, alpha: number)
     y = b.h * 0.40;
   }
   c.save();
-  
   c.globalAlpha = alpha * 0.6;
   c.strokeStyle = b.p.deep;
   c.lineWidth = Math.max(b.h * 0.012, 1.2);
@@ -352,14 +344,12 @@ function kiln(b: ShotBox, k: number, cx: number, baseY: number, rw: number, rh: 
   }
   c.save();
   c.globalAlpha = k;
-  
   archPath(c, cx, baseY, rw, rh);
   c.fillStyle = 'rgba(96,84,72,0.32)';
   c.fill();
   c.strokeStyle = 'rgba(43,38,34,0.55)';
   c.lineWidth = Math.max(b.h * 0.007, 1.4);
   c.stroke();
-  
   c.save();
   archPath(c, cx, baseY, rw, rh);
   c.clip();
@@ -373,7 +363,6 @@ function kiln(b: ShotBox, k: number, cx: number, baseY: number, rw: number, rh: 
     c.stroke();
   }
   c.restore();
-  
   let mw = rw * 0.52;
   let mh = rh * 0.52;
   let pulse = (Math.sin(b.t * 3.2) + 1) / 2;
@@ -385,7 +374,6 @@ function kiln(b: ShotBox, k: number, cx: number, baseY: number, rw: number, rh: 
   g.addColorStop(1, 'rgba(166,85,61,0)');
   c.fillStyle = g;
   c.fillRect(cx - mw, baseY - mh, mw * 2, mh);
-  
   c.fillStyle = '#FBEBC4';
   for (let i = -1; i <= 1; i++) {
     let fx = cx + i * mw * 0.5;
@@ -404,6 +392,7 @@ function kiln(b: ShotBox, k: number, cx: number, baseY: number, rw: number, rh: 
   c.restore();
 }
 
+
 function fishPts(cx: number, cy: number, L: number, H: number): number[] {
   let pts: number[] = [];
   let n = 26;
@@ -414,7 +403,6 @@ function fishPts(cx: number, cy: number, L: number, H: number): number[] {
     pts.push(x);
     pts.push(y);
   }
-  
   let tx = cx - L * 0.5 + L * 0.86;
   pts.push(tx + L * 0.14);
   pts.push(cy - H * 0.42);
@@ -431,7 +419,6 @@ function fishPts(cx: number, cy: number, L: number, H: number): number[] {
     pts.push(x);
     pts.push(y);
   }
-  
   pts.push(cx - L * 0.5 + L * 0.02);
   pts.push(cy - H * 0.10);
   return pts;
@@ -447,12 +434,10 @@ function fishOne(b: ShotBox, fx: number, cy: number, L: number, H: number, fill:
     c.fillStyle = ink;
     c.fillRect(fx - L * 0.55, cy - H * 0.62, L * 1.1, H * 1.24 * fill);
     if (fill < 0.99) {
-      
       c.fillStyle = 'rgba(255,252,244,0.20)';
       c.fillRect(fx - L * 0.55, cy - H * 0.62 + H * 1.24 * fill, L * 1.1,
         Math.max(H * 0.05, 1.6));
     }
-    
     if (fill > 0.5) {
       c.strokeStyle = pale;
       c.lineWidth = Math.max(H * 0.06, 1);
@@ -473,14 +458,12 @@ function fishOne(b: ShotBox, fx: number, cy: number, L: number, H: number, fill:
         c.save();
         c.globalAlpha = c.globalAlpha * dot;
         c.fillStyle = pale;
-        
         for (let i = 0; i < 2; i++) {
           c.beginPath();
           c.arc(fx + L * 0.30, cy + (i === 0 ? -1 : 1) * H * 0.24, Math.max(L * 0.024, 1.2), 0,
             Math.PI * 2);
           c.fill();
         }
-        
         c.beginPath();
         c.arc(fx - L * 0.33, cy - H * 0.05, Math.max(L * 0.048, 1.5), 0, Math.PI * 2);
         c.fill();
@@ -490,7 +473,6 @@ function fishOne(b: ShotBox, fx: number, cy: number, L: number, H: number, fill:
     c.restore();
   }
   if (fin > 0.01) {
-    
     c.fillStyle = ink;
     for (let i = 0; i < 2; i++) {
       let s = i === 0 ? -1 : 1;
@@ -526,11 +508,9 @@ function c01s1(b: ShotBox): void {
   table(b, ty, cx, vw * 0.42);
   halo(b, cx, ty - hh * 0.5, b.h * 0.46);
   let pts = drawVessel(b, profileOf('盆'), rise, cx, ty - hh, ty, vw, b.p.base, rise > 0.7);
-  
   let press = (Math.sin(b.t * 4.4) + 1) / 2;
   hands(b, cx, ty - hh - b.h * (0.005 + 0.03 * press), vw * (0.12 + 0.20 * rise),
     1 - seg(b.ph, 0.86, 1));
-  
   let seam = seg(b.ph, 0.80, 1);
   if (seam > 0.01 && seam < 0.99) {
     let k = Math.floor((1 - seam) * (pts.length / 2 - 1));
@@ -551,7 +531,6 @@ function c01s2(b: ShotBox): void {
   table(b, ty, cx, vw * 0.40);
   halo(b, cx, (top + ty) * 0.5, b.h * 0.50);
   let pts = drawVessel(b, profileOf('盆'), 1, cx, top, ty, vw, b.p.base, true);
-  
   c.save();
   smoothClosed(c, pts);
   c.clip();
@@ -564,7 +543,6 @@ function c01s2(b: ShotBox): void {
   let f2 = ease(seg(b.ph, 0.28, 0.58));
   let t1 = strokePartial(c, [cx - rx, yA, cx - rx * 0.2, yA - b.h * 0.012, cx + rx, yA], f1);
   let t2 = strokePartial(c, [cx - rx, yB, cx - rx * 0.2, yB - b.h * 0.012, cx + rx, yB], f2);
-  
   let f3 = seg(b.ph, 0.58, 0.78);
   if (f3 > 0.01) {
     c.save();
@@ -581,7 +559,6 @@ function c01s2(b: ShotBox): void {
     c.setLineDash([]);
     c.restore();
   }
-  
   let f4 = seg(b.ph, 0.76, 1);
   if (f4 > 0.01) {
     c.save();
@@ -600,7 +577,6 @@ function c01s2(b: ShotBox): void {
     c.restore();
   }
   c.restore();
-  
   let tp: number[] = [cx + rx * 0.9, yB];
   if (f1 < 1) {
     tp = t1;
@@ -625,7 +601,6 @@ function c01s3(b: ShotBox): void {
   c.clip();
   let yA = top + (ty - top) * 0.34;
   let yB = top + (ty - top) * 0.62;
-  
   c.strokeStyle = 'rgba(43,38,34,0.60)';
   c.lineWidth = Math.max(b.h * 0.007, 1.2);
   c.beginPath();
@@ -634,7 +609,6 @@ function c01s3(b: ShotBox): void {
   c.moveTo(cx - vw * 0.46, yB);
   c.lineTo(cx + vw * 0.46, yB);
   c.stroke();
-  
   let cy = (yA + yB) / 2;
   let fh = (yB - yA) * 0.60;
   let fl = vw * 0.27;
@@ -651,7 +625,6 @@ function c01s3(b: ShotBox): void {
   }
   c.restore();
   tool(b, tip, b.p.accent, Math.max(b.h * 0.012, 1.6));
-  
   let dx = b.w * 0.15;
   let dy = b.h * 0.86;
   let dr = b.w * 0.078;
@@ -692,7 +665,6 @@ function c01s4(b: ShotBox): void {
   let yA = top + (ty - top) * 0.34;
   let yB = top + (ty - top) * 0.62;
   let cy = (yA + yB) / 2;
-  
   let fl = vw * 0.27;
   let fh = (yB - yA) * 0.60;
   c.save();
@@ -706,7 +678,6 @@ function c01s4(b: ShotBox): void {
   c.moveTo(cx - vw * 0.46, yB);
   c.lineTo(cx + vw * 0.46, yB);
   c.stroke();
-  
   let k = seg(b.ph, 0.04, 0.96);
   let fr: number[] = [0, 0, 0];
   let cur = 0;
@@ -721,9 +692,7 @@ function c01s4(b: ShotBox): void {
       cur = i;
     }
   }
-  
   c.restore();
-  
   let fx = fishX(cx, vw, cur);
   let af = fr[cur];
   let tp4: number[] = [fx + fl * 0.30, cy + fh * 0.34];
@@ -742,17 +711,13 @@ function c01s5(b: ShotBox): void {
   let ty = b.h * 0.80;
   let top = b.h * 0.22;
   let vw = b.w * 0.72;
-  
   let load = ease(seg(b.ph, 0.16, 0.58));
-  
   let sc = 1 - 0.12 * load;
   let top2 = ty - (ty - top) * sc;
   let vw2 = vw * sc;
-  
   kiln(b, load, cx, ty + b.h * 0.02, b.w * 0.42, b.h * 0.44);
   table(b, ty, cx, vw2 * 0.40);
   halo(b, cx, (top2 + ty) * 0.5, b.h * 0.44);
-  
   let body = mixHex(b.p.base, b.p.deep, 0.55 * ease(seg(b.ph, 0.34, 0.98)));
   let pts = drawVessel(b, profileOf('盆'), 1, cx, top2, ty, vw2, body, true);
   c.save();
@@ -769,7 +734,6 @@ function c01s5(b: ShotBox): void {
   c.moveTo(cx - vw2 * 0.46, yB);
   c.lineTo(cx + vw2 * 0.46, yB);
   c.stroke();
-  
   let heat = ease(seg(b.ph, 0.40, 0.98));
   let inkFish = mixHex(b.p.accent, b.p.deep, 0.22 * heat);
   let paleFish = mixHex(b.p.paper, body, 0.34 * heat);
@@ -779,7 +743,6 @@ function c01s5(b: ShotBox): void {
     fishOne(b, fishX(cx, vw2, i), cy, fl2, fh2, 1, 1, 1, 1, inkFish, paleFish);
   }
   c.restore();
-  
   let dry = 1 - seg(b.ph, 0.40, 0.62);
   wisps(b, cx - vw2 * 0.3, cx + vw2 * 0.3, top2 + b.h * 0.02, b.h * 0.13, 3, 0.22,
     0.55 * dry, 'rgba(255,252,244,0.95)');
@@ -793,6 +756,7 @@ function c01s5(b: ShotBox): void {
   watermark(b, b.w * 0.88, b.h * 0.14, b.h * 0.12, 0.07);
 }
 
+
 function c02s1(b: ShotBox): void {
   let c = b.c;
   let cx = b.w * 0.5;
@@ -804,7 +768,6 @@ function c02s1(b: ShotBox): void {
   let sq = Math.sin(b.t * 3.8) * (1 - open);
   let bw = b.w * (0.30 + 0.06 * ease(fold));
   let bh = b.h * (0.20 - 0.03 * ease(fold) + 0.014 * sq);
-  
   if (open < 0.99) {
     c.save();
     c.globalAlpha = 1 - open;
@@ -825,7 +788,6 @@ function c02s1(b: ShotBox): void {
     c.restore();
     hands(b, cx, ty - bh - b.h * 0.018, bw * 0.52, 1 - seg(b.ph, 0.40, 0.55));
   }
-  
   if (open > 0.01) {
     let gap = bw * 0.16 * open;
     for (let s = 0; s < 2; s++) {
@@ -838,7 +800,6 @@ function c02s1(b: ShotBox): void {
       c.strokeStyle = b.p.deep;
       c.lineWidth = Math.max(b.h * 0.008, 1.2);
       c.stroke();
-      
       c.strokeStyle = b.p.deep;
       c.lineWidth = Math.max(b.h * 0.004, 1);
       let lines = Math.floor(open * 6);
@@ -852,7 +813,6 @@ function c02s1(b: ShotBox): void {
       }
       c.restore();
     }
-    
     let flick = seg(b.ph, 0.80, 1);
     let gx = cx + bw * 0.30;
     let gy = ty - bh * 0.45;
@@ -898,7 +858,6 @@ function c02s2(b: ShotBox): void {
   let ty = b.h * 0.78;
   halo(b, cx, ty - b.h * 0.18, b.h * 0.46);
   wheel(b, cx, ty, b.w * 0.34, 3.2);
-  
   let set = ease(seg(b.ph, 0.10, 0.82));
   let wob = (1 - set) * b.w * 0.085 * Math.sin(b.t * 8.5);
   let sq = Math.sin(b.t * 3.6);
@@ -906,7 +865,6 @@ function c02s2(b: ShotBox): void {
   let hh = b.h * (0.22 + 0.02 * sq - 0.03 * set);
   drawVessel(b, profileOf('盆'), 0.10, cx + wob, ty - hh, ty, vw, b.p.base, false);
   hands(b, cx + wob, ty - hh - b.h * 0.012, vw * 0.11, 0.9);
-  
   let ax = seg(b.ph, 0.62, 0.95);
   if (ax > 0.01) {
     c.save();
@@ -921,7 +879,6 @@ function c02s2(b: ShotBox): void {
     c.setLineDash([]);
     c.restore();
   }
-  
   c.strokeStyle = 'rgba(43,38,34,0.30)';
   c.lineWidth = Math.max(b.h * 0.006, 1);
   for (let i = -1; i <= 1; i += 2) {
@@ -948,7 +905,6 @@ function c02s3(b: ShotBox): void {
   let vw = b.w * 0.52;
   let hh = b.h * (0.16 + 0.36 * up);
   let top = ty - hh;
-  
   let wall = b.w * (0.055 - 0.030 * up);
   let outer = vesselPts(prof, 1, cx, top, ty, vw);
   let inner = vesselPts(prof, 1, cx, top + wall * 1.2, ty - wall * 0.6, vw - wall * 2.6);
@@ -959,7 +915,6 @@ function c02s3(b: ShotBox): void {
   c.lineWidth = Math.max(b.w * 0.008, 1.4);
   c.stroke();
   c.save();
-  
   smoothClosed(c, outer);
   c.clip();
   c.globalAlpha = 0.9;
@@ -967,22 +922,18 @@ function c02s3(b: ShotBox): void {
   c.fillStyle = b.p.deep;
   c.fill();
   c.restore();
-  
   let hole = ease(seg(b.ph, 0, 0.34));
   let mrx = Math.max(vw * 0.42 * hole, 1.2);
   let mry = Math.max(vw * 0.11 * hole, 1);
-  
   c.fillStyle = mixHex(b.p.deep, '#141311', 0.45);
   c.beginPath();
   c.ellipse(cx, top, mrx, mry, 0, 0, Math.PI * 2);
   c.fill();
-  
   c.strokeStyle = mixHex(b.p.base, b.p.paper, 0.55);
   c.lineWidth = Math.max(b.h * 0.006, 1.2);
   c.beginPath();
   c.ellipse(cx, top, mrx, mry, 0, Math.PI, Math.PI * 2);
   c.stroke();
-  
   c.save();
   smoothClosed(c, outer);
   c.clip();
@@ -1018,11 +969,9 @@ function c02s4(b: ShotBox): void {
   c.save();
   smoothClosed(c, pts);
   c.clip();
-  
   let shine = ease(seg(b.ph, 0.34, 0.86));
   if (shine > 0.01) {
     let y = top + (ty - top) * (0.16 + 0.70 * shine);
-    
     let g: CanvasGradient = c.createLinearGradient(0, y - b.h * 0.042, 0, y + b.h * 0.042);
     g.addColorStop(0, 'rgba(255,252,244,0)');
     g.addColorStop(0.5, 'rgba(255,252,244,0.38)');
@@ -1036,7 +985,6 @@ function c02s4(b: ShotBox): void {
     c.quadraticCurveTo(cx + vw * 0.34, y - b.h * 0.02, cx + vw * 0.26, y);
     c.stroke();
   }
-  
   let mk = ease(seg(b.ph, 0.52, 0.98));
   if (mk > 0.01) {
     let gy = top + (ty - top) * 0.34;
@@ -1049,7 +997,6 @@ function c02s4(b: ShotBox): void {
     c.restore();
   }
   c.restore();
-  
   let cut = seg(b.ph, 0.02, 0.50);
   if (cut > 0.01 && cut < 0.99) {
     let y = top + (ty - top) * (0.30 + 0.40 * ((Math.sin(b.t * 1.9) + 1) / 2));
@@ -1078,21 +1025,17 @@ function c02s5(b: ShotBox): void {
   let ty = b.h * 0.80;
   let top = b.h * 0.30;
   let vw = b.w * 0.48;
-  
   let load = ease(seg(b.ph, 0.10, 0.50));
   let ink = ease(seg(b.ph, 0.30, 0.96));
-  
   kiln(b, load, cx, ty + b.h * 0.02, b.w * 0.40, b.h * 0.42);
   table(b, ty, cx, vw * 0.42);
   halo(b, cx, (top + ty) * 0.5, b.h * 0.44);
-  
   let body = mixHex(b.p.base, '#232220', ink);
   let prof = profileOf('罐');
   let pts = drawVessel(b, prof, 1, cx, top, ty, vw, body, true);
   c.save();
   smoothClosed(c, pts);
   c.clip();
-  
   c.save();
   c.globalAlpha = 0.5;
   let gp: Palette = { base: body, deep: '#1B1A18', accent: '#B9B4A8', ink: '#EDE7DC',
@@ -1100,7 +1043,6 @@ function c02s5(b: ShotBox): void {
   grid(c, gp, cx - vw * 0.5, cx + vw * 0.5, top + (ty - top) * 0.34,
     top + (ty - top) * 0.60, 2);
   c.restore();
-  
   if (ink > 0.35) {
     let s = (b.t * 0.34) % 1;
     c.save();
@@ -1116,7 +1058,6 @@ function c02s5(b: ShotBox): void {
     c.restore();
   }
   c.restore();
-  
   let dry = 1 - seg(b.ph, 0.24, 0.44);
   wisps(b, cx - vw * 0.3, cx + vw * 0.3, top + b.h * 0.02, b.h * 0.12, 3, 0.20,
     0.5 * dry, 'rgba(255,252,244,0.95)');
@@ -1128,7 +1069,6 @@ function c02s5(b: ShotBox): void {
     c.fillStyle = 'rgba(246,164,76,0.85)';
     for (let i = 0; i < 4; i++) {
       let up = (b.t * 0.5 + i * 0.25) % 1;
-      
       let side = i % 2 === 0 ? -1 : 1;
       let off = b.w * (i < 2 ? 0.29 : 0.35);
       c.beginPath();

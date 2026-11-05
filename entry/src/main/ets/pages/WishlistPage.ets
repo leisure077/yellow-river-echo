@@ -14,7 +14,6 @@ interface Group {
 @Entry
 @Component
 struct WishlistPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('reload') rev: number = 0;
   @State tab: number = 0;
@@ -48,7 +47,6 @@ struct WishlistPage {
       if (found === undefined) {
         continue;
       }
-      
       let g: Goods = found;
       let grp = byCat.find((x: Group): boolean => x.cat === g.cat);
       if (grp === undefined) {
@@ -67,7 +65,6 @@ struct WishlistPage {
       }
     }
     this.liked = liked;
-    
     let ids = this.allIds();
     let next = this.checked.filter((x: string): boolean => ids.indexOf(x) >= 0);
     for (let id of ids) {

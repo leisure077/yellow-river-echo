@@ -4,6 +4,7 @@ import { StudioStore } from '../service/StudioStore';
 import { fs, WATER_FLOW, WATER_OFF } from '../common/Theme';
 import { effectiveWaterMode } from '../common/River';
 
+
 const TAU: number = Math.PI * 2;
 const FRAME_MS: number = 40;
 const DEG: number = Math.PI / 180;
@@ -101,6 +102,8 @@ interface Flash {
   life: number;
   max: number;
 }
+
+
 
 const TRIB: Chain[] = [
   { name: '渭河', big: true, pts: [104.32, 34.82, 105.1, 34.85, 105.75, 34.62, 106.6, 34.55,
@@ -232,7 +235,6 @@ function geoOf(id: string): Geo | undefined {
 
 @Component
 export struct BasinMap {
-  
   @StorageLink('textScale') ts: number = 1;
   @Prop activeId: string = '';
   @Prop mapHeight: number = 264;
@@ -343,7 +345,6 @@ export struct BasinMap {
     }
     let hw = this.w * 0.5 / (COS * this.k);
     let hh = this.h * 0.5 / (STR * this.k);
-    
     let s = 0.85;
     if (this.clon - hw * s < LON0) {
       this.clon = LON0 + hw * s;
@@ -443,7 +444,6 @@ export struct BasinMap {
     if (z1 === this.zoom) {
       return;
     }
-    
     if (this.w > 0) {
       let gl0 = this.invLon(ax);
       let gg0 = this.invLat(ay);
@@ -691,7 +691,6 @@ export struct BasinMap {
     c.lineJoin = 'round';
     c.lineCap = 'round';
     let breathe = glowOn ? 1 + 0.1 * Math.sin(this.time * 0.55) : 1;
-    
     for (let ch = 0; ch < chunks; ch++) {
       let i0 = Math.floor(ch * n / chunks);
       let i1 = Math.floor((ch + 1) * n / chunks);
@@ -734,7 +733,6 @@ export struct BasinMap {
       }
     }
     if (glowOn) {
-      
       c.save();
       c.setLineDash([12, 18]);
       c.lineDashOffset = -(this.phase % 30);
@@ -822,7 +820,6 @@ export struct BasinMap {
 
   private paintSites(c: CanvasRenderingContext2D): void {
     if (this.zoom < SITE_ZOOM) {
-      
       let x = this.X(112.9);
       let y = this.Y(34.85, 112.9);
       c.beginPath();
@@ -890,7 +887,6 @@ export struct BasinMap {
   }
 
   private paintFx(c: CanvasRenderingContext2D): void {
-    
     for (let f of this.flashes) {
       let k = f.life / f.max;
       let rad = 4 + k * 42;
@@ -905,7 +901,6 @@ export struct BasinMap {
       c.fillStyle = gr;
       c.fill();
     }
-    
     for (let h of this.halos) {
       if (h.life < 0) {
         continue;
@@ -932,7 +927,6 @@ export struct BasinMap {
       c.stroke();
       c.restore();
     }
-    
     for (let p of this.drops) {
       let k = p.life / p.max;
       let a = (1 - k) * 0.94;
@@ -954,7 +948,6 @@ export struct BasinMap {
 
   private paintHud(c: CanvasRenderingContext2D): void {
     let w = this.w;
-    
     c.font = '9px sans-serif';
     c.fillStyle = 'rgba(226,220,206,0.5)';
     c.fillText('N', 14, 18);
@@ -974,7 +967,6 @@ export struct BasinMap {
     c.font = '9.5px sans-serif';
     c.fillStyle = 'rgba(226,220,206,0.45)';
     c.fillText(this.networkStatus, 13, 44);
-    
     let vn = '全流域';
     if (this.zoom > 1.12) {
       if (this.clon < 102.5) {
@@ -997,7 +989,6 @@ export struct BasinMap {
     c.fillStyle = 'rgba(255,228,168,0.72)';
     let tw2 = c.measureText(vn).width;
     c.fillText(vn, w - tw2 - 14, 22);
-    
     let kmPerVp = 111 / (STR * this.k);
     let opts: number[] = [50, 100, 200, 300, 500, 1000];
     let pickKm = opts[opts.length - 1];

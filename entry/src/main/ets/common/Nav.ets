@@ -159,7 +159,6 @@ export function goTopicSection(type: string): void {
   }
   if (type === 'goods') {
     switchTab(1);
-    
     router.back({ url: 'pages/Index' });
   }
 }
@@ -185,6 +184,5 @@ export function closeSignOutAsk(): void {
 }
 
 export function params(): RouteParam {
-  
   return (router.getParams() ?? {}) as RouteParam;
 }

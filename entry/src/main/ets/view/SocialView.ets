@@ -9,7 +9,6 @@ import { openDrawer, goDetail, goSync, goPost } from '../common/Nav';
 
 @Component
 export struct SocialView {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @StorageLink('dataRev') dataRev: number = 0;
@@ -178,7 +177,6 @@ export struct SocialView {
             .height(this.coverH(p.id))
             .objectFit(ImageFit.Cover)
         } else {
-          
           Column() {
             Text('「 」')
               .fontSize(fs(this.ts, 26))
@@ -320,7 +318,6 @@ export struct SocialView {
             })
           Blank()
           if (this.isMine(p)) {
-            
             Text('删除')
               .fontSize(fs(this.ts, 10))
               .fontColor(SUB)
@@ -353,7 +350,6 @@ export struct SocialView {
     .borderRadius(12)
     .clip(true)
     .onClick((): void => {
-      
       goPost(p.id);
     })
   }
@@ -474,7 +470,6 @@ export struct SocialView {
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)
         } else {
-          
           WaterFlow() {
             ForEach(this.shown(), (p: Post): void => {
               FlowItem() {

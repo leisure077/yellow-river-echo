@@ -11,7 +11,6 @@ const MAP_H: number = 310;
 @Entry
 @Component
 struct CheckinPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('reload') studioRev: number = 0;
   @State sites: SiteInfo[] = [];
@@ -28,7 +27,6 @@ struct CheckinPage {
   reload(): void {
     this.sites = SiteRepo.get().sites;
     this.doneIds = StudioStore.get().checkedSiteIds();
-    
     let list: SiteInfo[] = [];
     for (let c of StudioStore.get().siteCheckins) {
       let s = SiteRepo.get().byId(c.siteId);
@@ -178,10 +176,8 @@ struct CheckinPage {
 
       Scroll() {
         Column({ space: 12 }) {
-          
           Column({ space: 8 }) {
             Row({ space: 8 }) {
-              
               Text('黄河全流域 · 水系脉络').fontSize(fs(this.ts, 14)).fontColor('#F2E6CF').fontWeight(FontWeight.Medium)
               Blank()
               Text('双指缩放 · 拖动平移 · 点河道溅水花').fontSize(fs(this.ts, 10)).fontColor('rgba(226,216,196,0.62)')

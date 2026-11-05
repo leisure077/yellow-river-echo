@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
 
+
 export const PROBE_MS: number = 2500;
 
 function qstr(s: string): string {
@@ -28,14 +29,12 @@ export struct Pottery3D {
   @Prop @Watch('onParam') pedestal: string = '素台';
   @Prop @Watch('onParam') word: string = '';
   @Prop @Watch('onParam') seed: number = 0;
-  
   onMode: (m: string) => void = (): void => {};
   onErr: (msg: string) => void = (): void => {};
   private controller: webview.WebviewController = new webview.WebviewController();
   private bridge: Pottery3DBridge = new Pottery3DBridge();
   private origin: string = 'https://huanghe.example/';
   private src: string = '';
-  
   private pageEnd: boolean = false;
   private mode: string = '';
 
@@ -70,7 +69,6 @@ export struct Pottery3D {
     try {
       this.controller.runJavaScript(js);
     } catch (e) {
-      
     }
   }
 
@@ -127,7 +125,6 @@ export struct Pottery3D {
           this.sync();
         })
         .onErrorReceive((event): void => {
-          
           if (event.request.isMainFrame()) {
             this.onMode('fallback');
           }

@@ -19,7 +19,6 @@ struct GuidePage {
       Stack() {
         Image(art).width('100%').height('100%').objectFit(ImageFit.Fill)
         HeritageMotion({ kind: kind, active: this.idx === kind })
-      
       }.width('100%').height('100%')
       Column({ space: 12 }) {
         Text(place).fontSize(11).letterSpacing(5).fontColor('#F1D8AC')

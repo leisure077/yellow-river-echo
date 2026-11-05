@@ -14,7 +14,6 @@ export class StudioStore {
   accounts: AccountRec[] = [];
   likes: string[] = [];
   cart: string[] = [];
-  
   cartLines: CartLine[] = [];
   chars: string[] = [];
   checkins: string[] = [];
@@ -22,7 +21,6 @@ export class StudioStore {
   readPosts: string[] = [];
   followed: string[] = [];
   postComments: LocalComment[] = [];
-  
   userPosts: Post[] = [];
   guideSeen: boolean = false;
   scaleStep: number = 1;
@@ -48,7 +46,6 @@ export class StudioStore {
     this.likes = this.readArr('likes');
     this.accounts = this.readArr<AccountRec>('accounts');
     for (let a of this.accounts) {
-      
       a.phone = a.phone ?? '';
     }
     this.cart = this.readArr('cart');
@@ -138,6 +135,7 @@ export class StudioStore {
     this.save('profile', this.profile);
   }
 
+
   static digest(nick: string, pwd: string): string {
     let s = nick + '|' + pwd;
     let a = 5381;
@@ -202,7 +200,6 @@ export class StudioStore {
       createdAt: Date.now(), lastAt: Date.now(), phone: VerifyGate.mask(VerifyGate.digits(phone)) };
     this.accounts.push(rec);
     this.save('accounts', this.accounts);
-    
     this.applySession(rec);
     return '';
   }

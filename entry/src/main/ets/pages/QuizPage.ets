@@ -324,7 +324,6 @@ struct QuizPage {
           .fontColor(INK)
           .fontWeight(FontWeight.Medium)
         ForEach(this.reco, (s: SiteInfo): void => {
-          
           SiteCard({ site: s })
         }, (s: SiteInfo): string => s.id)
       }

@@ -82,7 +82,6 @@ struct PostPage {
     if (this.post === undefined) {
       return 'yangshao';
     }
-    
     if (this.isMine()) {
       let keys: string[] = ['yangshao', 'longshan', 'xiashang', 'zhou', 'hantang', 'song'];
       let n = StudioStore.get().profile.avatar;

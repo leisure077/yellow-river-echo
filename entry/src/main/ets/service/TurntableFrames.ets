@@ -2,6 +2,7 @@ import { image } from '@kit.ImageKit';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
 
+
 export interface ShapeMeta {
   key: string;
   label: string;
@@ -26,7 +27,6 @@ export interface TurntableIndex {
 }
 
 const DIR = 'pottery/turntable/';
-
 const CACHE_MIN: number = 14;
 
 export class TurntableFrames {
@@ -43,7 +43,6 @@ export class TurntableFrames {
     new Map<string, Promise<image.PixelMap | null>>();
   private ctx: common.UIAbilityContext | null = null;
   private cacheMax: number = CACHE_MIN;
-  
   private preloadToken: number = 0;
 
   loadIndex(ctx: common.UIAbilityContext): TurntableIndex | null {
@@ -60,7 +59,6 @@ export class TurntableFrames {
         return null;
       }
       this.index = idx;
-      
       this.cacheMax = Math.max(CACHE_MIN, idx.frames + 2);
       return idx;
     } catch (e) {
@@ -177,7 +175,6 @@ export class TurntableFrames {
       return Promise.resolve<image.PixelMap | null>(null);
     }
     let path = DIR + key + '/' + frame + '.' + idx.ext;
-    
     return ctx.resourceManager.getRawFileContent(path)
       .then((bytes: Uint8Array): Promise<image.PixelMap | null> => {
         let src = image.createImageSource(bytes.buffer as ArrayBuffer);

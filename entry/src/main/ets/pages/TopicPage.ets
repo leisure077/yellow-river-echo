@@ -38,7 +38,6 @@ interface ChipArg {
 @Entry
 @Component
 struct TopicPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('redraw') rev: number = 0;
   @State scope: string = '';
@@ -94,7 +93,6 @@ struct TopicPage {
         }
       }
     }
-    
     ns.sort((a: SiteInfo, b: SiteInfo): number => {
       let ia = ERAS.indexOf(a.eras[0]);
       let ib = ERAS.indexOf(b.eras[0]);
@@ -231,7 +229,6 @@ struct TopicPage {
     if (ns.length === 1) {
       pts.push({ x: ctr.x, y: ctr.y });
     } else {
-      
       for (let i = 0; i < ns.length; i++) {
         let a = -Math.PI / 2 + Math.PI * 2 * i / ns.length;
         pts.push({ x: ctr.x + rx * Math.cos(a), y: ctr.y + ry * Math.sin(a) });

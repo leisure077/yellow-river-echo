@@ -7,10 +7,8 @@ import { goDetail } from '../common/Nav';
 
 @Component
 export struct FavoriteView {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') rev: number = 0;
-  
   @State favs: FavRec[] = [];
   @State tags: TagRec[] = [];
   @State filterTag: string = '';

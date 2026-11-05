@@ -100,7 +100,6 @@ export class SiteRepo {
       return [];
     }
     if (favIds.length === 0) {
-      
       let picks = ['s01', 's04', 's07', 's15'];
       let out: Suggestion[] = [];
       for (let id of picks) {

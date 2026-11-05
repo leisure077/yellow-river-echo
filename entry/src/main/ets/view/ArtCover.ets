@@ -2,7 +2,6 @@ import { fs, paletteOf, Palette } from '../common/Theme';
 
 @Component
 export struct ArtCover {
-  
   @StorageLink('textScale') ts: number = 1;
   @Prop @Watch('repaint') palette: string = 'yangshao';
   @Prop @Watch('repaint') shape: string = 'pot';
@@ -36,7 +35,6 @@ export struct ArtCover {
     c.lineWidth = Math.max(r * 0.06, 1.2);
     let mode = this.seed % 3;
     if (mode === 0) {
-      
       c.beginPath();
       let n = 7;
       for (let i = 0; i <= n; i++) {
@@ -50,14 +48,12 @@ export struct ArtCover {
       }
       c.stroke();
     } else if (mode === 1) {
-      
       for (let k = 1; k <= 3; k++) {
         c.beginPath();
         c.arc(cx, cy, r * k / 3.4, 0, Math.PI * 2);
         c.stroke();
       }
     } else {
-      
       for (let k = -2; k <= 2; k++) {
         c.beginPath();
         c.moveTo(cx + k * r * 0.35, cy - r * 0.8);
@@ -165,7 +161,6 @@ export struct ArtCover {
       c.fillStyle = p.paper;
       c.fillRect(cx - w * 0.18, h * 0.44, w * 0.36, h * 0.06);
     } else {
-      
       c.moveTo(cx - w * 0.09, top);
       c.lineTo(cx + w * 0.09, top);
       c.quadraticCurveTo(cx + w * 0.30, h * 0.40, cx + w * 0.20, bot);

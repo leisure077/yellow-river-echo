@@ -9,11 +9,9 @@ import { params } from '../common/Nav';
 @Entry
 @Component
 struct ArchivePage {
-  
   @StorageLink('textScale') ts: number = 1;
   @State tab: number = 0;
   @StorageLink('dataRev') @Watch('syncCount') rev: number = 0;
-  
   @State favN: number = 0;
   @State noteN: number = 0;
 
@@ -31,7 +29,6 @@ struct ArchivePage {
   }
 
   badgeOf(idx: number): string {
-    
     if (idx === 1) {
       return `${this.favN}`;
     }

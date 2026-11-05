@@ -28,20 +28,14 @@ const FOCUS_DELAY: number = 430;
 
 @Component
 export struct FloatingAssistant {
-  
   @StorageLink('textScale') ts: number = 1;
   @Prop bottomGap: number = 24;
-  
   @Prop tag: string = 'home';
-  
   @StorageLink('assistantSheet') open: boolean = false;
   @StorageLink('assistantOwner') @Watch('onOwnerChange') ownerTag: string = 'home';
-  
   @StorageLink('assistantSeen') seen: boolean = false;
   @State guide: boolean = false;
-  
   @StorageLink('aiRev') @Watch('syncTurns') aiRev: number = 0;
-  
   @StorageLink('fabScrollAt') @Watch('onScrollSignal') fabScrollAt: number = 0;
   @State breath: number = 1;
   @State msgs: ChatTurn[] = [];
@@ -51,7 +45,6 @@ export struct FloatingAssistant {
   @State err: string = '';
   @State lastQ: string = '';
   @State clearAsk: boolean = false;
-  
   @State side: string = 'right';
   @State tx: number = 0;
   @State ty: number = 0;
@@ -73,7 +66,6 @@ export struct FloatingAssistant {
   private scrollTimer: number = -1;
   private clearTimer: number = -1;
   private guideTimer: number = -1;
-  
   private showing: boolean = false;
   private autoFocused: boolean = false;
   private idleTuck: boolean = false;
@@ -84,7 +76,6 @@ export struct FloatingAssistant {
 
   aboutToAppear(): void {
     this.msgs = AiStore.get().turns.slice();
-    
     let savedSide = AppStorage.get<string>('fabSide');
     if (savedSide === 'left' || savedSide === 'right') {
       this.side = savedSide;
@@ -97,7 +88,6 @@ export struct FloatingAssistant {
     this.tgtTx = this.tx;
     this.tgtTy = this.ty;
     this.touch();
-    
     this.guide = !this.seen && this.mine();
     if (this.guide) {
       this.guideTimer = setTimeout((): void => {
@@ -105,7 +95,6 @@ export struct FloatingAssistant {
         this.guideTimer = -1;
       }, GUIDE_MS);
     }
-    
     this.breathT0 = Date.now();
     this.breathTimer = setInterval((): void => {
       let phase = ((Date.now() - this.breathT0) % 3200) / 3200;
@@ -180,6 +169,7 @@ export struct FloatingAssistant {
     }
   }
 
+
   private dockTx(): number {
     let left = -(Math.max(120, this.stageW - 2 * INSET - FAB_W));
     return this.side === 'left' ? left : 0;
@@ -194,7 +184,6 @@ export struct FloatingAssistant {
   }
 
   private clampTy(v: number): number {
-    
     let min = TOP_KEEP - (this.stageH - this.bottomGap - FAB_W);
     if (min > 0) {
       min = 0;
@@ -301,7 +290,6 @@ export struct FloatingAssistant {
     this.ty = this.clampTy(this.ty);
     AppStorage.setOrCreate('fabSide', this.side);
     AppStorage.setOrCreate('fabY', this.ty);
-    
     this.idleTuck = false;
     this.moveTo(this.dockTx(), this.ty, 0);
     if (this.idleTimer >= 0) {
@@ -421,11 +409,9 @@ export struct FloatingAssistant {
       this.msgs = this.msgs.concat([t]);
       AiStore.get().pushTurn(t);
     } else if (aborted) {
-      
       this.err = '回答已中断';
       this.lastQ = this.curQ;
     } else {
-      
       this.err = AiService.ERR_EMPTY;
       this.lastQ = this.curQ;
     }
@@ -442,7 +428,6 @@ export struct FloatingAssistant {
   }
 
   private goFull(): void {
-    
     if (this.handle !== null) {
       this.handle.stop();
     }
@@ -453,23 +438,19 @@ export struct FloatingAssistant {
   }
 
   private openSheet(): void {
-    
     if (!this.mine()) {
       return;
     }
     this.open = true;
     this.guide = false;
-    
     if (!this.seen) {
       this.seen = true;
       AiStore.get().markAskSeen();
     }
     this.touch();
-    
     setTimeout((): void => {
       this.follow(true);
     }, 320);
-    
     if (!this.autoFocused) {
       this.autoFocused = true;
       this.tryFocus(3);
@@ -503,7 +484,6 @@ export struct FloatingAssistant {
     this.lastQ = '';
     this.err = '';
     this.msgs = [];
-    
     AiStore.get().clearChat().catch((e: Error): void => {
       console.warn('clear chat: ' + e.message);
     });
@@ -529,12 +509,9 @@ export struct FloatingAssistant {
     .backgroundColor($r('app.color.card_bg'))
     .shadow({ radius: 12, color: 'rgba(166,85,61,0.26)', offsetY: 4 })
     .margin({ right: INSET, bottom: this.bottomGap })
-    
     .translate({ x: this.fabShiftX(), y: this.ty })
-    
     .scale(this.sheetOn() ? { x: 0.86, y: 0.86 } : { x: 1, y: 1 })
     .opacity(this.fabAlpha())
-    
     .hitTestBehavior(HitTestMode.Block)
     .gesture(
       PanGesture({ distance: 6, direction: PanDirection.All })
@@ -549,13 +526,11 @@ export struct FloatingAssistant {
         })
     )
     .onClick((): void => {
-      
       if (Date.now() - this.lastDragAt < 260) {
         return;
       }
       this.openSheet();
     })
-    
     .bindSheet(this.sheetOn(), this.sheetView(), {
       height: 500,
       dragBar: false,
@@ -566,7 +541,6 @@ export struct FloatingAssistant {
         this.showing = true;
       },
       onDisappear: (): void => {
-        
         if (this.showing) {
           this.showing = false;
           if (this.mine()) {
@@ -616,7 +590,6 @@ export struct FloatingAssistant {
             if (this.clearTimer >= 0) {
               clearTimeout(this.clearTimer);
             }
-            
             this.clearTimer = setTimeout((): void => {
               this.clearAsk = false;
               this.clearTimer = -1;
@@ -699,7 +672,6 @@ export struct FloatingAssistant {
       .border({ width: 1, color: c.type === 'site' ? 'rgba(74,123,140,0.45)' : 'rgba(200,161,96,0.55)' })
       .margin({ right: 6, top: 4 })
       .onClick((): void => {
-        
         if ((c.type === 'site' && c.siteId.length === 0) ||
           (c.type !== 'site' && c.type !== 'goods' && c.type !== 'courses' && c.type !== 'events')) {
           return;
@@ -922,7 +894,6 @@ export struct FloatingAssistant {
     .height('100%')
     .padding({ left: 14, right: 14, bottom: 8 })
     .backgroundColor($r('app.color.card_bg'))
-    
     .gesture(
       PanGesture({ direction: PanDirection.Vertical, distance: 24 })
         .onActionEnd((event: GestureEvent): void => {
@@ -961,7 +932,6 @@ export struct FloatingAssistant {
   }
 
   build() {
-    
     Stack({ alignContent: Alignment.BottomEnd }) {
       this.fab()
       if (this.guide && this.mine() && !this.sheetOn()) {
@@ -980,7 +950,6 @@ export struct FloatingAssistant {
       if (typeof h === 'number') {
         this.stageH = h;
       }
-      
       this.moveTo(this.dockTx(), this.clampTy(this.ty), this.tuckTarget());
     })
   }

@@ -11,7 +11,6 @@ const LOG_DOMAIN: number = 0x0000;
 const LOG_TAG: string = 'HH_AI';
 
 export interface StreamHooks {
-  
   onChunk: (raw: string) => void;
   onDone: (citations: Citation[], aborted: boolean) => void;
   onError: (msg: string) => void;
@@ -22,7 +21,6 @@ export interface StreamHandle {
 }
 
 export class AiService {
-  
   static readonly ERR_RATE_LIMIT: string = 'rate_limited';
   static readonly ERR_EMPTY: string = 'empty_answer';
   static readonly ERR_MODEL: string = '模型侧报错';
@@ -36,7 +34,6 @@ export class AiService {
   }
 
   start(query: string, personalContext: string, hooks: StreamHooks): StreamHandle {
-    
     let inner: StreamHandle = { stop: (): void => {} };
     let swap = (h: StreamHandle): void => {
       inner = h;
@@ -77,7 +74,6 @@ export class AiService {
 
     let req = http.createHttp();
     let decoder: util.TextDecoder = util.TextDecoder.create('utf-8');
-    
     let pending = '';
     let raw = '';
     let citations: Citation[] = [];
@@ -89,7 +85,6 @@ export class AiService {
     let stopped = false;
     let lastData = Date.now();
     let watchdog = -1;
-    
     let t0 = Date.now();
     let ttft = 0;
     let self = this;
@@ -102,7 +97,6 @@ export class AiService {
       try {
         req.destroy();
       } catch (e) {
-        
       }
     };
 
@@ -117,7 +111,6 @@ export class AiService {
           console.warn('conversation save: ' + e.message);
         });
       }
-      
       store.clearLastFail();
       AiService.info('答完 status=' + status + ' 首字 ' + (ttft > 0 ? (ttft - t0) : -1)
         + 'ms 总 ' + (Date.now() - t0) + 'ms 字数 ' + raw.length
@@ -192,7 +185,6 @@ export class AiService {
         } else if (name === 'message_end') {
           citations = self.citationsOf(ev.metadata);
         } else if (name === 'error') {
-          
           let m = ev.message ?? '未知原因';
           fail(AiService.rateLimited(m) ? AiService.ERR_RATE_LIMIT : AiService.ERR_MODEL + '：' + m,
             status, m);
@@ -206,7 +198,6 @@ export class AiService {
         return;
       }
       if (status !== 0 && status !== 200) {
-        
         let errText = errBody.length > 0 ? errBody : pending;
         fail(self.errorOf(status, errText), status, errText);
         return;
@@ -250,7 +241,6 @@ export class AiService {
       if (stopped || finished) {
         return;
       }
-      
       if (status === 0) {
         return;
       }
@@ -333,7 +323,6 @@ export class AiService {
         return;
       }
       let url = v + '/parameters';
-      
       AiService.info('探测 → ' + url);
       let t0 = Date.now();
       let req = http.createHttp();
@@ -349,7 +338,6 @@ export class AiService {
         try {
           req.destroy();
         } catch (e) {
-          
         }
         AiService.info('探测结果 code=' + code + ' 用时 ' + out.ms + 'ms：' + msg);
         resolve(out);
@@ -468,7 +456,6 @@ export class AiService {
     if (head === 'goods' || head === 'courses' || head === 'events') {
       return head;
     }
-    
     return this.siteIdOf(name).length > 0 ? 'site' : '';
   }
 

@@ -6,12 +6,11 @@ import { drawBand, drawPaper, drawPedestal, drawWord, tracePath } from '../commo
 import { ShapeMeta, TurntableFrames, TurntableIndex } from '../service/TurntableFrames';
 import { PotteryCanvas } from './PotteryCanvas';
 
+
 const SLABS: number = 8;
 const SPIN_MS: number = 120;
 const RESUME_MS: number = 2500;
-
 const STRIP_SS: number = 3;
-
 const FRAME_LUM: number = 179;
 const TINT_TOL: number = 22;
 const TINT_MIN: number = 0.62;
@@ -25,9 +24,7 @@ export struct PotteryTurntable {
   @Prop @Watch('onParam') pedestal: string = '素台';
   @Prop @Watch('onParam') word: string = '';
   @Prop @Watch('onParam') seed: number = 0;
-  
   @StorageLink('textScale') ts: number = 1;
-  
   @State ready: boolean = false;
   @State hint: boolean = true;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
@@ -46,10 +43,8 @@ export struct PotteryTurntable {
   private dragBase: number = 0;
   private idleAt: number = 0;
   private spin: number = -1;
-  
   private strip: image.PixelMap | null = null;
   private stripKey: string = '';
-  
   private bandCtx: OffscreenCanvasRenderingContext2D | null = null;
   private bandW: number = 0;
   private bandH: number = 0;
@@ -65,7 +60,6 @@ export struct PotteryTurntable {
       this.fh = this.idx.canvas[1];
       this.degStep = this.idx.degStep > 0 ? this.idx.degStep : 15;
       this.showFrame();
-      
       svc.preloadFrom(m.key, this.frameIdx(), this.frameCount());
     }
     this.ensureSpin();
@@ -77,7 +71,6 @@ export struct PotteryTurntable {
       this.spin = -1;
     }
     this.cur = null;
-    
     let s = this.strip;
     this.strip = null;
     this.stripKey = '';
@@ -98,18 +91,15 @@ export struct PotteryTurntable {
     let m = svc.metaOf(this.shape);
     this.meta = m;
     if (m === null || this.idx === null) {
-      
       this.cur = null;
       this.ready = false;
       return;
     }
     this.fw = this.idx.canvas[0];
     this.fh = this.idx.canvas[1];
-    
     if (m.key !== this.lastKey) {
       this.cur = null;
       this.ready = false;
-      
       svc.keepOnly(m.key);
       this.showFrame();
       svc.preloadFrom(m.key, this.frameIdx(), this.frameCount());
@@ -138,7 +128,6 @@ export struct PotteryTurntable {
     }
     let n = this.frameCount();
     let f = this.frameIdx();
-    
     let key = m.key;
     let hit = svc.peek(key, f);
     if (hit !== null) {
@@ -150,12 +139,10 @@ export struct PotteryTurntable {
       let my = this.seq + 1;
       this.seq = my;
       svc.frame(key, f).then((pm: image.PixelMap | null): void => {
-        
         if (my !== this.seq) {
           return;
         }
         if (pm === null) {
-          
           this.meta = null;
           this.ready = false;
           return;
@@ -221,11 +208,8 @@ export struct PotteryTurntable {
     c.drawImage(cur, 0, 0, this.fw, this.fh);
     this.tint(c, p, m);
     this.wrap(c, p, m);
-    
     this.shade(c, m);
-    
     c.globalCompositeOperation = 'destination-over';
-    
     let contact = this.shape === '鼎式' ? this.fh * 0.895 : m.botPx;
     drawPedestal(c, p, this.shape, this.pedestal, contact, this.fw, this.fh);
     c.restore();
@@ -236,11 +220,9 @@ export struct PotteryTurntable {
   }
 
   private tint(c: CanvasRenderingContext2D, p: Palette, m: ShapeMeta): void {
-    
     let d = FRAME_LUM - hexLum(p.base);
     let a = d <= TINT_TOL ? TINT_MIN : Math.max(TINT_MIN, Math.min(TINT_MAX, 1 - TINT_TOL / d));
     let g: CanvasGradient = c.createLinearGradient(0, m.topPx, 0, m.botPx);
-    
     g.addColorStop(0, withAlpha(p.base, a));
     g.addColorStop(0.55, withAlpha(p.base, a));
     g.addColorStop(1, withAlpha(p.deep, Math.min(TINT_MAX, a + 0.08)));
@@ -285,10 +267,8 @@ export struct PotteryTurntable {
       let hPx = Math.ceil((y1 - y0) * STRIP_SS);
       let off = new OffscreenCanvas(wPx, hPx, LengthMetricsUnit.PX);
       let o = off.getContext('2d', new RenderingContextSettings(true));
-      
       o.scale(STRIP_SS, STRIP_SS);
       o.translate(0, -y0);
-      
       for (let j = -1; j <= 1; j++) {
         drawBand(o, p, this.motif, this.seed, j * per, (j + 1) * per, y0, y1, this.fh);
       }
@@ -311,17 +291,14 @@ export struct PotteryTurntable {
   private blitSlabs(o: CanvasRenderer, bmp: image.PixelMap, per: number, sw: number, y0: number,
     bh: number, xL: number[], xR: number[], sL: number[], sq: number[]): void {
     for (let k = 0; k < SLABS; k++) {
-      
       let u = sL[k] - per * Math.floor(sL[k] / per);
       let wide = per * sq[k];
       let x0 = xL[k] - u * sq[k];
       o.save();
       o.beginPath();
-      
       o.rect(xL[k], y0, xR[k] - xL[k], bh);
       o.clip();
       o.drawImage(bmp, x0, y0, wide, bh);
-      
       if (u + sw > per) {
         o.drawImage(bmp, x0 + wide, y0, wide, bh);
       }
@@ -351,7 +328,6 @@ export struct PotteryTurntable {
     try {
       o.setTransform(1, 0, 0, 1, 0, 0);
       o.clearRect(0, 0, bwPx, bhPx);
-      
       o.setTransform(STRIP_SS, 0, 0, STRIP_SS,
         -(this.fw / 2 - r) * STRIP_SS, -y0 * STRIP_SS);
       o.globalCompositeOperation = 'source-over';
@@ -375,14 +351,11 @@ export struct PotteryTurntable {
     let per = Math.PI * r;
     let y0 = m.topPx + (m.botPx - m.topPx) * m.band[0];
     let y1 = m.topPx + (m.botPx - m.topPx) * m.band[1];
-    
     let phi = -this.angle * Math.PI / 180;
     let da = Math.PI / SLABS;
-    
     let wordW = 2 * r / 0.92;
     let wordLo = per / 2 - wordW / 2;
     let wordHi = per / 2 + wordW / 2;
-    
     let xL: number[] = [];
     let xR: number[] = [];
     let sL: number[] = [];
@@ -401,7 +374,6 @@ export struct PotteryTurntable {
       sR.push(s1);
       sq.push((x1 - x0) / (s1 - s0));
     }
-    
     let blitted = false;
     if (this.ensureStrip(p, m, y0, y1)) {
       let bmp = this.strip;
@@ -409,19 +381,16 @@ export struct PotteryTurntable {
         blitted = true;
         let bh = y1 - y0;
         let sw = r * da;
-        
         let band = this.composeBand(bmp, r, y0, y1, per, sw, xL, xR, sL, sq);
         c.globalCompositeOperation = 'source-atop';
         if (band !== null) {
           c.drawImage(band, this.fw / 2 - r, y0, 2 * r, bh);
         } else {
-          
           this.blitSlabs(c, bmp, per, sw, y0, bh, xL, xR, sL, sq);
         }
       }
     }
     if (!blitted) {
-      
       c.globalCompositeOperation = 'source-atop';
       for (let k = 0; k < SLABS; k++) {
         c.save();
@@ -439,7 +408,6 @@ export struct PotteryTurntable {
         c.restore();
       }
     }
-    
     if (this.word.length > 0) {
       c.save();
       tracePath(c, this.shape, this.fw, this.fh);
@@ -477,7 +445,6 @@ export struct PotteryTurntable {
         Canvas(this.c2d)
           .width('100%')
           .height('100%')
-          
           .backgroundColor(paletteOf(this.glaze).paper)
           .onReady((): void => {
             this.paint();

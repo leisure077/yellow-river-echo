@@ -4,6 +4,7 @@ import {
   drawPaper, drawBand, drawRimFoot, drawPedestal
 } from '../common/PotteryArt';
 
+
 @Component
 export struct PotteryCanvas {
   @Prop @Watch('repaint') shape: string = '罐';
@@ -67,7 +68,6 @@ export struct PotteryCanvas {
     c.clearRect(0, 0, w, h);
     drawPaper(c, p, this.seed, w, h);
     this.feet(c, p, w, h);
-    
     drawPedestal(c, p, this.shape, this.pedestal,
       this.shape === '鼎式' ? bot + (bot - top) * 0.20 : bot, w, h);
 

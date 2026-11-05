@@ -100,7 +100,6 @@ export class SyncService {
         this.note('info', '上次退出时是本机模式，未启动设备扫描');
       } else {
         this.hint = '等待可信设备出现';
-        
         setTimeout((): void => {
           this.refreshDevices();
           if (this.dirty.size > 0) {
@@ -218,7 +217,6 @@ export class SyncService {
     let ids = this.devices.map((d: DeviceRow): string => d.id).filter((s: string): boolean => s.length > 0);
     let sent = this.dirty.size;
     try {
-      
       this.kv.sync(ids, distributedKVStore.SyncMode.PUSH_PULL, 3000);
       this.note('state', 'PUSH_PULL 已发出：' + ids.length + ' 台设备 / ' + sent + ' 条变更 / 超时 3000ms');
       setTimeout((): void => {
@@ -266,7 +264,6 @@ export class SyncService {
         let id = key.substring(sep + 1);
         let localTs = store.localTs(entity, id);
         if (this.dirty.has(key) && localTs > remoteTs) {
-          
           this.conflicts.unshift({ key: key, at: Date.now(), kept: '本机版本' });
           if (this.conflicts.length > 20) {
             this.conflicts.pop();

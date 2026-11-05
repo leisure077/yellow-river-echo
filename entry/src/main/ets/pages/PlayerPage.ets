@@ -39,32 +39,25 @@ function kindOf(t: string, i: number): string {
 @Entry
 @Component
 struct PlayerPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @State course: Course | undefined = undefined;
   @State idx: number = 0;
   @State playing: boolean = false;
-  
   @State cardIn: number = 1;
   private timer: number = -1;
-  
   private prev: number = -1;
-  
   private shotMs: number = 0;
   private fadeMs: number = FADE_MS;
-  
   private clock: number = 0;
   private lastBeat: number = 0;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
-  
   private box: ShotBox | undefined = undefined;
 
   aboutToAppear(): void {
     let p = params();
     let id = p.courseId ?? '';
     this.course = ContentRepo.get().courseOf(id);
-    
     if (this.total() > 0) {
       this.playing = true;
     }
@@ -180,7 +173,6 @@ struct PlayerPage {
     if (n === 0) {
       return;
     }
-    
     this.enter((this.stepIdx() + 1) % n);
   }
 
@@ -268,7 +260,6 @@ struct PlayerPage {
       c.ellipse(sx, g - h * 0.03 - hop, w * 0.065, h * 0.045, 0, 0, Math.PI * 2);
       c.fill();
     }
-    
     c.strokeStyle = p.ink;
     c.lineWidth = Math.max(h * 0.012, 1.2);
     let press = (sq + 1) / 2;
@@ -280,7 +271,6 @@ struct PlayerPage {
       c.arc(cx, cy, rr, Math.PI * (0.15 + 0.1 * press), Math.PI * (0.85 - 0.1 * press));
       c.stroke();
     }
-    
     c.strokeStyle = 'rgba(43,38,34,0.55)';
     c.beginPath();
     c.moveTo(w * 0.30, h * 0.22 + h * 0.02 * sq);
@@ -298,7 +288,6 @@ struct PlayerPage {
     let rw = w * (0.205 - 0.035 * ph);
     let vy = g - rh;
     this.vessel(c, p, w * 0.5, vy, rw, rh);
-    
     c.strokeStyle = p.accent;
     c.lineWidth = Math.max(h * 0.010, 1.2);
     c.setLineDash([h * 0.03, h * 0.03]);
@@ -310,7 +299,6 @@ struct PlayerPage {
       c.stroke();
     }
     c.setLineDash([]);
-    
     c.strokeStyle = p.deep;
     c.lineWidth = Math.max(h * 0.006, 1);
     for (let i = 0; i < 4; i++) {
@@ -323,7 +311,6 @@ struct PlayerPage {
       c.quadraticCurveTo(w * 0.5, yy + h * 0.012, w * 0.5 + rw * 0.46, yy);
       c.stroke();
     }
-    
     c.strokeStyle = 'rgba(255,255,255,0.42)';
     c.lineWidth = Math.max(rw * 0.10, 2);
     let hx = w * 0.5 + rw * 0.5 * Math.sin(t * 2.6);
@@ -331,7 +318,6 @@ struct PlayerPage {
     c.moveTo(hx, vy - rh * 0.82);
     c.lineTo(hx, g - rh * 0.12);
     c.stroke();
-    
     c.strokeStyle = 'rgba(43,38,34,0.50)';
     c.lineWidth = Math.max(h * 0.014, 1.4);
     let hy = vy + h * 0.01 * Math.sin(t * 3.1);
@@ -361,7 +347,6 @@ struct PlayerPage {
       c.lineTo(w * 0.54, y0 - h * 0.02);
       c.stroke();
     }
-    
     let sweep = (Math.sin(t * 1.8) + 1) / 2;
     let ty = g - h * (0.10 + 0.26 * sweep);
     c.strokeStyle = '#5A4030';
@@ -374,7 +359,6 @@ struct PlayerPage {
     c.beginPath();
     c.arc(w * 0.56, ty, Math.max(w * 0.014, 1.6), 0, Math.PI * 2);
     c.fill();
-    
     let chips = 1 + Math.floor(ph * 5);
     for (let i = 0; i < chips; i++) {
       let drop = (t * 0.7 + i * 0.19) % 1;
@@ -402,7 +386,6 @@ struct PlayerPage {
     let f2 = Math.min(1, Math.max(0, ph * 1.6 - 0.55));
     this.spiral(c, p, w * 0.40, by, h * 0.05, f1);
     this.spiral(c, p, w * 0.58, by, h * 0.05, f2);
-    
     let tipF = f2 < 1 ? f2 : f1;
     let tipR = h * 0.05 * (1 - tipF * 4 / 4.4);
     let tx = (f2 < 1 ? w * 0.58 : w * 0.40) + tipR;
@@ -445,7 +428,6 @@ struct PlayerPage {
     c.lineTo(w * 0.64, g);
     c.closePath();
     c.fill();
-    
     c.fillStyle = '#F6E1B0';
     for (let i = -1; i <= 1; i++) {
       let fx = w * 0.5 + i * w * 0.09;
@@ -457,7 +439,6 @@ struct PlayerPage {
       c.closePath();
       c.fill();
     }
-    
     c.fillStyle = 'rgba(246,164,76,0.85)';
     for (let i = 0; i < 4; i++) {
       let up = (t * 0.55 + i * 0.25) % 1;
@@ -466,7 +447,6 @@ struct PlayerPage {
       c.arc(sx, h * 0.44 - h * 0.30 * up, Math.max(w * (0.008 - 0.004 * up), 1.2), 0, Math.PI * 2);
       c.fill();
     }
-    
     c.strokeStyle = 'rgba(43,38,34,0.35)';
     c.lineWidth = Math.max(h * 0.008, 1);
     for (let i = 0; i < 3; i++) {
@@ -484,7 +464,6 @@ struct PlayerPage {
   private scene(c: CanvasRenderingContext2D, p: Palette, w: number, h: number, kind: string,
     ph: number, t: number): void {
     let ground = h * 0.78;
-    
     c.strokeStyle = 'rgba(43,38,34,0.30)';
     c.lineWidth = Math.max(h * 0.006, 1);
     c.beginPath();
@@ -533,7 +512,6 @@ struct PlayerPage {
     let i = this.stepIdx();
     let ph = Math.min(1, this.shotMs / SHOT_MS);
     c.fillStyle = 'rgba(43,38,34,0.62)';
-    
     c.font = `${Math.round(h * 0.05)}vp sans-serif`;
     c.textAlign = 'left';
     c.textBaseline = 'top';
@@ -541,7 +519,6 @@ struct PlayerPage {
     c.font = `${Math.round(h * 0.062)}vp sans-serif`;
     c.fillStyle = 'rgba(43,38,34,0.86)';
     c.fillText(st[i].t, w * 0.05, h * 0.12);
-    
     c.fillStyle = 'rgba(43,38,34,0.14)';
     c.fillRect(w * 0.05, h - h * 0.045, w * 0.90, Math.max(h * 0.012, 2));
     c.fillStyle = CLAY;
@@ -600,16 +577,13 @@ struct PlayerPage {
     let p = paletteOf(co.palette);
     c.globalAlpha = 1;
     c.clearRect(0, 0, w, h);
-    
     drawPaper(c, p, co.id.length, w, h);
     let i = this.stepIdx();
     let ph = Math.min(1, this.shotMs / SHOT_MS);
     let t = this.clock;
     let f = Math.min(1, this.fadeMs / FADE_MS);
-    
     let slide = hasCourseShot(co.id);
     let push = slide ? w * 0.30 : w * 0.06;
-    
     if (f < 1 && this.prev >= 0 && this.prev !== i) {
       c.save();
       c.globalAlpha = slide ? (1 - f) * 0.9 : 1 - f;
@@ -630,7 +604,6 @@ struct PlayerPage {
 
   build() {
     Column() {
-      
       Row({ space: 10 }) {
         Text('‹')
           .fontSize(fs(this.ts, 20))
@@ -673,7 +646,6 @@ struct PlayerPage {
       } else {
         Scroll() {
           Column({ space: 10 }) {
-            
             Column({ space: 0 }) {
               Canvas(this.ctx)
                 .width('100%')

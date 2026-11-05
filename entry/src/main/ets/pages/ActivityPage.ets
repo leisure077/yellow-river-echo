@@ -25,7 +25,6 @@ function pad2(n: number): string {
 @Entry
 @Component
 struct ActivityPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @State topId: string = '';

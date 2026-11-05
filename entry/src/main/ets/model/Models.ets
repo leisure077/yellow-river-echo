@@ -34,6 +34,7 @@ export interface Suggestion {
   score: number;
 }
 
+
 export interface FavRec {
   siteId: string;
   tagIds: string[];
@@ -59,9 +60,7 @@ export interface NoteRec {
   version: number;
   deviceId: string;
   deleted: boolean;
-  
   ord?: number;
-  
   srcIds?: string[];
 }
 
@@ -98,6 +97,7 @@ export interface QuizRun {
   picks: number[];
 }
 
+
 export interface SpecKV {
   k: string;
   v: string;
@@ -114,7 +114,6 @@ export interface Goods {
   likes: number;
   tags: string[];
   palette: string;
-  
   img: string;
   spec: SpecKV[];
   story: string;
@@ -179,6 +178,7 @@ export interface LocalComment {
   at: number;
 }
 
+
 export interface CartLine {
   id: string;
   n: number;
@@ -208,7 +208,6 @@ export interface AccountRec {
   avatar: number;
   createdAt: number;
   lastAt: number;
-  
   phone: string;
 }
 

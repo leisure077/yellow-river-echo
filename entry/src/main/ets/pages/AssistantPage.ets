@@ -19,7 +19,6 @@ const TYPE_MS: number = 50;
 @Entry
 @Component
 struct AssistantPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('aiRev') rev: number = 0;
   @State turns: ChatTurn[] = [];
@@ -34,7 +33,6 @@ struct AssistantPage {
   @State clearAsk: boolean = false;
   @State live: string = '';
   @State liveOn: boolean = false;
-  
   @State probing: boolean = false;
   @State probeMsg: string = '';
   @State lastFail: string = '';
@@ -175,7 +173,6 @@ struct AssistantPage {
     this.cleanTarget = this.streamDone ? cleanAiText(this.rawTarget) : cleanPartial(this.rawTarget);
     if (this.shown < this.cleanTarget.length) {
       let remain = this.cleanTarget.length - this.shown;
-      
       let step = Math.max(2, Math.ceil(remain / 6));
       this.shown = Math.min(this.cleanTarget.length, this.shown + step);
       this.live = this.cleanTarget.substring(0, this.shown);
@@ -213,7 +210,6 @@ struct AssistantPage {
     if (this.streamErr.length > 0) {
       this.err = text.length > 0 ? this.streamErr + '（回答已中断）' : this.streamErr;
       this.lastQ = this.askQ;
-      
       this.lastFail = store.lastFail;
     } else if (text.length === 0) {
       this.err = AiService.ERR_EMPTY;
@@ -255,7 +251,6 @@ struct AssistantPage {
     AiService.get().probe(this.base, this.apiKey).then((r: ProbeResult): void => {
       this.probing = false;
       this.probeMsg = r.msg;
-      
       if (r.ok) {
         this.lastFail = '';
       }
@@ -338,7 +333,6 @@ struct AssistantPage {
           this.err = '';
           this.probeMsg = '';
           this.clearAsk = false;
-          
           this.lastFail = AiStore.get().lastFail;
         })
     }

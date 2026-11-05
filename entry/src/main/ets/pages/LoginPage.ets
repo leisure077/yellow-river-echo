@@ -36,7 +36,6 @@ interface QuickArg {
 @Entry
 @Component
 struct LoginPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @State mode: string = 'login';
   @State nick: string = '续响者';
@@ -56,7 +55,6 @@ struct LoginPage {
       this.nick = last.nick;
       this.avatar = last.avatar;
     }
-    
     this.tick();
   }
 

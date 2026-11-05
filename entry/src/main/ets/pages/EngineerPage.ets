@@ -55,7 +55,6 @@ struct EngineerPage {
 
   aboutToAppear(): void {
     this.reload();
-    
     this.ticker = setInterval((): void => {
       this.clock = Date.now();
       this.reload();
@@ -242,7 +241,6 @@ struct EngineerPage {
 
       Scroll() {
         Column({ space: 12 }) {
-          
           Column({ space: 8 }) {
             Row({ space: 8 }) {
               Circle().width(10).height(10).fill(this.stateColor())

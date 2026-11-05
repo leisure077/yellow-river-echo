@@ -26,7 +26,6 @@ const TABS: string[] = ['观文物', '创意坊', '选教程'];
 @Entry
 @Component
 export struct StudioPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @State tab: number = 1;
   @State cur: number = 0;
@@ -39,7 +38,6 @@ export struct StudioPage {
     if (p !== undefined && p.tab !== undefined && p.tab >= 0 && p.tab < TABS.length) {
       this.tab = p.tab;
     }
-    
     animateTo({
       duration: 6000, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
@@ -79,7 +77,6 @@ export struct StudioPage {
     Stack() {
       PatternBg()
       Column() {
-      
       Row() {
         Text('‹')
           .fontSize(fs(this.ts, 20))
@@ -128,7 +125,6 @@ export struct StudioPage {
       .justifyContent(FlexAlign.Center)
 
       if (this.tab === 0) {
-        
         RelicBrowser()
           .layoutWeight(1)
       } else {
@@ -145,7 +141,6 @@ export struct StudioPage {
         }
         .layoutWeight(1)
         .scrollBar(BarState.Off)
-        
         .align(Alignment.Top)
         .edgeEffect(EdgeEffect.Spring)
       }
@@ -160,7 +155,6 @@ export struct StudioPage {
   stage() {
     Column({ space: 8 }) {
       Stack({ alignContent: Alignment.Center }) {
-        
         Column()
           .width(330)
           .height(296)
@@ -176,7 +170,6 @@ export struct StudioPage {
                 .width(216)
                 .height(216)
                 .objectFit(ImageFit.Contain)
-              
               if (this.rel(i) === 0) {
                 Stack({ alignContent: Alignment.Top }) {
                   Image(coverRes(e.img))
@@ -210,7 +203,6 @@ export struct StudioPage {
             })
           }
         }, (e: ExhibitRec, i: number): string => 'stage_' + e.img + '_' + this.cur)
-        
         Row() {
           Text('‹')
             .fontSize(fs(this.ts, 22))

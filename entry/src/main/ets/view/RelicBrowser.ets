@@ -83,7 +83,6 @@ export struct RelicBrowser {
       Text(c.name).fontSize(fs(this.ts, 9)).fontColor(this.colors.indexOf(c.key) >= 0 ? CLAY : SUB)
     }
     .onClick((): void => {
-      
       this.colors = this.colors.indexOf(c.key) >= 0 ? [] : [c.key];
     })
   }
@@ -217,7 +216,6 @@ export struct RelicBrowser {
 
         Scroll() {
           Column({ space: 12 }) {
-            
             Column({ space: 8 }) {
               this.groupHead('分类')
               Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {

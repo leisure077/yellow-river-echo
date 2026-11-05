@@ -6,8 +6,8 @@ import {
   SUB, fs
 } from '../common/Theme';
 
+
 export function effectiveWaterMode(): string {
-  
   return WATER_STILL;
 }
 
@@ -64,7 +64,6 @@ export function siteDot(s: SiteInfo, w: number, h: number): DotPos {
 
 @Component
 export struct RiverRibbon {
-  
   @StorageLink('textScale') ts: number = 1;
   @Prop activeId: string = '';
   @Prop showDots: boolean = true;

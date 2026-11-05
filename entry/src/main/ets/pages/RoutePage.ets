@@ -9,7 +9,6 @@ import { goDetail } from '../common/Nav';
 @Entry
 @Component
 struct RoutePage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') rev: number = 0;
   @State era: string = '';

@@ -35,7 +35,6 @@ export default class EntryAbility extends UIAbility {
   }
 
   onBackground(): void {
-    
     MemoryStore.get().flushNow();
     StudioStore.get().flushNow();
   }

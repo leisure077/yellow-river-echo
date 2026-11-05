@@ -9,7 +9,6 @@ const CATS: string[] = ['全部', '手作', '讲读', '影像'];
 @Entry
 @Component
 struct CoursePage {
-  
   @StorageLink('textScale') ts: number = 1;
   @State cat: string = '全部';
 

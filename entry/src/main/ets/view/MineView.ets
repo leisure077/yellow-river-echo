@@ -27,7 +27,6 @@ interface FuncArg {
 
 @Component
 export struct MineView {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('syncCount') dataRev: number = 0;
   @StorageLink('syncRev') @Watch('syncCount') syncRev: number = 0;

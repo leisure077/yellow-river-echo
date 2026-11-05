@@ -16,7 +16,6 @@ const BOXES: string[] = ['素台', '木座', '圆几', '无'];
 @Entry
 @Component
 struct PotteryPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') rev: number = 0;
   @State shape: string = '罐';
@@ -25,13 +24,11 @@ struct PotteryPage {
   @State box: string = '素台';
   @State seed: number = 1;
   @State name: string = '未命名第 1 件';
-  
   @State mode3d: string = 'probe';
   private probeTimer: number = -1;
 
   aboutToAppear(): void {
     this.name = `未命名第 ${StudioStore.get().works.length + 1} 件`;
-    
     this.probeTimer = setTimeout((): void => {
       this.probeTimer = -1;
       if (this.mode3d === 'probe') {
@@ -147,7 +144,6 @@ struct PotteryPage {
       Scroll() {
         Column({ space: 12 }) {
           Column({ space: 8 }) {
-            
             Column() {
               Stack() {
                 Pottery3D({
@@ -160,7 +156,6 @@ struct PotteryPage {
                     this.onProbe(m);
                   }
                 })
-                  
                   .visibility(this.mode3d === 'fallback' ? Visibility.Hidden : Visibility.Visible)
                 if (this.mode3d !== '3d') {
                   PotteryTurntable({

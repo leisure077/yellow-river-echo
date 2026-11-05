@@ -1,4 +1,3 @@
-
 export class VerifyGate {
   private static readonly inst: VerifyGate = new VerifyGate();
 

@@ -20,7 +20,6 @@ struct DetailPage {
   @StorageLink('studioRev') @Watch('syncCheckin') studioRev: number = 0;
   @StorageLink('textScale') ts: number = 1;
   @State site: SiteInfo | undefined = undefined;
-  
   @State favOn: boolean = false;
   @State readOn: boolean = false;
   @State notes: NoteRec[] = [];
@@ -420,7 +419,6 @@ struct DetailPage {
           this.scrollY = next < 0 ? 0 : next;
         })
         .onScrollIndex((first: number, last: number): void => {
-          
           let max = this.secs().length - 1;
           let secIdx = Math.min(Math.max(last - 5, 0), max);
           if (this.site !== undefined) {

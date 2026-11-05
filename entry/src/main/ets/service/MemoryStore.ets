@@ -99,7 +99,6 @@ export class MemoryStore {
     if (this.p === null) {
       return;
     }
-    
     let t0 = Date.now();
     await this.p.put(key, JSON.stringify(arr));
     if (Date.now() - t0 > 200) {
@@ -142,13 +141,13 @@ export class MemoryStore {
     let payload = JSON.stringify(rec);
     let r = rec as Record<string, Object>;
     let ts = r.updatedAt as number;
-    
     setTimeout((): void => {
       if (this.onLocalChange !== null) {
         this.onLocalChange(entity, id, payload, ts);
       }
     }, 0);
   }
+
 
   favsActive(): FavRec[] {
     return this.favs.filter((f: FavRec): boolean => !f.deleted);
@@ -207,6 +206,7 @@ export class MemoryStore {
     MemoryStore.bumpRev();
   }
 
+
   tagsActive(): TagRec[] {
     return this.tags.filter((t: TagRec): boolean => !t.deleted);
   }
@@ -260,6 +260,7 @@ export class MemoryStore {
     this.emit('tag', id, rec);
     MemoryStore.bumpRev();
   }
+
 
   static ordOf(n: NoteRec): number {
     return n.ord !== undefined ? n.ord : n.updatedAt;
@@ -362,6 +363,7 @@ export class MemoryStore {
     await this.addNote(src.siteId, src.text, []);
   }
 
+
   progressOf(siteId: string): ProgressRec | undefined {
     return this.prog.find((p: ProgressRec): boolean => p.siteId === siteId);
   }
@@ -399,6 +401,7 @@ export class MemoryStore {
     return this.prog.filter((p: ProgressRec): boolean => p.read).length;
   }
 
+
   touchView(siteId: string): void {
     this.views = this.views.filter((v: ViewLog): boolean => v.siteId !== siteId);
     this.views.unshift({ siteId: siteId, at: Date.now() });
@@ -416,6 +419,7 @@ export class MemoryStore {
     await this.persist('views', this.views);
     MemoryStore.bumpRev();
   }
+
 
   topicsActive(): TopicRec[] {
     return this.topics.filter((t: TopicRec): boolean => !t.deleted);
@@ -477,6 +481,7 @@ export class MemoryStore {
     this.emit('topic', id, rec);
     MemoryStore.bumpRev();
   }
+
 
   async applyRemote(entity: string, payload: string): Promise<void> {
     if (entity === 'fav') {
@@ -549,6 +554,7 @@ export class MemoryStore {
     return this.topics.find((x: TopicRec): boolean => x.id === id);
   }
 
+
   saveDraft(siteId: string, text: string): void {
     if (this.p !== null) {
       this.p.put('draft_' + siteId, text);
@@ -567,6 +573,7 @@ export class MemoryStore {
       this.p.delete('draft_' + siteId);
     }
   }
+
 
   exportAll(siteCount: number): BackupData {
     let data: BackupData = {

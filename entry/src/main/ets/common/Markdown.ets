@@ -1,4 +1,3 @@
-
 const TABLE_SEP = /^\s*\|?[\s:|-]*-{2,}[\s:|-]*\|?\s*$/;
 const BULLET = /^(\s*)[-*+]\s+/;
 const HEADING = /^#{1,6}\s*/;

@@ -10,7 +10,6 @@ import { params } from '../common/Nav';
 @Entry
 @Component
 struct NoteEditPage {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') rev: number = 0;
   @StorageLink('syncRev') syncRev: number = 0;

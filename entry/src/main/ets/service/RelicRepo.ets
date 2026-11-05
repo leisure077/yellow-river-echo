@@ -1,17 +1,12 @@
-
 export interface Relic {
   id: string;
   name: string;
   cat: string;
   era: string;
-  
   palette: string;
-  
   shape: string;
-  
   img: string;
   material: string;
-  
   hold: string;
   desc: string;
 }

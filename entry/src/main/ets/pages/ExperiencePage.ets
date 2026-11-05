@@ -11,7 +11,6 @@ class ExperienceBridge {
   ctx: common.UIAbilityContext;
   constructor(ctx: common.UIAbilityContext) { this.ctx = ctx; }
   back(): void { router.back(); }
-  
   journey(): void { router.pushUrl({ url: 'pages/RoutePage' }); }
   private bytes(data: string): Uint8Array {
     if (!data.startsWith('data:image/png;base64,') || data.length > 12000000) { throw new Error('无效的明信片'); }
@@ -42,7 +41,6 @@ class ExperienceBridge {
 @Component
 struct ExperiencePage {
   aboutToAppear(): void {
-    
     claimAssistant('map');
   }
 
@@ -52,10 +50,8 @@ struct ExperiencePage {
 
   private controller: webview.WebviewController = new webview.WebviewController();
   private bridge: ExperienceBridge = new ExperienceBridge(getContext(this) as common.UIAbilityContext);
-  
   private fabSignalAt: number = 0;
   private lastScrollY: number = -1;
-  
   private origin: string = 'https://huanghe.example/experience/';
   private localResource(url: string): WebResourceResponse | null {
     if (!url.startsWith(this.origin)) { return null; }
@@ -83,13 +79,11 @@ struct ExperiencePage {
       Column() {
       Web({ src: this.origin + 'index.html', controller: this.controller })
         .javaScriptAccess(true).domStorageAccess(true).fileAccess(true)
-        
         .zoomAccess(false)
         .onInterceptRequest((event): WebResourceResponse =>
           this.localResource(event.request.getRequestUrl()) as WebResourceResponse)
         .javaScriptProxy({ object: this.bridge, name: 'Native', methodList: ['back', 'journey', 'saveImage', 'shareImage'], controller: this.controller })
         .onScroll((ev: OnScrollEvent): void => {
-          
           let now = Date.now();
           if (ev.yOffset === this.lastScrollY || now - this.fabSignalAt < 80) {
             this.lastScrollY = ev.yOffset;

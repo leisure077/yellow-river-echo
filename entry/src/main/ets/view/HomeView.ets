@@ -165,7 +165,6 @@ function artOf(kind: string, scale: number) {
 
 @Component
 struct RelicTile {
-  
   @StorageLink('textScale') ts: number = 1;
   @Prop kind: string = '';
   @Prop title: string = '';
@@ -188,7 +187,6 @@ struct RelicTile {
   build() {
     Column({ space: 5 }) {
       Stack({ alignContent: Alignment.Bottom }) {
-        
         Column()
           .width(34)
           .height(9)
@@ -237,20 +235,16 @@ export struct HomeView {
   @State noteN: number = 0;
   @State wSway: number = -7;
   @State mapFloat: boolean = false;
-  
   @StorageLink('assistantSeen') askSeen: boolean = false;
-  
   private fabSignalAt: number = 0;
 
   aboutToAppear(): void {
     this.reload();
-    
     animateTo({
       duration: 5200, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
       this.wSway = 7;
     });
-    
     animateTo({
       duration: 3000, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
@@ -386,12 +380,10 @@ export struct HomeView {
           .borderRadius(16)
           .backgroundColor(CLAY)
           .textAlign(TextAlign.Center)
-        
           .onClick((): void => {
             openAssistantSheet();
           })
         if (!this.askSeen) {
-          
           Circle()
             .width(9)
             .height(9)
@@ -638,7 +630,6 @@ export struct HomeView {
         .fontSize(fs(this.ts, 9))
         .fontColor(SUB)
       Stack({ alignContent: Alignment.Center }) {
-        
         Column()
           .width('100%')
           .height(58)
@@ -794,7 +785,6 @@ export struct HomeView {
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
-      
       if (sg.score > 0) {
         Text(sg.reason)
           .fontSize(fs(this.ts, 10))
@@ -862,7 +852,6 @@ export struct HomeView {
           .fontSize(fs(this.ts, 12))
           .fontColor(CLAY)
           .fontWeight(FontWeight.Medium)
-        
         Text(g.origin)
           .fontSize(fs(this.ts, 10))
           .fontColor(RIVER)
@@ -916,7 +905,6 @@ export struct HomeView {
               this.shopGrid()
             }
             .width('100%')
-            
             .padding({ left: 14, right: 14, bottom: 92 })
             .alignItems(HorizontalAlign.Start)
           }
@@ -929,7 +917,6 @@ export struct HomeView {
           if (yOffset === 0) {
             return;
           }
-          
           let now = Date.now();
           if (now - this.fabSignalAt < 80) {
             return;

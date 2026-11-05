@@ -9,7 +9,6 @@ const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'box', 'coin', 
 
 @Component
 export struct ShopView {
-  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') dataRev: number = 0;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;

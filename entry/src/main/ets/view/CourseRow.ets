@@ -25,10 +25,8 @@ export function coverShape(c: Course): string {
 
 @Component
 export struct CourseRow {
-  
   @StorageLink('textScale') ts: number = 1;
   @Require @Prop course: Course;
-  
   @Prop seed: number = 1;
 
   build() {

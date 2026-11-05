@@ -1,8 +1,6 @@
 import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { Boot } from '../service/Boot';
-import { StudioStore } from '../service/StudioStore';
-import { fs, INK, SUB, LOESS, CLAY, RIVER } from '../common/Theme';
 
 const RIVER_PTS: number[][] = [
   [0.10, 0.16], [0.28, 0.12], [0.50, 0.19], [0.62, 0.31],

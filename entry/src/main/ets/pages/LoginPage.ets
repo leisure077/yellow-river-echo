@@ -1,8 +1,7 @@
 import { router, promptAction } from '@kit.ArkUI';
 import { StudioStore } from '../service/StudioStore';
 import { VerifyGate } from '../service/VerifyGate';
-import { ArtCover } from '../view/ArtCover';
-import { fs, INK, SUB, LOESS, CLAY, RIVER, LINE, PAPER } from '../common/Theme';
+import { fs, INK, SUB, CLAY, RIVER, LINE, PAPER } from '../common/Theme';
 
 interface AvatarSeed {
   key: string;

@@ -5,7 +5,7 @@ import { AiService, StreamHandle } from '../service/AiService';
 import { AiContext } from '../service/AiContext';
 import { cleanAiText, cleanPartial } from '../common/Markdown';
 import { errCopyOf } from '../common/AssistantCopy';
-import { INK, SUB, LOESS, CLAY, LINE, RIVER, fs } from '../common/Theme';
+import { INK, SUB, CLAY, LINE, RIVER, fs } from '../common/Theme';
 import { goDetail, goTopicSection } from '../common/Nav';
 
 const TIPS: string[] = [

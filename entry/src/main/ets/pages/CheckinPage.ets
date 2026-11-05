@@ -3,7 +3,7 @@ import { SiteInfo } from '../model/Models';
 import { SiteRepo } from '../service/SiteRepo';
 import { StudioStore } from '../service/StudioStore';
 import { BasinMap } from '../common/BasinMap';
-import { INK, SUB, LOESS, CLAY, RIVER, agoText, coverRes, fs } from '../common/Theme';
+import { INK, SUB, LOESS, CLAY, agoText, coverRes, fs } from '../common/Theme';
 import { goDetail } from '../common/Nav';
 
 const MAP_H: number = 310;

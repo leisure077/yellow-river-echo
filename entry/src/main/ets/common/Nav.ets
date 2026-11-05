@@ -25,10 +25,6 @@ export function openAssistantSheet(): void {
   AppStorage.setOrCreate('assistantSheet', true);
 }
 
-export function closeAssistantSheet(): void {
-  AppStorage.setOrCreate('assistantSheet', false);
-}
-
 export function claimAssistant(tag: string): void {
   AppStorage.setOrCreate('assistantOwner', tag);
   AppStorage.setOrCreate('assistantSheet', false);

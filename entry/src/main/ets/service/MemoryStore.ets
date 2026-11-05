@@ -1,7 +1,7 @@
 import { preferences } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
-import { FavRec, NoteRec, ProgressRec, TagRec, TopicRec, ViewLog, BackupData } from '../model/Models';
+import { FavRec, NoteRec, ProgressRec, TagRec, TopicRec, ViewLog, BackupData, AccProfile, PrevImport } from '../model/Models';
 import { DEFAULT_TAG_NAMES } from '../common/Theme';
 
 export class MemoryStore {
@@ -518,7 +518,8 @@ export class MemoryStore {
     }
   }
 
-  localTs(entity: string, id: string): number {    if (entity === 'fav') {
+  localTs(entity: string, id: string): number {
+    if (entity === 'fav') {
       let r = this.favs.find((x: FavRec): boolean => x.siteId === id);
       return r === undefined ? 0 : r.updatedAt;
     }
@@ -555,6 +556,19 @@ export class MemoryStore {
   }
 
 
+  // 给 BackupService 存「已知的快照清单」用：记住 hdc 搬走之前本机见过哪些备份文件
+  setJson(key: string, val: Object): void {
+    if (this.p === null) {
+      return;
+    }
+    this.p.put(key, JSON.stringify(val));
+    this.scheduleFlush();
+  }
+
+  getJson<T>(key: string): T[] {
+    return this.readArr<T>(key);
+  }
+
   saveDraft(siteId: string, text: string): void {
     if (this.p !== null) {
       this.p.put('draft_' + siteId, text);
@@ -575,17 +589,26 @@ export class MemoryStore {
   }
 
 
-  exportAll(siteCount: number): BackupData {
+  exportAll(siteCount: number, accounts: AccProfile[]): BackupData {
     let data: BackupData = {
-      formatVer: 1, appVer: '1.0.0', exportedAt: Date.now(), siteCount: siteCount,
+      formatVer: 2, appVer: '1.0.0', exportedAt: Date.now(), siteCount: siteCount,
       checksum: 0,
       favorites: this.favs, tags: this.tags, notes: this.notes,
-      progress: this.prog, topics: this.topics
+      progress: this.prog, topics: this.topics, accounts: accounts
     };
-    let body = JSON.stringify(data.favorites) + JSON.stringify(data.notes) +
-      JSON.stringify(data.tags) + JSON.stringify(data.progress) + JSON.stringify(data.topics);
-    data.checksum = MemoryStore.fnv(body);
+    data.checksum = MemoryStore.fnv(MemoryStore.bodyOf(data));
     return data;
+  }
+
+  // 校验和覆盖「会被恢复的正文」。v1 文件没有 accounts 段，正文口径与旧版一致，
+  // 这样老备份文件在新版本上仍然能验通。
+  private static bodyOf(d: BackupData): string {
+    let body = JSON.stringify(d.favorites) + JSON.stringify(d.notes) +
+      JSON.stringify(d.tags) + JSON.stringify(d.progress) + JSON.stringify(d.topics);
+    if (d.formatVer >= 2 && d.accounts !== undefined) {
+      body += JSON.stringify(d.accounts);
+    }
+    return body;
   }
 
   static fnv(s: string): number {
@@ -596,19 +619,84 @@ export class MemoryStore {
     return h >>> 0;
   }
 
-  async importAll(data: BackupData): Promise<boolean> {
-    if (data.formatVer !== 1) {
+  private prevOf(): PrevImport | null {
+    if (this.p === null) {
+      return null;
+    }
+    let raw = this.p.getSync('prev_import_snapshot', '') as string;
+    if (raw.length === 0) {
+      return null;
+    }
+    try {
+      return JSON.parse(raw) as PrevImport;
+    } catch (e) {
+      console.warn('prev_import_snapshot broken: ' + JSON.stringify(e));
+      return null;
+    }
+  }
+
+  canUndoImport(): boolean {
+    return this.prevOf() !== null;
+  }
+
+  undoAt(): number {
+    if (this.p === null) {
+      return 0;
+    }
+    return this.p.getSync('prev_import_at', 0) as number;
+  }
+
+  undoFrom(): string {
+    if (this.p === null) {
+      return '';
+    }
+    return this.p.getSync('prev_import_from', '') as string;
+  }
+
+  // 兜底：恢复搞错了 / 文件不是想要的那份，把本机数据退回导入前的原样
+  async undoImport(): Promise<boolean> {
+    let prev = this.prevOf();
+    if (prev === null || this.p === null) {
       return false;
     }
-    let body = JSON.stringify(data.favorites) + JSON.stringify(data.notes) +
-      JSON.stringify(data.tags) + JSON.stringify(data.progress) + JSON.stringify(data.topics);
-    if (MemoryStore.fnv(body) !== data.checksum) {
+    this.favs = prev.favs ?? [];
+    this.tags = prev.tags ?? [];
+    this.notes = prev.notes ?? [];
+    this.prog = prev.prog ?? [];
+    this.topics = prev.topics ?? [];
+    await this.persist('favs', this.favs);
+    await this.persist('tags', this.tags);
+    await this.persist('notes', this.notes);
+    await this.persist('prog', this.prog);
+    await this.persist('topics', this.topics);
+    await this.p.put('prev_import_snapshot', '');
+    await this.p.put('prev_import_at', 0);
+    await this.p.put('prev_import_from', '');
+    await this.p.flush();
+    let now = Date.now();
+    console.info('[HH_BACKUP] undo import at ' + now + ' restored ' +
+      this.favs.length + ' fav / ' + this.notes.length + ' note / ' + this.topics.length + ' topic');
+    MemoryStore.bumpRev();
+    return true;
+  }
+
+  async importAll(data: BackupData, from: string): Promise<boolean> {
+    if (data.formatVer !== 1 && data.formatVer !== 2) {
+      console.warn('[HH_BACKUP] reject formatVer=' + data.formatVer + ' from ' + from);
+      return false;
+    }
+    if (MemoryStore.fnv(MemoryStore.bodyOf(data)) !== data.checksum) {
+      console.warn('[HH_BACKUP] checksum mismatch from ' + from);
       return false;
     }
     if (this.p !== null) {
-      await this.p.put('prev_import_snapshot', JSON.stringify({
+      let prev: PrevImport = {
         favs: this.favs, tags: this.tags, notes: this.notes, prog: this.prog, topics: this.topics
-      }));
+      };
+      await this.p.put('prev_import_snapshot', JSON.stringify(prev));
+      await this.p.put('prev_import_at', Date.now());
+      await this.p.put('prev_import_from', from);
+      await this.p.flush();
     }
     this.favs = data.favorites;
     this.tags = data.tags;
@@ -636,7 +724,7 @@ export class MemoryStore {
     for (let tp of this.topics) {
       this.emit('topic', tp.id, tp);
     }
-    console.info('import done at ' + now);
+    console.info('[HH_BACKUP] import done from ' + from + ' at ' + now);
     MemoryStore.bumpRev();
     return true;
   }

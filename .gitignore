@@ -30,3 +30,7 @@ __pycache__/
 
 # 号码认证 SDK 凭据按机器配置，真值只留本机，一律不入库
 entry/src/main/ets/service/NumberAuthConfig.local.ets
+
+# 演示用的 PPT 工程与导出件不是源码，别被 git add -A 扫进提交包
+/ppt/
+/*.pptx

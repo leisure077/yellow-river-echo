@@ -15,23 +15,19 @@ export interface ConflictRow {
   kept: string;
 }
 
-// 状态机日志：只留本次启动以来的，写在内存里，用于「河工面板」自查
 export interface SyncLog {
   at: number;
   tag: string;
   msg: string;
 }
 
-// 同步引擎：本地写 preferences 成功后进入 KV 存储队列，
-// 发现同账号可信设备后 PUSH_PULL；策略是 updatedAt 新者胜，
-// 被覆盖的笔记存一份副本，可在同步面板里找回。
 export class SyncService {
   private static readonly inst: SyncService = new SyncService();
   static get(): SyncService {
     return SyncService.inst;
   }
 
-  state: string = 'off'; // off | ready | unavailable
+  state: string = 'off';
   hint: string = '同步未开始';
   lastSyncAt: number = 0;
   conflicts: ConflictRow[] = [];
@@ -104,7 +100,7 @@ export class SyncService {
         this.note('info', '上次退出时是本机模式，未启动设备扫描');
       } else {
         this.hint = '等待可信设备出现';
-        // 设备扫描是同步阻塞调用，放到启动帧之后，别拖慢首屏
+        
         setTimeout((): void => {
           this.refreshDevices();
           if (this.dirty.size > 0) {
@@ -174,7 +170,6 @@ export class SyncService {
     this.notify();
   }
 
-  // 连着改多条时合并成一次同步，别把设备扫描顶到界面上
   private scheduleSync(): void {
     if (this.syncTimer >= 0) {
       return;
@@ -223,8 +218,7 @@ export class SyncService {
     let ids = this.devices.map((d: DeviceRow): string => d.id).filter((s: string): boolean => s.length > 0);
     let sent = this.dirty.size;
     try {
-      // sync 是异步广播，没有回执；4 秒内没抛异常就认为已推送，
-      // 对端真正落库以对方的 dataChange 为准
+      
       this.kv.sync(ids, distributedKVStore.SyncMode.PUSH_PULL, 3000);
       this.note('state', 'PUSH_PULL 已发出：' + ids.length + ' 台设备 / ' + sent + ' 条变更 / 超时 3000ms');
       setTimeout((): void => {
@@ -272,7 +266,7 @@ export class SyncService {
         let id = key.substring(sep + 1);
         let localTs = store.localTs(entity, id);
         if (this.dirty.has(key) && localTs > remoteTs) {
-          // 双端都改过：时间戳新者胜，旧内容留档
+          
           this.conflicts.unshift({ key: key, at: Date.now(), kept: '本机版本' });
           if (this.conflicts.length > 20) {
             this.conflicts.pop();

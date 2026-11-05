@@ -4,14 +4,6 @@ import {
   drawPaper, drawBand, drawRimFoot, drawPedestal
 } from '../common/PotteryArt';
 
-// 彩陶组装预览：器型、纹样、配色、题字、展示座全部按画布尺寸归一化现画。
-// shape：罐 / 盆 / 壶 / 瓶 / 鼎式；glaze 存 palette key；pedestal：素台 / 木座 / 圆几 / 无
-//
-// 轮廓和纹样的画法抽到了 common/PotteryArt.ets，由这里和 view/PotteryTurntable.ets
-// 共用一份：转台要把同一套纹样按弧度罩到 3D 灰模序列帧上，两边各写一遍的话，
-// 改一种纹样只会在一边生效，而这种差异只有拿两台设备对着看才看得出来。
-// 这个组件同时也是转台拿不到帧文件时的兜底画面，它必须一直能独立画完一件器物。
-
 @Component
 export struct PotteryCanvas {
   @Prop @Watch('repaint') shape: string = '罐';
@@ -75,10 +67,7 @@ export struct PotteryCanvas {
     c.clearRect(0, 0, w, h);
     drawPaper(c, p, this.seed, w, h);
     this.feet(c, p, w, h);
-    // 展示座先画、器身后画：座面贴着器底，器身把座面当中盖住，
-    // 露出来的两侧弧面和座身前沿就是「坐在上面」的遮挡关系。
-    // 鼎式的接触点在三足尖（feet 往下伸的那截），不在 V_BOT 那条线；
-    // 转台不用特判——灰模帧的底足/足尖本来就烘在 botPx 上。
+    
     drawPedestal(c, p, this.shape, this.pedestal,
       this.shape === '鼎式' ? bot + (bot - top) * 0.20 : bot, w, h);
 
@@ -106,7 +95,6 @@ export struct PotteryCanvas {
 
     drawRimFoot(c, p, this.shape, w, h);
 
-    // 器耳只有二维版要描：转台的耳已经烘进 3D 灰模帧里，再描一遍等于在图上长出一对纸耳朵
     let rx = profileOf(this.shape)[0][1] * w;
     if (this.shape === '鼎式') {
       c.strokeStyle = p.deep;

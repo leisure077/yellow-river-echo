@@ -1,16 +1,11 @@
-// 河小导的"人话"文案层：AiService 抛回来的是技术错误，直接念给用户太硬。
-// 这里按错误特征分组成一句口语主句 + 一行小字技术细节，
-// 界面只负责排布，重试/去设置的入口都还在原来的位置上。
-// 小字只做排错用，纯英文或带错误码的原文一律不上屏（见 tailOf）。
 
 export interface ErrCopy {
-  // 主句：河小导的口吻
+  
   line: string;
-  // 小字：可选的技术细节；不需要时给空串
+  
   sub: string;
 }
 
-// AiService 用这两个标记代替原始报错，界面才能安心给温柔话术
 const RATE_LIMIT: string = 'rate_limited';
 const EMPTY_ANSWER: string = 'empty_answer';
 
@@ -18,7 +13,6 @@ function has(s: string, needle: string): boolean {
   return s.indexOf(needle) >= 0;
 }
 
-// 只保留中文那截；带英文串或错误码的原文一律不回显
 function tailOf(t: string): string {
   if (t.length === 0 || /[A-Za-z0-9]/.test(t)) {
     return '';
@@ -33,8 +27,6 @@ export function errCopyOf(raw: string): ErrCopy {
   }
   let low = t.toLowerCase();
 
-  // 限流：HTTP 429、智谱 1305（访问量过大）/1302（速度限制）都归到这里，
-  // 一大段英文报错在 AiService 就被拦掉了，这里只负责说得软一点
   if (t === RATE_LIMIT || has(low, '429') || has(t, '1305') || has(t, '1302')
     || has(t, '额度') || has(t, '太频繁')) {
     return {
@@ -60,10 +52,7 @@ export function errCopyOf(raw: string): ErrCopy {
   if (has(t, '地址不对') || has(low, '404')) {
     return { line: '按这个地址找不到档案室，确认填的是 Dify 的 /v1 地址。', sub: tailOf(t) };
   }
-  // 连连接层面就没通：地址填错、Dify 没起、端口没转发，都走这一条。
-  // 这条必须排在下面"翻得有点久"前面——http 在连不上的时候也会回一句 Operation timeout，
-  // 先按超时判就会把"地址不对"说成"模型慢"，让人往错的方向查。
-  // 旧文案里的"没网/够不着云端"在本机自建部署下也不成立，所以直接点名地址和自检按钮。
+  
   if (has(t, '连不上') || has(low, 'resolve host') || has(low, 'offline') || has(low, 'network')
     || has(low, 'connection') || has(low, 'connect')) {
     return {
@@ -71,8 +60,7 @@ export function errCopyOf(raw: string): ErrCopy {
       sub: tailOf(t)
     };
   }
-  // 看门狗到点（60s 没新字节）。本地部署下最常见的原因是模型刚被卸载、正在重新装载，
-  // 不是网络断了，所以话术只说"翻得久"，并把重试的口子留给用户；旧文案里的"云端"也不成立。
+  
   if (has(low, 'timeout') || has(t, '超时') || has(t, '没有响应') || has(t, '没有回应')) {
     return { line: '档案翻得有点久，河小导先等到这儿。再问一次试试，问题短一点会更快。', sub: tailOf(t) };
   }

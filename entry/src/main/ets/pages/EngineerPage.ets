@@ -6,7 +6,6 @@ import { SyncService, DeviceRow, SyncLog } from '../service/SyncService';
 import { ERAS, INK, SUB, LOESS, CLAY, RIVER, fmtTime, fs } from '../common/Theme';
 import { riverY } from '../common/River';
 
-// @Builder 只能吃对象字面量，普通参数是快照
 interface CountArg {
   label: string;
   live: number;
@@ -30,9 +29,6 @@ interface EraBucket {
   done: number;
 }
 
-// 河工面板（扩展设计方案 §2.13 彩蛋）：连点边侧栏头像 5 次进入。
-// 把同步状态机、每张表的行数、LWW 参数和打卡密度一次性摊开——
-// 证明这层是可观测的，不是黑盒。本页只读本机内存与 preferences，不发任何网络请求。
 @Entry
 @Component
 struct EngineerPage {
@@ -59,7 +55,7 @@ struct EngineerPage {
 
   aboutToAppear(): void {
     this.reload();
-    // 日志和"多久以前"要像仪表一样自己走
+    
     this.ticker = setInterval((): void => {
       this.clock = Date.now();
       this.reload();
@@ -137,7 +133,6 @@ struct EngineerPage {
     this.paint();
   }
 
-  // 河道热力图：横轴仍是六个年代，柱高是收录数，赭红部分是打卡数
   private paint(): void {
     let c = this.ctx;
     let w = c.width;
@@ -149,7 +144,6 @@ struct EngineerPage {
     let base = h - 16;
     let span = base - 18;
 
-    // 与首页同一条中轴，压扁后当水位线
     let steps = 40;
     c.beginPath();
     for (let k = 0; k <= steps; k++) {
@@ -248,7 +242,7 @@ struct EngineerPage {
 
       Scroll() {
         Column({ space: 12 }) {
-          // ---- 状态机 ----
+          
           Column({ space: 8 }) {
             Row({ space: 8 }) {
               Circle().width(10).height(10).fill(this.stateColor())
@@ -288,7 +282,6 @@ struct EngineerPage {
           .backgroundColor($r('app.color.card_bg'))
           .borderRadius(12)
 
-          // ---- 实时日志 ----
           Column({ space: 6 }) {
             Text('状态机日志 · 本次启动以来').fontSize(fs(this.ts, 15)).fontColor(INK).fontWeight(FontWeight.Medium)
             if (this.logs.length === 0) {
@@ -317,7 +310,6 @@ struct EngineerPage {
           .backgroundColor($r('app.color.card_bg'))
           .borderRadius(12)
 
-          // ---- 分布式清单 ----
           Column({ space: 4 }) {
             Text('进分布式清单的 5 类数据').fontSize(fs(this.ts, 15)).fontColor(INK).fontWeight(FontWeight.Medium)
             Text('键格式 entity:id，值为整条记录的 JSON')
@@ -332,7 +324,6 @@ struct EngineerPage {
           .backgroundColor($r('app.color.card_bg'))
           .borderRadius(12)
 
-          // ---- 本机表 ----
           Column({ space: 4 }) {
             Text('只存本机的互动数据').fontSize(fs(this.ts, 15)).fontColor(INK).fontWeight(FontWeight.Medium)
             Text('这些刻意不进同步队列：换设备互相覆盖没有意义')
@@ -347,7 +338,6 @@ struct EngineerPage {
           .backgroundColor($r('app.color.card_bg'))
           .borderRadius(12)
 
-          // ---- LWW 参数 ----
           Column({ space: 4 }) {
             Text('LWW 参数（照代码原样抄，不是文档口径）').fontSize(fs(this.ts, 15)).fontColor(INK).fontWeight(FontWeight.Medium)
             this.param({ k: 'store_id', v: 'hh_memory_kv' })
@@ -367,7 +357,6 @@ struct EngineerPage {
           .backgroundColor($r('app.color.card_bg'))
           .borderRadius(12)
 
-          // ---- 打卡密度河图 ----
           Column({ space: 6 }) {
             Text('河道热力图 · 按年代').fontSize(fs(this.ts, 15)).fontColor(INK).fontWeight(FontWeight.Medium)
             Canvas(this.ctx)

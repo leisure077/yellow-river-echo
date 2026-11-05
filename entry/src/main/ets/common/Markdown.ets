@@ -1,5 +1,3 @@
-// 模型回复的轻量清洗：ArkUI 没有 Markdown 渲染器，
-// 直接上屏会满屏星号、井号和竖线。这里只去掉标记，保留文字的层次感。
 
 const TABLE_SEP = /^\s*\|?[\s:|-]*-{2,}[\s:|-]*\|?\s*$/;
 const BULLET = /^(\s*)[-*+]\s+/;
@@ -7,7 +5,6 @@ const HEADING = /^#{1,6}\s*/;
 const QUOTE = /^>\s?/;
 const HR = /^\s*([-*_])\1{2,}\s*$/;
 
-// 表格的 |---| 分隔行要整行丢掉，不能变成空行，否则表头和数据之间会空一大截
 const DROP = '\u0001';
 
 function cleanLine(raw: string): string {
@@ -56,8 +53,6 @@ function cleanInline(raw: string): string {
   return t;
 }
 
-// 流式阶段用：完整行照常清洗，最后半行只把标记符号按字符抹掉。
-// 半行不能走整行规则（比如 ** 还没闭合），否则会闪出星号又消失。
 function cleanTail(raw: string): string {
   let line = raw.replace(/\r?\n/g, ' ');
   line = line.replace(HEADING, '');
@@ -91,7 +86,6 @@ export function cleanAiText(raw: string): string {
   return text.trim();
 }
 
-// 流式增量渲染用的版本：已收完整行按正式规则清洗，未完的半行做保守抹标记。
 export function cleanPartial(raw: string): string {
   if (raw.length === 0) {
     return '';

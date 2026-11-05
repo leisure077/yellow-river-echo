@@ -18,12 +18,11 @@ const AVATARS: AvatarSeed[] = [
   { key: 'song', glyph: '桥' }
 ];
 
-// @Builder 收对象字面量才会跟着状态重画，普通参数只是建时快照
 interface FieldArg {
   label: string;
   holder: string;
   value: string;
-  kind: string; // text | pwd | phone | num
+  kind: string;
   max: number;
   set: (v: string) => void;
 }
@@ -34,17 +33,12 @@ interface QuickArg {
   act: () => void;
 }
 
-// 版式照参考图：圆形纹样头像 + 欢迎登录/欢迎注册双态 + 昵称口令两行 +
-// 主次两颗胶囊按钮 + 快捷登录 + 底部协议勾选。
-// 账号只写在本机 preferences，口令存摘要、手机号只存掩码，没有服务端，也不上传任何东西。
-// 注册要多一道手机号 + 验证码，但码是本机生成的，只在这台设备上校验，不出设备。
-// 注册这一步不问签名，一句话签名留到「我的」里改。
 @Entry
 @Component
 struct LoginPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
-  @State mode: string = 'login'; // login | register
+  @State mode: string = 'login';
   @State nick: string = '续响者';
   @State pwd: string = '';
   @State pwd2: string = '';
@@ -62,7 +56,7 @@ struct LoginPage {
       this.nick = last.nick;
       this.avatar = last.avatar;
     }
-    // 闸门是常驻单例，页面退出再进来时倒计时可能还没走完
+    
     this.tick();
   }
 
@@ -101,7 +95,6 @@ struct LoginPage {
     this.enter(this.isRegister() ? '注册好了，已经替你登进来' : '回来了，接着记');
   }
 
-  // 发码：本机生成，弹一条带明文的 toast，不然演示时没人知道该输什么
   sendCode(): void {
     let bad = VerifyGate.phoneErr(this.phone);
     if (bad.length > 0) {
@@ -119,7 +112,6 @@ struct LoginPage {
     promptAction.showToast({ message: `验证码 ${issued}，5 分钟内有效` });
   }
 
-  // 倒计时与演示码都按闸门的真实状态取，不自己减，免得页面挂后台回来对不上
   tick(): void {
     let gate = VerifyGate.get();
     this.cdLeft = gate.secondsLeft();
@@ -159,7 +151,6 @@ struct LoginPage {
     });
   }
 
-  // 快捷登录里的「本机账号」只帮你把昵称填上，口令还得自己输
   fillLast(): void {
     let last = StudioStore.get().lastAccount();
     if (last === undefined) {
@@ -210,7 +201,6 @@ struct LoginPage {
     .width('100%')
   }
 
-  // 验证码这行跟别的字段不一样：右边挂着「获取验证码」，按钮上跑倒计时
   @Builder
   codeField() {
     Column({ space: 2 }) {

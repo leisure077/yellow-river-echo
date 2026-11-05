@@ -29,7 +29,6 @@ interface Persona {
   era: string;
 }
 
-// 六型「人手」，每型锚定一个年代与库内真实遗址；趣味自测，不是学术测评。
 const PERSONAS: Persona[] = [
   { key: 'yangshao', ch: '彩', name: '画彩的人', line: '你先看纹样，再看器形。',
     detail: '鱼纹、旋纹、几何边——你习惯先确认它好不好看，再问它是干什么用的。', era: '仰韶' },
@@ -128,7 +127,6 @@ struct QuizPage {
     this.reco = [];
   }
 
-  // 首个命中 +2，次选 +1；同分取年代在前的一型，结果可复现
   private tally(): string {
     let score: Map<string, number> = new Map();
     for (let i = 0; i < this.picks.length && i < QUESTIONS.length; i++) {
@@ -326,7 +324,7 @@ struct QuizPage {
           .fontColor(INK)
           .fontWeight(FontWeight.Medium)
         ForEach(this.reco, (s: SiteInfo): void => {
-          // 不传 note：让卡片显示各自的摘要，比重复一遍"城市 · 年代段"有用
+          
           SiteCard({ site: s })
         }, (s: SiteInfo): string => s.id)
       }

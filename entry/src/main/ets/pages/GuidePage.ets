@@ -19,8 +19,7 @@ struct GuidePage {
       Stack() {
         Image(art).width('100%').height('100%').objectFit(ImageFit.Fill)
         HeritageMotion({ kind: kind, active: this.idx === kind })
-      // Extend the original painted gradient and paper texture to the bottom.
-      // A fixed 9:16 container exposes the unrelated solid fill on taller phones.
+      
       }.width('100%').height('100%')
       Column({ space: 12 }) {
         Text(place).fontSize(11).letterSpacing(5).fontColor('#F1D8AC')

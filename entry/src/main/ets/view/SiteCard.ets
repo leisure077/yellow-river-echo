@@ -4,7 +4,7 @@ import { goDetail } from '../common/Nav';
 
 @Component
 export struct SiteCard {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @Require @Prop site: SiteInfo;
   @Prop note: string = '';

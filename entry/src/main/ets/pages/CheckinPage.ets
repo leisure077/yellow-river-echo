@@ -6,15 +6,12 @@ import { BasinMap } from '../common/BasinMap';
 import { INK, SUB, LOESS, CLAY, RIVER, agoText, coverRes, fs } from '../common/Theme';
 import { goDetail } from '../common/Nav';
 
-// 河图洛书：一整幅黄河流域图，从约古宗列曲到东营入海，两侧支流同框。
-// 干流是缓慢流动的黄色荧光，点河道溅黄橘渐变水花；放大到河南流域才出现 20 处遗址圈，
-// 选中后盖章写进 StudioStore.siteCheckins（只存本机，不进分布式队列）。
 const MAP_H: number = 310;
 
 @Entry
 @Component
 struct CheckinPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('reload') studioRev: number = 0;
   @State sites: SiteInfo[] = [];
@@ -31,7 +28,7 @@ struct CheckinPage {
   reload(): void {
     this.sites = SiteRepo.get().sites;
     this.doneIds = StudioStore.get().checkedSiteIds();
-    // 章的列表也存进状态：@Builder 里直接调方法拿不到响应式，盖完章列表会停在旧数
+    
     let list: SiteInfo[] = [];
     for (let c of StudioStore.get().siteCheckins) {
       let s = SiteRepo.get().byId(c.siteId);
@@ -46,7 +43,6 @@ struct CheckinPage {
     return this.doneIds.indexOf(id) >= 0;
   }
 
-  // @Builder 里不声明局部变量，标签在这儿算好
   checkedLabel(): string {
     let s = this.sel;
     if (s === undefined) {
@@ -63,7 +59,6 @@ struct CheckinPage {
     }
   }
 
-  // 盖成功就在图上炸一团光：父组件只改这一个字符串，落点由地图自己按当前视图算
   flash(id: string): void {
     this.flashSeq = this.flashSeq + 1;
     this.flashReq = `${id}|${this.flashSeq}`;
@@ -183,10 +178,10 @@ struct CheckinPage {
 
       Scroll() {
         Column({ space: 12 }) {
-          // 流域图：整块可缩放/平移，点河道有水花，放大到河南流域才出现遗址圈
+          
           Column({ space: 8 }) {
             Row({ space: 8 }) {
-              // 这块是深色底（#1A212A），标题/提示不能用纸面上的 INK/SUB，否则黑压黑看不清
+              
               Text('黄河全流域 · 水系脉络').fontSize(fs(this.ts, 14)).fontColor('#F2E6CF').fontWeight(FontWeight.Medium)
               Blank()
               Text('双指缩放 · 拖动平移 · 点河道溅水花').fontSize(fs(this.ts, 10)).fontColor('rgba(226,216,196,0.62)')
@@ -248,7 +243,6 @@ struct CheckinPage {
             this.selCard()
           }
 
-          // 进度：一眼看出这条河还差几段
           Column({ space: 6 }) {
             Row() {
               Text('这条河走了').fontSize(fs(this.ts, 12)).fontColor(SUB)

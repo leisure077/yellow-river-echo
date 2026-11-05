@@ -11,12 +11,10 @@ interface Group {
   items: Goods[];
 }
 
-// 喜欢清单：文创页右上角那颗「清单」点进来。
-// 按品类分组、可勾选、能改数量，底部一条 全选 / 合计 / 结算 的动作栏。
 @Entry
 @Component
 struct WishlistPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('reload') rev: number = 0;
   @State tab: number = 0;
@@ -50,7 +48,7 @@ struct WishlistPage {
       if (found === undefined) {
         continue;
       }
-      // 闭包里读不到上面的 undefined 收窄，先落成确定的 Goods 再用
+      
       let g: Goods = found;
       let grp = byCat.find((x: Group): boolean => x.cat === g.cat);
       if (grp === undefined) {
@@ -69,7 +67,7 @@ struct WishlistPage {
       }
     }
     this.liked = liked;
-    // 勾选项跟着清单走：删掉的抹掉，新加进来的默认勾上
+    
     let ids = this.allIds();
     let next = this.checked.filter((x: string): boolean => ids.indexOf(x) >= 0);
     for (let id of ids) {
@@ -130,7 +128,6 @@ struct WishlistPage {
     this.toggleMany(this.groupIds(g), on);
   }
 
-  // 组头那句小计和全选框要跟着数量、勾选一起变，把这两样写进 key 里逼它重建
   grpKey(g: Group): string {
     let st = StudioStore.get();
     let s = g.cat;
@@ -218,8 +215,6 @@ struct WishlistPage {
     });
   }
 
-  // 勾选框直接读 this.checked：@Builder 收对象字面量也只是建时快照，
-  // 勾了不重画就等于「点了没反应」
   @Builder
   head() {
     Row({ space: 10 }) {
@@ -239,7 +234,6 @@ struct WishlistPage {
     .padding({ left: 14, right: 14, top: 10, bottom: 4 })
   }
 
-  // 数字在 builder 里现取状态，不能当参数传：传进去的是建时快照
   nOf(idx: number): number {
     return idx === 0 ? this.cartN : this.liked.length;
   }

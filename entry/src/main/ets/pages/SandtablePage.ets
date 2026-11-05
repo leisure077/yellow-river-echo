@@ -8,9 +8,6 @@ class SandtableBridge {
   }
 }
 
-// 「黄河沙盘」：整页是一张 Canvas 时间轴推演图，逻辑都在
-// rawfile/sandtable/index.html 里，宿主只负责把 rawfile 挂到同一个 https 源下，
-// 让网页的 localStorage、Canvas 与返回桥都按本地资源这套路径走。
 @Entry
 @Component
 struct SandtablePage {

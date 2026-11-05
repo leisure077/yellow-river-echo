@@ -17,27 +17,19 @@ export const RIVER = '#4A7B8C';
 export const PAPER = '#F5EFE4';
 export const LINE = '#E5DAC6';
 
-// 河道档：流动 / 静水 / 关闭。侧栏的切换入口已按要求撤下，
-// River.effectiveWaterMode() 现在固定回静水，下面两档只留给画布判断用。
 export const WATER_FLOW: string = 'flow';
 export const WATER_STILL: string = 'still';
 export const WATER_OFF: string = 'off';
 
-// 字号三档：S / M / L。档位差要一眼看得出来，所以拉到 -15% / +20%，
-// 再小就只是"好像变了又好像没变"，切完还得回详情页确认。
 export const SCALE_STEPS: number[] = [0.85, 1, 1.20];
 export const SCALE_LABELS: string[] = ['小', '标准', '大'];
 
-// 全局字号缩放。缩放档必须由组件自己持有的 @StorageLink('textScale') 传进来：
-// ArkUI 只重画「表达式里真读过那个状态」的元素，在函数里偷偷 get 一下 AppStorage
-// 是唤不醒重绘的——切了档位不重画，看着就像字号根本没生效。
 export function fs(scale: number, base: number): number {
   let s = scale > 0 ? scale : 1;
   let v = base * s;
   return Math.round(v * 10) / 10;
 }
 
-// 年代条这类「一个年代一张图」的封面，缺省回仰韶
 export function coverOf(era: string): string {
   if (era === '龙山') {
     return 'era_longshan';
@@ -58,8 +50,7 @@ export function coverOf(era: string): string {
 }
 
 export function coverRes(name: string): Resource {
-  // 遗址实体图一处一张，名字从资源包里读出来，只能走 $rawfile 动态拼；
-  // media 里的图要编译期写死，留给年代条和文物用
+  
   if (name.indexOf('site_') === 0) {
     return $rawfile('sites/' + name.substring(5) + '.jpg');
   }
@@ -111,7 +102,6 @@ export function dayText(ts: number): string {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
 
-// 程序化封面配色：不依赖图片资源，卡片用 Canvas 现画
 export interface Palette {
   base: string;
   deep: string;
@@ -134,8 +124,6 @@ export function paletteOf(key: string): Palette {
   return p === undefined ? (PALETTES.get('yangshao') as Palette) : p;
 }
 
-// 六色的演示口径称呼 + 一句话说法：色名跟着 PALETTES 的键走，
-// 数字文物展台下方那行字取的就是这一份。
 export interface ColorRow {
   key: string;
   name: string;
@@ -161,9 +149,6 @@ export function colorRowOf(key: string): ColorRow {
   return COLOR_ROWS[0];
 }
 
-// #RRGGBB → rgba(...)。转台给灰模帧罩釉色要用带透明度的色：
-// ArkUI 的 Canvas 只支持 Porter-Duff 十一种混合，没有 multiply，压暗提亮只能靠
-// 「半透明色 + source-atop」，灰模的明暗才透得出来。传进非 # 开头的值就原样返回。
 export function withAlpha(hex: string, a: number): string {
   if (hex.length !== 7 || !hex.startsWith('#')) {
     return hex;
@@ -171,14 +156,11 @@ export function withAlpha(hex: string, a: number): string {
   let r = parseInt(hex.substring(1, 3), 16);
   let g = parseInt(hex.substring(3, 5), 16);
   let b = parseInt(hex.substring(5, 7), 16);
-  // alpha 一律写成 0~1 的小数：rgba() 的第四个分量按 CSS 口径是比例，
-  // 填 0~255 会被当成大于 1 直接夹成完全不透明，透明度看着就“没生效”。
+  
   let al = Math.round(Math.max(0, Math.min(1, a)) * 1000) / 1000;
   return `rgba(${r},${g},${b},${al})`;
 }
 
-// #RRGGBB → 感知亮度（Rec.601 加权，0~255）。转台罩釉色时用它判断这套釉有多深：
-// 灰模是固定亮度的底，越深的釉越要压得实，否则黑陶罩出来变灰陶。
 export function hexLum(hex: string): number {
   if (hex.length !== 7 || !hex.startsWith('#')) {
     return 128;

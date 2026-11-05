@@ -1,10 +1,8 @@
 import { fs, paletteOf, Palette } from '../common/Theme';
 
-// 商品封面：给了 img 就贴实拍图，没给才按器型现画（不占包体，也不会在列表刷新时反复解码大图）。
-// shape 取值：pot jar ding tile stele tower cave scroll coin box bridge kiln
 @Component
 export struct ArtCover {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @Prop @Watch('repaint') palette: string = 'yangshao';
   @Prop @Watch('repaint') shape: string = 'pot';
@@ -38,7 +36,7 @@ export struct ArtCover {
     c.lineWidth = Math.max(r * 0.06, 1.2);
     let mode = this.seed % 3;
     if (mode === 0) {
-      // 锯齿带
+      
       c.beginPath();
       let n = 7;
       for (let i = 0; i <= n; i++) {
@@ -52,14 +50,14 @@ export struct ArtCover {
       }
       c.stroke();
     } else if (mode === 1) {
-      // 同心圆
+      
       for (let k = 1; k <= 3; k++) {
         c.beginPath();
         c.arc(cx, cy, r * k / 3.4, 0, Math.PI * 2);
         c.stroke();
       }
     } else {
-      // 网格
+      
       for (let k = -2; k <= 2; k++) {
         c.beginPath();
         c.moveTo(cx + k * r * 0.35, cy - r * 0.8);
@@ -167,7 +165,7 @@ export struct ArtCover {
       c.fillStyle = p.paper;
       c.fillRect(cx - w * 0.18, h * 0.44, w * 0.36, h * 0.06);
     } else {
-      // pot：小口鼓腹罐
+      
       c.moveTo(cx - w * 0.09, top);
       c.lineTo(cx + w * 0.09, top);
       c.quadraticCurveTo(cx + w * 0.30, h * 0.40, cx + w * 0.20, bot);

@@ -7,11 +7,10 @@ import { goDetail } from '../common/Nav';
 
 @Component
 export struct FavoriteView {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') rev: number = 0;
-  // 列表抄成 @State：MemoryStore 是普通单例，ArkUI 观察不到它内部的数组变化。
-  // dataRev 一涨就整份换新数组引用，ForEach 才认这个变化、当场重排
+  
   @State favs: FavRec[] = [];
   @State tags: TagRec[] = [];
   @State filterTag: string = '';

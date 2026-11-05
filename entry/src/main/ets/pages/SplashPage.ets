@@ -4,7 +4,6 @@ import { Boot } from '../service/Boot';
 import { StudioStore } from '../service/StudioStore';
 import { fs, INK, SUB, LOESS, CLAY, RIVER } from '../common/Theme';
 
-// 几字形河道，归一化坐标，画的时候按画布尺寸缩放
 const RIVER_PTS: number[][] = [
   [0.10, 0.16], [0.28, 0.12], [0.50, 0.19], [0.62, 0.31],
   [0.50, 0.41], [0.32, 0.48], [0.30, 0.62], [0.46, 0.72],
@@ -14,7 +13,7 @@ const RIVER_PTS: number[][] = [
 @Entry
 @Component
 struct SplashPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
@@ -65,7 +64,6 @@ struct SplashPage {
     }
     c.clearRect(0, 0, w, h);
 
-    // 远山：两层淡墨
     c.fillStyle = 'rgba(122,110,98,0.10)';
     c.beginPath();
     c.moveTo(0, h * 0.30);
@@ -85,7 +83,6 @@ struct SplashPage {
     c.closePath();
     c.fill();
 
-    // 河道：按 draw 逐段推进
     let n = RIVER_PTS.length;
     let reach = this.draw * (n - 1);
     c.lineCap = 'round';
@@ -111,13 +108,11 @@ struct SplashPage {
     c.lineWidth = Math.max(w * 0.012, 2);
     c.stroke();
 
-    // 日头
     c.fillStyle = 'rgba(166,85,61,0.75)';
     c.beginPath();
     c.arc(w * 0.80, h * 0.14, w * 0.035 * Math.min(this.draw * 1.6, 1), 0, Math.PI * 2);
     c.fill();
 
-    // 掠水鸟
     if (this.draw > 0.5) {
       c.strokeStyle = 'rgba(43,38,34,0.45)';
       c.lineWidth = 1.6;

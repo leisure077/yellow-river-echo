@@ -7,7 +7,6 @@ import { fs, INK, SUB, LOESS, CLAY, RIVER, dayText, moneyText } from '../common/
 import { params, goDetail, RouteParam } from '../common/Nav';
 import { ArtCover } from '../view/ArtCover';
 
-// 活动页：签到日历 + 集字 + 活动报名 + 盲盒。日期与随机都在点击里算。
 interface CalCell {
   key: string;
   day: number;
@@ -26,7 +25,7 @@ function pad2(n: number): string {
 @Entry
 @Component
 struct ActivityPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @State topId: string = '';
@@ -39,7 +38,6 @@ struct ActivityPage {
   @State checkinN: number = 0;
   @State mineChars: string[] = [];
 
-  // 签到、集字都发生在这一页里，镜像到状态变量上文案才会跟着刷新
   syncMine(): void {
     let st = StudioStore.get();
     this.signed = st.checkedToday();

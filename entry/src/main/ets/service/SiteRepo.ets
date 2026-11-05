@@ -2,8 +2,6 @@ import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
 import { SiteInfo, Suggestion, ViewLog } from '../model/Models';
 
-// 预置资源仓库：加载 rawfile 里的资源包，负责检索、筛选和关联推荐。
-// 推荐权重可调，先按 年代 > 类型 > 城市 的直觉排序，理由直接取最高的一项。
 export class SiteRepo {
   private static readonly inst: SiteRepo = new SiteRepo();
   static get(): SiteRepo {
@@ -56,7 +54,6 @@ export class SiteRepo {
     return n;
   }
 
-  // 关键词命中名称、别名、摘要和标签词；不同维度取交集，同维度取并集
   query(kw: string, eras: string[], cities: string[], types: string[]): SiteInfo[] {
     let key = kw.trim();
     let out: SiteInfo[] = [];
@@ -96,7 +93,6 @@ export class SiteRepo {
     return SiteRepo.anyMatch(a, b);
   }
 
-  // 相关推荐：排除已收藏与当前页，按相似度加权，给一句可核验的理由
   recommend(favIds: string[], views: ViewLog[], limit: number, excludeId: string): Suggestion[] {
     let base = this.sites.filter((s: SiteInfo): boolean =>
       favIds.indexOf(s.id) < 0 && s.id !== excludeId);
@@ -104,7 +100,7 @@ export class SiteRepo {
       return [];
     }
     if (favIds.length === 0) {
-      // 冷启动：先给精选，不猜偏好
+      
       let picks = ['s01', 's04', 's07', 's15'];
       let out: Suggestion[] = [];
       for (let id of picks) {

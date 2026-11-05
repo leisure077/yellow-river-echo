@@ -1,20 +1,17 @@
-// 「观文物」查询库：随包只读的一批真实馆藏文物条目，按分类 / 年代 / 颜色三个维度筛。
-// 每条都指到具体一件器物，名称与「藏地」照公开资料写；一句话说明只讲看得见的器形与工艺，
-// 不写尺寸、年代数字这类核对不住的细节。卡面用检索到的实物照片，照片来源杂、可能带站点水印。
+
 export interface Relic {
   id: string;
   name: string;
   cat: string;
   era: string;
-  // 色键对应 Theme 的六色，卡面配色与「颜色」筛选共用
+  
   palette: string;
-  // ArtCover 程序化器形：pot jar ding tile stele tower cave scroll coin box bridge kiln
-  // 有 img 时这个只作兜底
+  
   shape: string;
-  // 实物照片，随包 rawfile 下的相对路径
+  
   img: string;
   material: string;
-  // 藏地 / 出土地，浮卡里单列一行，便于回查
+  
   hold: string;
   desc: string;
 }
@@ -24,10 +21,8 @@ export interface ColorSeed {
   name: string;
 }
 
-// 分类：照数字文物库的常见门类收拢到十类以内，骨角器单列（骨笛这类器归不进陶瓷铜器）
 export const RELIC_CATS: string[] = ['陶瓷', '铜器', '玉石器', '金属器', '书画', '碑帖', '砖瓦', '造像', '文房', '骨角器'];
 
-// 年代：从新石器到清，与文物条目对得上
 export const RELIC_ERAS: string[] = ['新石器时代', '夏', '商', '西周', '春秋', '战国', '秦', '汉', '唐', '宋', '元', '明', '清'];
 
 export const RELIC_COLORS: ColorSeed[] = [
@@ -149,7 +144,6 @@ export class RelicRepo {
     return c === undefined ? key : c.name;
   }
 
-  // 三个维度都是「多选其一命中即可，未选视为不限」，再叠一层名称/材质关键词
   filtered(kw: string, cats: string[], eras: string[], colors: string[]): Relic[] {
     let k = kw.trim();
     return this.relics.filter((r: Relic): boolean => {

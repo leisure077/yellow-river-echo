@@ -7,10 +7,9 @@ import { goGoods, goWishlist } from '../common/Nav';
 
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'box', 'coin', 'kiln'];
 
-// 文创列表：搜索 + 分类 + 排序的双列商品流，点赞与清单直接可操作。
 @Component
 export struct ShopView {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') dataRev: number = 0;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
@@ -28,7 +27,6 @@ export struct ShopView {
     this.syncMine();
   }
 
-  // 点赞和清单要当场变，所以在本机镜像一份，由 studioRev 驱动
   syncMine(): void {
     let st = StudioStore.get();
     this.liked = st.likes.slice();

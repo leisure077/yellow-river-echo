@@ -5,8 +5,6 @@ import { BackupData } from '../model/Models';
 import { MemoryStore } from './MemoryStore';
 import { SiteRepo } from './SiteRepo';
 
-// 备份就是一层带校验和的 JSON 快照。先写应用沙箱保底，
-// 再尝试通过文档选择器让用户存到公共目录，用户取消不算失败。
 export class BackupService {
   static async exportSnapshot(ctx: common.Context): Promise<string> {
     let data = MemoryStore.get().exportAll(SiteRepo.get().sites.length);

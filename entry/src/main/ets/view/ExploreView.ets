@@ -7,12 +7,11 @@ import { SiteCard } from './SiteCard';
 
 @Component
 export struct ExploreView {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') rev: number = 0;
   @State kw: string = '';
-  // 推荐位和「最近在读」都来自 MemoryStore / SiteRepo 这两个普通单例，
-  // ArkUI 看不到它们的变化；dataRev 一跳就抄成 @State，行与理由文案才跟着刷
+  
   @State recs: Suggestion[] = [];
   @State recent: SiteInfo[] = [];
 

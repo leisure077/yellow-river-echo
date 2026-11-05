@@ -1,6 +1,4 @@
-// 纸面纹样底层：Canvas 一遍画成极淡的「水波纹」重复纹样（静态贴图感），
-// 再叠两团慢漂的暖光斑与几粒浮沉金屑——背景有纹样、有动效，
-// 但全部压在底层低不透明度，只衬内容不抢内容。
+
 const SPECKS: number[][] = [
   [10, 26, 3, 0.6], [84, 36, 2.5, 1], [32, 55, 2, 0.8],
   [70, 66, 3, 0.5], [18, 78, 2.5, 0.9], [88, 86, 2, 0.7]
@@ -26,7 +24,6 @@ export struct PatternBg {
     });
   }
 
-  // 水波纹：一鳞三圈同心半环，隔行错半格，满铺如鱼鳞；两色交替避免死板
   private waves(): void {
     let c = this.ctx;
     let w = c.width;
@@ -62,7 +59,6 @@ export struct PatternBg {
           this.waves();
         })
 
-      // 慢漂暖光：两团柔光斜向游走，让纸面有呼吸感
       Column()
         .width(260)
         .height(260)
@@ -84,7 +80,6 @@ export struct PatternBg {
         .position({ x: 180, y: 420 })
         .translate({ x: -this.drift * 0.7, y: -this.drift * 0.3 })
 
-      // 浮沉金屑：六粒小金点按各自相位起落
       ForEach(SPECKS, (s: number[], i: number): void => {
         Column()
           .width(s[2])

@@ -12,14 +12,11 @@ import { FloatingAssistant } from '../view/FloatingAssistant';
 import { INK, SUB, LOESS, CLAY, paletteOf, SCALE_LABELS, fs } from '../common/Theme';
 import { goArchive, goPottery, goTopic, goSync, goCourses, goQuiz, goGuide, goEngineer, closeDrawer, goCompose, goLogin, closeSignOutAsk } from '../common/Nav';
 
-// 退出登录是危险操作，面板里这一行单独标红
 const DANGER: string = '#C0392B';
 
-// 字号档位胶囊组。做成组件而不是 @Builder：Builder 的普通参数是快照，
-// 点了「大」之后高亮不会跟着变（真机上实测到的高亮卡死）。
 @Component
 struct DrawerPicker {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('refresh') rev: number = 0;
   @State cur: number = 0;
@@ -77,7 +74,7 @@ struct Index {
   @StorageLink('textScale') ts: number = 1;
   @State ready: boolean = false;
   @State createOpen: boolean = false;
-  // 彩蛋：连点头像 5 次才露出「河工面板」入口
+  
   @State taps: number = 0;
   @State engineerUnlocked: boolean = false;
   private lastTap: number = 0;
@@ -127,7 +124,7 @@ struct Index {
 
   tapAvatar(): void {
     let now = Date.now();
-    // 隔太久就当重新开始数，别让人误触发；但也别要求 1 秒内点完 5 下
+    
     if (now - this.lastTap > 1500) {
       this.taps = 0;
     }
@@ -213,7 +210,6 @@ struct Index {
 
           Divider().strokeWidth(1).color($r('app.color.line')).margin({ left: 16, right: 16, top: 6, bottom: 6 })
 
-          // 标题一行、胶囊一行：272vp 的边侧栏塞不下"标题 + 三个胶囊"同行，实测会切掉最后一档
           DrawerPicker()
 
           Row({ space: 12 }) {
@@ -240,7 +236,7 @@ struct Index {
           })
         }
         .width('100%')
-        // 原来底下那行版本小字删了，留点呼吸空间，别让最后一行贴着面板底
+        
         .padding({ bottom: 16 })
       }
       .layoutWeight(1)
@@ -274,8 +270,7 @@ struct Index {
         .margin({ top: 10, bottom: 14 })
       Text('记点什么')
         .fontSize(fs(this.ts, 13)).fontColor(SUB)
-      // 四个入口两行排，宽度按 (100% - gap)/2 算，别用 layoutWeight，
-      // 否则换行后最后一格会被挤成半宽
+      
       Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
         Column() {
           this.createTile('✎', '写笔记', '挑一处遗址记两行', (): void => {
@@ -339,9 +334,6 @@ struct Index {
     return StudioStore.get().accounts.length;
   }
 
-  // 退出登录：底部动作面板。切换账号 / 退出登录两条动作，危险的那条标红，
-  // 取消单独一张卡，点遮罩也能收回去。
-  // 面板挂在 Index 而不是 MineView：底栏是这一页的兄弟节点，写在「我的」里盖不住它
   @Builder
   signOutSheet() {
     Column() {
@@ -486,7 +478,6 @@ struct Index {
       .width('100%')
       .height('100%')
 
-      // 只在首页露出；底栏 58vp，再留 16vp 呼吸空间
       if (this.ready && this.tab === 0) {
         FloatingAssistant({ bottomGap: 74, tag: 'home' })
       }
@@ -523,7 +514,7 @@ struct Index {
 
       if (this.signOutAsk) {
         Column() {
-          // 遮罩：点空白处也能收回去
+          
           Column().layoutWeight(1)
             .width('100%')
             .onClick((): void => {

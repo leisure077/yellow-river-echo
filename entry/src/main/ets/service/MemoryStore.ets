@@ -4,8 +4,6 @@ import { util } from '@kit.ArkTS';
 import { FavRec, NoteRec, ProgressRec, TagRec, TopicRec, ViewLog, BackupData } from '../model/Models';
 import { DEFAULT_TAG_NAMES } from '../common/Theme';
 
-// 个人数据仓库：收藏、标签、笔记、进度、主题都存在 preferences 里。
-// 约定：所有本地变更先落盘、再通知同步层；deleted 是墓碑标记，不物理删。
 export class MemoryStore {
   private static readonly inst: MemoryStore = new MemoryStore();
   static get(): MemoryStore {
@@ -56,7 +54,6 @@ export class MemoryStore {
     MemoryStore.bumpRev();
   }
 
-  // 首启铺几条带「演示」字样的收藏和笔记，标签分类、整理排序这些界面才有实物可看
   private async seedDemo(): Promise<void> {
     let want = this.tagsActive().find((t: TagRec): boolean => t.name === '待实地探访');
     let been = this.tagsActive().find((t: TagRec): boolean => t.name === '已去过');
@@ -102,7 +99,7 @@ export class MemoryStore {
     if (this.p === null) {
       return;
     }
-    // put 成功即可刷新界面；flush 慢且没必要卡住交互，攒一批后台落盘
+    
     let t0 = Date.now();
     await this.p.put(key, JSON.stringify(arr));
     if (Date.now() - t0 > 200) {
@@ -145,15 +142,13 @@ export class MemoryStore {
     let payload = JSON.stringify(rec);
     let r = rec as Record<string, Object>;
     let ts = r.updatedAt as number;
-    // 同步入队延后到本帧之后，点击响应不等分布式 KV 的原生调用
+    
     setTimeout((): void => {
       if (this.onLocalChange !== null) {
         this.onLocalChange(entity, id, payload, ts);
       }
     }, 0);
   }
-
-  // ---- 收藏 ----
 
   favsActive(): FavRec[] {
     return this.favs.filter((f: FavRec): boolean => !f.deleted);
@@ -212,8 +207,6 @@ export class MemoryStore {
     MemoryStore.bumpRev();
   }
 
-  // ---- 标签 ----
-
   tagsActive(): TagRec[] {
     return this.tags.filter((t: TagRec): boolean => !t.deleted);
   }
@@ -247,7 +240,6 @@ export class MemoryStore {
     MemoryStore.bumpRev();
   }
 
-  // 删标签只解除关联，不动收藏本身
   async deleteTag(id: string): Promise<void> {
     let rec = this.tags.find((t: TagRec): boolean => t.id === id && !t.deleted);
     if (rec === undefined) {
@@ -269,8 +261,6 @@ export class MemoryStore {
     MemoryStore.bumpRev();
   }
 
-  // ---- 笔记 ----
-
   static ordOf(n: NoteRec): number {
     return n.ord !== undefined ? n.ord : n.updatedAt;
   }
@@ -285,7 +275,6 @@ export class MemoryStore {
     return this.notesActive().filter((n: NoteRec): boolean => n.siteId === siteId);
   }
 
-  // 整理模式上下移：按新顺序重盖 ord，不动 updatedAt，免得被当成内容改动
   async moveNote(id: string, delta: number): Promise<void> {
     let act = this.notesActive();
     let i = act.findIndex((n: NoteRec): boolean => n.id === id);
@@ -373,8 +362,6 @@ export class MemoryStore {
     await this.addNote(src.siteId, src.text, []);
   }
 
-  // ---- 学习进度 ----
-
   progressOf(siteId: string): ProgressRec | undefined {
     return this.prog.find((p: ProgressRec): boolean => p.siteId === siteId);
   }
@@ -412,8 +399,6 @@ export class MemoryStore {
     return this.prog.filter((p: ProgressRec): boolean => p.read).length;
   }
 
-  // ---- 浏览记录 ----
-
   touchView(siteId: string): void {
     this.views = this.views.filter((v: ViewLog): boolean => v.siteId !== siteId);
     this.views.unshift({ siteId: siteId, at: Date.now() });
@@ -431,8 +416,6 @@ export class MemoryStore {
     await this.persist('views', this.views);
     MemoryStore.bumpRev();
   }
-
-  // ---- 主题 ----
 
   topicsActive(): TopicRec[] {
     return this.topics.filter((t: TopicRec): boolean => !t.deleted);
@@ -494,8 +477,6 @@ export class MemoryStore {
     this.emit('topic', id, rec);
     MemoryStore.bumpRev();
   }
-
-  // ---- 远端数据落库（由同步层调用，不再回抛同步事件） ----
 
   async applyRemote(entity: string, payload: string): Promise<void> {
     if (entity === 'fav') {
@@ -568,8 +549,6 @@ export class MemoryStore {
     return this.topics.find((x: TopicRec): boolean => x.id === id);
   }
 
-  // ---- 草稿：只留本机，不参与同步 ----
-
   saveDraft(siteId: string, text: string): void {
     if (this.p !== null) {
       this.p.put('draft_' + siteId, text);
@@ -588,8 +567,6 @@ export class MemoryStore {
       this.p.delete('draft_' + siteId);
     }
   }
-
-  // ---- 备份 / 恢复 ----
 
   exportAll(siteCount: number): BackupData {
     let data: BackupData = {
@@ -612,7 +589,6 @@ export class MemoryStore {
     return h >>> 0;
   }
 
-  // 恢复前校验，成功后整体打时间戳重新广播，避免被旧副本盖掉
   async importAll(data: BackupData): Promise<boolean> {
     if (data.formatVer !== 1) {
       return false;

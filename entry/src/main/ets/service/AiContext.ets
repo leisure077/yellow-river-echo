@@ -3,8 +3,6 @@ import { SiteRepo } from './SiteRepo';
 import { AiStore } from './AiStore';
 import { NoteRec } from '../model/Models';
 
-// 本地资料注入：只挑与问题相关的最多 8 条，随请求体发给 Dify。
-// 默认关闭；开启时只发摘要，不发全文，也不写入知识库。
 export class AiContext {
   static build(query: string): string {
     if (!AiStore.get().personalOn) {

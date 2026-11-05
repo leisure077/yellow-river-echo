@@ -11,7 +11,7 @@ class ExperienceBridge {
   ctx: common.UIAbilityContext;
   constructor(ctx: common.UIAbilityContext) { this.ctx = ctx; }
   back(): void { router.back(); }
-  // 应用里只有一张行程页 pages/RoutePage（原本指向 pages/JourneyPage，那一页从未存在，点它没反应）。
+  
   journey(): void { router.pushUrl({ url: 'pages/RoutePage' }); }
   private bytes(data: string): Uint8Array {
     if (!data.startsWith('data:image/png;base64,') || data.length > 12000000) { throw new Error('无效的明信片'); }
@@ -42,7 +42,7 @@ class ExperienceBridge {
 @Component
 struct ExperiencePage {
   aboutToAppear(): void {
-    // 进地图页就把悬浮助手交给这一页的实例，压在底下的首页实例不再弹卡片
+    
     claimAssistant('map');
   }
 
@@ -52,10 +52,10 @@ struct ExperiencePage {
 
   private controller: webview.WebviewController = new webview.WebviewController();
   private bridge: ExperienceBridge = new ExperienceBridge(getContext(this) as common.UIAbilityContext);
-  // 地图页里的悬浮球也要跟着网页滚动收一收
+  
   private fabSignalAt: number = 0;
   private lastScrollY: number = -1;
-  // A single intercepted origin keeps ES modules, GLB fetches and storage consistent.
+  
   private origin: string = 'https://huanghe.example/experience/';
   private localResource(url: string): WebResourceResponse | null {
     if (!url.startsWith(this.origin)) { return null; }
@@ -83,13 +83,13 @@ struct ExperiencePage {
       Column() {
       Web({ src: this.origin + 'index.html', controller: this.controller })
         .javaScriptAccess(true).domStorageAccess(true).fileAccess(true)
-        // 关掉 WebView 自带的双指缩放页面，手势才能交给百度地图自己处理
+        
         .zoomAccess(false)
         .onInterceptRequest((event): WebResourceResponse =>
           this.localResource(event.request.getRequestUrl()) as WebResourceResponse)
         .javaScriptProxy({ object: this.bridge, name: 'Native', methodList: ['back', 'journey', 'saveImage', 'shareImage'], controller: this.controller })
         .onScroll((ev: OnScrollEvent): void => {
-          // Web 给的是绝对位置，只有真的动了才发信号；80ms 一次足够
+          
           let now = Date.now();
           if (ev.yOffset === this.lastScrollY || now - this.fabSignalAt < 80) {
             this.lastScrollY = ev.yOffset;
@@ -110,7 +110,6 @@ struct ExperiencePage {
         }).width('100%').height('100%')
       }.width('100%').height('100%')
 
-      // 地图页右下角悬浮；地图底部中间有「路线」大按钮，这里留 20vp 靠右不打架
       FloatingAssistant({ bottomGap: 20, tag: 'map' })
     }.width('100%').height('100%')
   }

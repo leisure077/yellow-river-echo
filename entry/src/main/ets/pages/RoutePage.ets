@@ -6,12 +6,10 @@ import { siteU } from '../common/River';
 import { INK, SUB, LOESS, CLAY, LINE, ERAS, CITIES, fs } from '../common/Theme';
 import { goDetail } from '../common/Nav';
 
-// 行程规划：选一个年代或一座城市，把境内的遗址按年代顺河排成一条线。
-// 顺序用的是河道示意图上的 siteU（年代轴），不是真实里程，页脚必须说明。
 @Entry
 @Component
 struct RoutePage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') rev: number = 0;
   @State era: string = '';
@@ -107,7 +105,6 @@ struct RoutePage {
     return text === '全部' ? this.city.length === 0 : this.city === text;
   }
 
-  // 路线条：一根横线串起各站的小圆，盖过章的填实，一眼看出走到哪了
   @Builder
   routeStrip() {
     Stack() {

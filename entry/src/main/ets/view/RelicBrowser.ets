@@ -2,15 +2,12 @@ import { Relic, RelicRepo, RELIC_CATS, RELIC_ERAS, RELIC_COLORS, ColorSeed } fro
 import { ArtCover } from './ArtCover';
 import { INK, SUB, CLAY, LINE, PAPER, fs, paletteOf } from '../common/Theme';
 
-// @Builder 收对象字面量才会跟着状态重画，普通参数只是建时快照（真机实测：chip 点了不变色）
 interface ChipArg {
   label: string;
   on: boolean;
   act: () => void;
 }
 
-// 「观文物」查询面板：搜索 + 分类 / 年代多选、颜色单选，结果两列排开，点卡片浮出文物小传。
-// 做成组件而不是页面，是因为数字文物把它放在顶栏第一个页签里；条目与照片都随包，见 RelicRepo。
 @Component
 export struct RelicBrowser {
   @StorageLink('textScale') ts: number = 1;
@@ -86,7 +83,7 @@ export struct RelicBrowser {
       Text(c.name).fontSize(fs(this.ts, 9)).fontColor(this.colors.indexOf(c.key) >= 0 ? CLAY : SUB)
     }
     .onClick((): void => {
-      // 颜色只单选：点一个顶掉上一个，再点同一个才取消
+      
       this.colors = this.colors.indexOf(c.key) >= 0 ? [] : [c.key];
     })
   }
@@ -127,7 +124,6 @@ export struct RelicBrowser {
     })
   }
 
-  // 文物小传：盖一层纸色浮卡，点空白或「知道了」收起
   @Builder
   detailOverlay() {
     Stack({ alignContent: Alignment.Center }) {
@@ -209,7 +205,6 @@ export struct RelicBrowser {
         .width('100%')
         .padding({ left: 14, right: 14, top: 8 })
 
-        // 搜索：名称 / 质地 / 年代 / 纹样都能撞一下
         TextInput({ placeholder: '搜文物名称、质地或纹样', text: this.kw })
           .fontSize(fs(this.ts, 13)).fontColor(INK).placeholderColor('#B7A995')
           .backgroundColor('rgba(255,255,255,0.86)')
@@ -222,7 +217,7 @@ export struct RelicBrowser {
 
         Scroll() {
           Column({ space: 12 }) {
-            // 筛选栏：分类 / 年代组内多选，颜色只单选，组间取交集
+            
             Column({ space: 8 }) {
               this.groupHead('分类')
               Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
@@ -282,7 +277,6 @@ export struct RelicBrowser {
             .borderRadius(12)
             .border({ width: 1, color: LINE })
 
-            // 结果两列
             if (this.shown().length === 0) {
               Column({ space: 6 }) {
                 Text('没有对得上的文物').fontSize(fs(this.ts, 14)).fontColor(INK)

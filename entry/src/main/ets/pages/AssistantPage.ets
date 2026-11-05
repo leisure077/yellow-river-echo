@@ -14,13 +14,12 @@ const TIPS: string[] = [
   '我收藏里哪几处值得先去？'
 ];
 
-// 打字机的节拍：50ms 合并一次增量，既不会一格一格卡顿，也不至于整段跳出
 const TYPE_MS: number = 50;
 
 @Entry
 @Component
 struct AssistantPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('aiRev') rev: number = 0;
   @State turns: ChatTurn[] = [];
@@ -35,7 +34,7 @@ struct AssistantPage {
   @State clearAsk: boolean = false;
   @State live: string = '';
   @State liveOn: boolean = false;
-  // 「测一下」的自检结果只出现在设置卡片里，不打扰游客
+  
   @State probing: boolean = false;
   @State probeMsg: string = '';
   @State lastFail: string = '';
@@ -84,7 +83,6 @@ struct AssistantPage {
     }, 60);
   }
 
-  // 流式期间每 50ms 都会触发，滚动按 150ms 节流，避免和打字抢帧
   follow(): void {
     let now = Date.now();
     if (now - this.lastFollow < 150) {
@@ -169,7 +167,6 @@ struct AssistantPage {
     }
   }
 
-  // 每次节拍都按最新原文重算可见文本：流没结束时半行保守清洗，结束后走正式清洗
   pump(): void {
     if (!this.liveOn || this.closing) {
       this.stopTimer();
@@ -178,7 +175,7 @@ struct AssistantPage {
     this.cleanTarget = this.streamDone ? cleanAiText(this.rawTarget) : cleanPartial(this.rawTarget);
     if (this.shown < this.cleanTarget.length) {
       let remain = this.cleanTarget.length - this.shown;
-      // 差距越大步进越大，避免模型吐得快时打字机永远追不上
+      
       let step = Math.max(2, Math.ceil(remain / 6));
       this.shown = Math.min(this.cleanTarget.length, this.shown + step);
       this.live = this.cleanTarget.substring(0, this.shown);
@@ -189,7 +186,6 @@ struct AssistantPage {
     }
   }
 
-  // 用户按停止：已收到的内容一次性补齐，立刻收尾，不留定时器也不留连接
   fastForward(): void {
     this.cleanTarget = cleanAiText(this.rawTarget);
     this.shown = this.cleanTarget.length;
@@ -217,7 +213,7 @@ struct AssistantPage {
     if (this.streamErr.length > 0) {
       this.err = text.length > 0 ? this.streamErr + '（回答已中断）' : this.streamErr;
       this.lastQ = this.askQ;
-      // 状态码和耗时是服务里同步记下的，设置卡片展开时给排错的人看
+      
       this.lastFail = store.lastFail;
     } else if (text.length === 0) {
       this.err = AiService.ERR_EMPTY;
@@ -250,8 +246,6 @@ struct AssistantPage {
     this.err = '';
   }
 
-  // 设置页的「测一次」：地址和 Key 用当前输入框里的值（没保存也能测），
-  // 只打一次 /v1/parameters，不消耗模型额度，也不留下问答记录。
   probeOnce(): void {
     if (this.probing) {
       return;
@@ -261,7 +255,7 @@ struct AssistantPage {
     AiService.get().probe(this.base, this.apiKey).then((r: ProbeResult): void => {
       this.probing = false;
       this.probeMsg = r.msg;
-      // 连上的话，之前那次失败的现场也就不必再提了
+      
       if (r.ok) {
         this.lastFail = '';
       }
@@ -271,8 +265,6 @@ struct AssistantPage {
     });
   }
 
-  // 地址里的 127.0.0.1 只在一种情况下是对的：本机用 hdc 端口转发把服务映射进设备。
-  // 别人第一次接的时候最容易踩这个坑，所以只提醒、不拦（拦了会把 rport 用法堵死）。
   addrHint(): string {
     let b = this.base.trim().toLowerCase();
     if (b.length === 0) {
@@ -286,8 +278,6 @@ struct AssistantPage {
     return '';
   }
 
-  // App Key 是一长串，输入框窄、又是密文显示，最容易漏粘。这里只看长度和前缀，绝不回显内容。
-  // 本机这套 Dify 的 Key 实测 28 字（app- + 24），所以只把「短到不可能是整串」当异常。
   keyHint(): string {
     let k = this.apiKey.trim();
     if (k.length === 0) {
@@ -348,7 +338,7 @@ struct AssistantPage {
           this.err = '';
           this.probeMsg = '';
           this.clearAsk = false;
-          // 只刷新排错现场，不回灌输入框：用户可能刚改了地址还没点保存
+          
           this.lastFail = AiStore.get().lastFail;
         })
     }
@@ -409,7 +399,6 @@ struct AssistantPage {
             .width('100%')
         }
 
-        // 自检只打一次 /v1/parameters：不调模型、不占额度，专门给换电脑的人定位「哪一段没通」
         Row({ space: 10 }) {
           Text(this.probing ? '试中…' : '测一下')
             .fontSize(fs(this.ts, 12))

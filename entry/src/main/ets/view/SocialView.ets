@@ -7,10 +7,9 @@ import { Post, PostComment } from '../model/Models';
 import { fs, INK, SUB, CLAY, agoText, likeText, paletteOf, eraPalette, coverRes } from '../common/Theme';
 import { openDrawer, goDetail, goSync, goPost } from '../common/Nav';
 
-// 社区页：推荐流 + 本机提醒。流里既有随包带的动态，也有这台设备自己发出去的动态。
 @Component
 export struct SocialView {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @StorageLink('dataRev') dataRev: number = 0;
@@ -26,7 +25,6 @@ export struct SocialView {
     this.syncMine();
   }
 
-  // 点赞和关注点了要当场变，绑到状态上才吃得到刷新
   syncMine(): void {
     let st = StudioStore.get();
     this.myLikes = st.likes.slice();
@@ -64,8 +62,6 @@ export struct SocialView {
     return eraPalette(s.eras.length > 0 ? s.eras[0] : '');
   }
 
-  // 本机发的动态没有遗址可挂，头像按「我的」里选的那个走，一眼认得出是自己；
-  // 配了图也一样，图是相册里的，不挂在遗址上
   avatarKeyOf(p: Post): string {
     if (this.isMine(p)) {
       let keys: string[] = ['yangshao', 'longshan', 'xiashang', 'zhou', 'hantang', 'song'];
@@ -136,7 +132,6 @@ export struct SocialView {
     .borderRadius(8)
   }
 
-  // 双列瀑布流：图高按 id 散开，两列才会错落成阶梯而不是一排排等高格子
   coverH(id: string): number {
     let n = 0;
     for (let i = 0; i < id.length; i++) {
@@ -146,8 +141,6 @@ export struct SocialView {
     return hs[n % hs.length];
   }
 
-  // 瀑布流卡片：图在上、文字压在下，作者和点赞收在最后一行
-  // 本机动态的 img 存的是相册 URI，直接给 Image 用；随包动态存的是资源名，要过 coverRes
   imgSrc(p: Post): string | Resource {
     if (p.img.indexOf('://') >= 0) {
       return p.img;
@@ -185,7 +178,7 @@ export struct SocialView {
             .height(this.coverH(p.id))
             .objectFit(ImageFit.Cover)
         } else {
-          // 本机发的纯文字动态：给一块纸色底，压一个「」符号，别去套随包的实景图
+          
           Column() {
             Text('「 」')
               .fontSize(fs(this.ts, 26))
@@ -327,7 +320,7 @@ export struct SocialView {
             })
           Blank()
           if (this.isMine(p)) {
-            // 自己这条只留一个「删除」：半屏卡片再挤一个关注，大字号下就顶出格子了
+            
             Text('删除')
               .fontSize(fs(this.ts, 10))
               .fontColor(SUB)
@@ -360,7 +353,7 @@ export struct SocialView {
     .borderRadius(12)
     .clip(true)
     .onClick((): void => {
-      // 整卡点开进详情页：全文 + 点赞关注 + 评论回话
+      
       goPost(p.id);
     })
   }
@@ -481,7 +474,7 @@ export struct SocialView {
           .layoutWeight(1)
           .justifyContent(FlexAlign.Center)
         } else {
-          // 小红书式双列瀑布流：图先占住卡片上半，文字和作者在下半，两列各自错落往下排
+          
           WaterFlow() {
             ForEach(this.shown(), (p: Post): void => {
               FlowItem() {

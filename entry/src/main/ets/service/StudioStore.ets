@@ -4,8 +4,6 @@ import { Profile, AccountRec, WorkRec, CheckinRec, QuizRun, LocalComment, Post, 
 import { VerifyGate } from './VerifyGate';
 import { SCALE_STEPS } from '../common/Theme';
 
-// 本机互动与创作数据：昵称头像、商品点赞/清单、集字、签到、彩陶作品。
-// 刻意不进分布式队列——这些是演示型数据，跨端要同步的仍是档案收藏与笔记。
 export class StudioStore {
   private static readonly inst: StudioStore = new StudioStore();
   static get(): StudioStore {
@@ -16,8 +14,7 @@ export class StudioStore {
   accounts: AccountRec[] = [];
   likes: string[] = [];
   cart: string[] = [];
-  // 清单里每件的数量。cart 仍是「在不在清单」的准，这条只挂数量，
-  // 老数据没有这一行的按 1 件算
+  
   cartLines: CartLine[] = [];
   chars: string[] = [];
   checkins: string[] = [];
@@ -25,7 +22,7 @@ export class StudioStore {
   readPosts: string[] = [];
   followed: string[] = [];
   postComments: LocalComment[] = [];
-  // 本机自己发的动态：随包 posts 是只读的，发的东西另存一张表，读的时候再并回去
+  
   userPosts: Post[] = [];
   guideSeen: boolean = false;
   scaleStep: number = 1;
@@ -51,7 +48,7 @@ export class StudioStore {
     this.likes = this.readArr('likes');
     this.accounts = this.readArr<AccountRec>('accounts');
     for (let a of this.accounts) {
-      // 验证码功能上线之前注册的账号没有 phone，补成空串，别留 undefined
+      
       a.phone = a.phone ?? '';
     }
     this.cart = this.readArr('cart');
@@ -100,7 +97,6 @@ export class StudioStore {
 
   private flushTimer: number = -1;
 
-  // flush 慢，攒一批后台落盘，别卡在点击上
   scheduleFlush(): void {
     if (this.p === null || this.flushTimer >= 0) {
       return;
@@ -128,7 +124,6 @@ export class StudioStore {
     }
   }
 
-  // 边侧栏「重看引河」：只清首启标记，收藏笔记作品一律不动
   redoGuide(): void {
     this.guideSeen = false;
     if (this.p !== null) {
@@ -143,9 +138,6 @@ export class StudioStore {
     this.save('profile', this.profile);
   }
 
-  // ---- 本机账号：口令只存摘要，不存明文，也不出这台设备 ----
-
-  // 两段不同初值的散列拼起来，够挡住「翻 preferences 直接看到口令」这一步
   static digest(nick: string, pwd: string): string {
     let s = nick + '|' + pwd;
     let a = 5381;
@@ -180,8 +172,6 @@ export class StudioStore {
     return best;
   }
 
-  // 返回 '' 表示成功，否则是能直接弹给用户的中文原因
-  // 验证码放在最后一道：它校验通过就作废，前面任何一条先失败都不会白白烧掉一条码
   register(nick: string, pwd: string, confirm: string, avatar: number,
     phone: string, code: string): string {
     let n = nick.trim();
@@ -212,7 +202,7 @@ export class StudioStore {
       createdAt: Date.now(), lastAt: Date.now(), phone: VerifyGate.mask(VerifyGate.digits(phone)) };
     this.accounts.push(rec);
     this.save('accounts', this.accounts);
-    // 签名不在注册这一步问，进「我的」再改
+    
     this.applySession(rec);
     return '';
   }
@@ -236,8 +226,6 @@ export class StudioStore {
     this.save('profile', this.profile);
   }
 
-  // 退出只关掉这次会话：账号、收藏、笔记、作品都原样留在这台设备上，
-  // 重新登录（或换个账号）接着用
   signOut(): void {
     this.profile.joinedAt = 0;
     this.save('profile', this.profile);
@@ -288,7 +276,6 @@ export class StudioStore {
     return 1;
   }
 
-  // 数量减到 0 就是撤出清单，不留下 n=0 的僵尸行
   setQty(id: string, n: number): void {
     if (n <= 0) {
       this.dropCart([id]);
@@ -317,8 +304,6 @@ export class StudioStore {
     this.save('cartLines', this.cartLines);
   }
 
-  // 商品包换过一批时，本机存的旧 id 已经点不到东西，却还在清单数字里凑数。
-  // 启动时拿现在的商品表过一遍，对不上的直接抹掉。
   pruneGoods(alive: string[]): void {
     let lk = this.likes.filter((x: string): boolean => alive.indexOf(x) >= 0);
     let ct = this.cart.filter((x: string): boolean => alive.indexOf(x) >= 0);
@@ -355,7 +340,6 @@ export class StudioStore {
     }
   }
 
-  // 首页邮件角标：点进去就把整条动态流一次标完，只落一次盘，不一条条写
   markFeedRead(ids: string[]): void {
     let added = 0;
     for (let id of ids) {
@@ -369,7 +353,6 @@ export class StudioStore {
     }
   }
 
-  // ---- 本机补的评论：随包评论只读，自己回的写这台设备 ----
   commentsFor(postId: string): LocalComment[] {
     return this.postComments.filter((c: LocalComment): boolean => c.postId === postId);
   }
@@ -385,7 +368,6 @@ export class StudioStore {
     return true;
   }
 
-  // ---- 本机发的动态：只存这台设备，读的时候和随包动态按时间并排 ----
   publishPost(text: string, topic: string, img: string): boolean {
     let t = text.trim();
     if (t.length === 0) {
@@ -402,7 +384,6 @@ export class StudioStore {
     return true;
   }
 
-  // 删本机动态：连带这条底下的本机评论一起清掉，别留孤儿评论
   removeUserPost(postId: string): boolean {
     let i = this.userPosts.findIndex((p: Post): boolean => p.id === postId);
     if (i < 0) {
@@ -513,7 +494,6 @@ export class StudioStore {
     }
   }
 
-  // ---- 字号三档 ----
   setScaleStep(i: number): void {
     this.scaleStep = this.clampStep(i);
     AppStorage.setOrCreate('textScale', SCALE_STEPS[this.scaleStep]);
@@ -524,7 +504,6 @@ export class StudioStore {
     StudioStore.rev();
   }
 
-  // ---- 到遗址现场打卡（本机数据） ----
   checkinOf(siteId: string): CheckinRec | undefined {
     for (let c of this.siteCheckins) {
       if (c.siteId === siteId) {
@@ -557,7 +536,6 @@ export class StudioStore {
     return this.siteCheckins.map((c: CheckinRec): string => c.siteId);
   }
 
-  // ---- 趣味测试记录 ----
   addQuizRun(persona: string, picks: number[]): void {
     let rec: QuizRun = {
       id: `qz_${Date.now()}`,

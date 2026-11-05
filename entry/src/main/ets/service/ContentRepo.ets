@@ -3,8 +3,6 @@ import { util } from '@kit.ArkTS';
 import { Goods, Course, EventInfo, Post } from '../model/Models';
 import { StudioStore } from './StudioStore';
 
-// 只读内容包：文创、课程、活动、社区动态。
-// 缺文件时留空，页面自己显示占位，避免启动链被拖住。
 export class ContentRepo {
   private static readonly inst: ContentRepo = new ContentRepo();
   static get(): ContentRepo {
@@ -67,7 +65,6 @@ export class ContentRepo {
     return undefined;
   }
 
-  // 推荐流读这一份：随包动态 + 这台设备自己发的动态，按时间倒序，刚发的自然顶到最前
   feed(): Post[] {
     let out = this.posts.slice();
     let mine = StudioStore.get().userPosts;

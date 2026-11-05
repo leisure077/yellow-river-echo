@@ -16,7 +16,7 @@ const BOXES: string[] = ['素台', '木座', '圆几', '无'];
 @Entry
 @Component
 struct PotteryPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') rev: number = 0;
   @State shape: string = '罐';
@@ -25,15 +25,13 @@ struct PotteryPage {
   @State box: string = '素台';
   @State seed: number = 1;
   @State name: string = '未命名第 1 件';
-  // 渲染链路：probe = 探针还没出结论（此刻看到的是转台），3d = 页内 WebGL 起来了，
-  // fallback = 页内明确报错或超时没吭声。只有 '3d' 才撤掉盖在 Web 上面的转台。
+  
   @State mode3d: string = 'probe';
   private probeTimer: number = -1;
 
   aboutToAppear(): void {
     this.name = `未命名第 ${StudioStore.get().works.length + 1} 件`;
-    // 探针的第三种结局是「没有结局」：rawfile 读不到、模块 import 失败、ArkWeb 自己起不来，
-    // 这几种情况下页里那行 Native.setMode 永远不会被调到，只能靠超时收口。
+    
     this.probeTimer = setTimeout((): void => {
       this.probeTimer = -1;
       if (this.mode3d === 'probe') {
@@ -49,8 +47,6 @@ struct PotteryPage {
     }
   }
 
-  // 探针回话。撤转台是一次真实的组件销毁：那 1.3MB 灰模帧的解码位图会一起释放，
-  // 正好还给真 3D 用。反过来（3d 再退回转台）不存在——结论一旦出来就锁死。
   onProbe(m: string): void {
     if (this.probeTimer >= 0) {
       clearTimeout(this.probeTimer);
@@ -151,13 +147,7 @@ struct PotteryPage {
       Scroll() {
         Column({ space: 12 }) {
           Column({ space: 8 }) {
-            // 预览位两条链路叠在一起：底下是 ArkWeb 真 3D（同时也是探针），
-            // 上面盖一层伪 3D 转台：灰模序列帧打底，釉色和纹样在 App 端现罩，能左右拖着转。
-            // 探针没出结论、或者结论是 fallback，用户看到的一直是转台；
-            // 只有 '3d' 才把转台撤掉，露出下面已经铺好的 3D 页。
-            // 转台自己仍带「帧拿不到就退回二维 PotteryCanvas」的兜底，三层都不会白屏。
-            // 下面「已存作品」的缩略图仍然走二维：88vp 一格看不出立体感，
-            // 却要为每件作品解一两张 1.3MB 的位图，不划算。
+            
             Column() {
               Stack() {
                 Pottery3D({
@@ -170,10 +160,7 @@ struct PotteryPage {
                     this.onProbe(m);
                   }
                 })
-                  // 探针结论一旦是 fallback，这层就不该再参与成像：它建不起 WebGL 就只剩
-                  // 一张二维底图，而系统还会把不可见的 Web 页 rAF 节流掉，于是它停在一个
-                  // 「擦了纸底、没擦器物」的半帧上，从上面转台画布的透明区漏出来。
-                  // 隐藏只断成像，Web 节点和探针回调都还在（结论已经拿到，不需要它再报）。
+                  
                   .visibility(this.mode3d === 'fallback' ? Visibility.Hidden : Visibility.Visible)
                 if (this.mode3d !== '3d') {
                   PotteryTurntable({

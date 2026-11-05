@@ -3,7 +3,6 @@ import { fs, INK, SUB, CLAY } from '../common/Theme';
 import { goPlayer } from '../common/Nav';
 import { ArtCover } from './ArtCover';
 
-// 封面器型按标题与简介里的关键词挑，课程影像页和数字文物「选教程」共用这一份
 export function coverShape(c: Course): string {
   let hay = c.title + c.brief;
   if (hay.indexOf('拓') >= 0 || hay.indexOf('碑') >= 0 || hay.indexOf('刻') >= 0) {
@@ -24,13 +23,12 @@ export function coverShape(c: Course): string {
   return 'tile';
 }
 
-// 课程行：示意封面 + 标题、简介、一行元信息。两处列表都走这里，样式只留一份
 @Component
 export struct CourseRow {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @Require @Prop course: Course;
-  // 传给封面画布的纹样种子，同一条课程在哪个列表里都画成同一张
+  
   @Prop seed: number = 1;
 
   build() {

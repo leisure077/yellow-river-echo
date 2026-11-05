@@ -7,15 +7,11 @@ import { RelicBrowser } from '../view/RelicBrowser';
 import { Course } from '../model/Models';
 import { CourseRow } from '../view/CourseRow';
 
-// 「数字文物」独立模块：页顶栏三个页签——观文物 / 创意坊 / 选教程
-// 观文物是内嵌的查询面板（搜索 + 分类年代颜色筛选 + 两列结果），
-// 创意坊放 3D 文物展台与工坊入口，选教程是分类胶囊 + 教程列表
 interface ExhibitRec {
   img: string;
   key: string;
 }
 
-// 六件展品：实物示意图 + 对应色键，色键用来取展台下方的色名与说法
 const SHOW: ExhibitRec[] = [
   { img: 'relic_caitao', key: 'yangshao' },
   { img: 'relic_heitao', key: 'longshan' },
@@ -30,7 +26,7 @@ const TABS: string[] = ['观文物', '创意坊', '选教程'];
 @Entry
 @Component
 export struct StudioPage {
-  // 字号档位变了要整页重画，否则切完「大」这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @State tab: number = 1;
   @State cur: number = 0;
@@ -43,7 +39,7 @@ export struct StudioPage {
     if (p !== undefined && p.tab !== undefined && p.tab >= 0 && p.tab < TABS.length) {
       this.tab = p.tab;
     }
-    // 展台缓摆：绕 y 轴 -5°~5° 往复；上下 8px 浮沉，像展柜里被轻托着
+    
     animateTo({
       duration: 6000, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
@@ -56,7 +52,6 @@ export struct StudioPage {
     });
   }
 
-  // 展品相对当前选中的偏移：-3..3，只渲染 |rel|<=1（两侧侧身件 + 中央正身件）
   private rel(i: number): number {
     let d = i - this.cur;
     while (d > 3) {
@@ -76,7 +71,6 @@ export struct StudioPage {
     }
   }
 
-  // 选教程当前分类下的课程，与课程影像页取的是同一份数据
   courses(): Course[] {
     return ContentRepo.get().coursesOf(this.cat);
   }
@@ -85,7 +79,7 @@ export struct StudioPage {
     Stack() {
       PatternBg()
       Column() {
-      // 页头：返回 + 居中标题
+      
       Row() {
         Text('‹')
           .fontSize(fs(this.ts, 20))
@@ -108,7 +102,6 @@ export struct StudioPage {
       .width('100%')
       .padding({ left: 14, right: 14, top: 10, bottom: 6 })
 
-      // 页顶栏：观文物 / 创意坊 / 选教程
       Row() {
         ForEach(TABS, (t: string, i: number): void => {
           Column({ space: 5 }) {
@@ -135,7 +128,7 @@ export struct StudioPage {
       .justifyContent(FlexAlign.Center)
 
       if (this.tab === 0) {
-        // 观文物自带滚动，不能再套一层 Scroll，否则内层 layoutWeight 撑不开
+        
         RelicBrowser()
           .layoutWeight(1)
       } else {
@@ -152,7 +145,7 @@ export struct StudioPage {
         }
         .layoutWeight(1)
         .scrollBar(BarState.Off)
-        // 课少的时候内容不满一屏，Scroll 默认会把它垂直居中，讲读/影像这种单课分类会掉到屏幕中间
+        
         .align(Alignment.Top)
         .edgeEffect(EdgeEffect.Spring)
       }
@@ -163,12 +156,11 @@ export struct StudioPage {
   }
   }
 
-  // —— 3D 文物展台：中央正身缓摆 + 两侧侧身件 + 地面倒影 + 指示点 ——
   @Builder
   stage() {
     Column({ space: 8 }) {
       Stack({ alignContent: Alignment.Center }) {
-        // 展台净底：一圈纸色柔光晕开，文物像立在展柜灯下，也盖住背景纹样
+        
         Column()
           .width(330)
           .height(296)
@@ -184,7 +176,7 @@ export struct StudioPage {
                 .width(216)
                 .height(216)
                 .objectFit(ImageFit.Contain)
-              // 倒影：同一张图取一段翻转压扁，纸色渐变抹淡
+              
               if (this.rel(i) === 0) {
                 Stack({ alignContent: Alignment.Top }) {
                   Image(coverRes(e.img))
@@ -218,7 +210,7 @@ export struct StudioPage {
             })
           }
         }, (e: ExhibitRec, i: number): string => 'stage_' + e.img + '_' + this.cur)
-        // 左右切换箭头
+        
         Row() {
           Text('‹')
             .fontSize(fs(this.ts, 22))
@@ -244,7 +236,6 @@ export struct StudioPage {
       .width('100%')
       .height(300)
 
-      // 展品名 + 指示点
       Text(colorRowOf(SHOW[this.cur].key).name)
         .fontSize(fs(this.ts, 15))
         .fontWeight(FontWeight.Bold)
@@ -273,7 +264,6 @@ export struct StudioPage {
     .padding({ top: 6 })
   }
 
-  // 卡片标题一律逐字排到四字宽、两端对齐：「3D工坊」开头是半角，整块排会短一截对不齐
   @Builder
   workTitle(t: string) {
     Row() {
@@ -288,7 +278,6 @@ export struct StudioPage {
     .justifyContent(FlexAlign.SpaceBetween)
   }
 
-  // —— 工坊入口：彩陶工坊 / 3D工坊 / 黄河沙盘，各带一句玩法说明 ——
   @Builder
   works() {
     Column({ space: 10 }) {
@@ -377,7 +366,6 @@ export struct StudioPage {
     .padding({ left: 14, right: 14 })
   }
 
-  // —— 选教程：分类胶囊 + 教程列表，行样式与课程影像页同一段代码 ——
   @Builder
   coursePick() {
     Column({ space: 10 }) {

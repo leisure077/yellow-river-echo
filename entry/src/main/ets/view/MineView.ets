@@ -13,7 +13,6 @@ import { openDrawer, goSync, goTopic, goCourses, goPottery, goDetail, goNote, go
 
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'tower', 'cave', 'scroll', 'coin', 'box', 'bridge', 'kiln'];
 
-// @Builder 用对象字面量收参，数字改了才会跟着重画；传值只是建时快照
 interface StatArg {
   title: string;
   value: string;
@@ -28,7 +27,7 @@ interface FuncArg {
 
 @Component
 export struct MineView {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('syncCount') dataRev: number = 0;
   @StorageLink('syncRev') @Watch('syncCount') syncRev: number = 0;
@@ -53,7 +52,6 @@ export struct MineView {
     this.syncCount();
   }
 
-  // 上面那排数字得跟着删改走，绑到状态变量上才会重画
   syncCount(): void {
     let st = StudioStore.get();
     let mem = MemoryStore.get();

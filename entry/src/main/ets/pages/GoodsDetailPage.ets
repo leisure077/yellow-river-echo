@@ -11,11 +11,10 @@ import { params, goDetail } from '../common/Nav';
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'box', 'coin', 'kiln'];
 const ANGLES: string[] = ['正面', '侧面', '细节'];
 
-// 商品详情：多角度封面、规格、灵感来源故事、同年代遗址推荐与底部操作条。
 @Entry
 @Component
 struct GoodsDetailPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @State g: Goods | undefined = undefined;
@@ -35,7 +34,6 @@ struct GoodsDetailPage {
     this.syncMine();
   }
 
-  // 点赞和清单要在这一页当场改当场看，所以镜像到状态上
   syncMine(): void {
     if (this.g === undefined) {
       this.myLike = false;
@@ -73,7 +71,7 @@ struct GoodsDetailPage {
   @Builder
   shot(i: number) {
     Column() {
-      // 实拍图只有一张，不再假装有正面/侧面/细节三个角度
+      
       ArtCover({ palette: this.g!.palette, shape: this.shapeOf(this.g!.id), seed: i + 1,
         img: this.g!.img,
         label: this.g!.img.length > 0 ? '' : ANGLES[i % ANGLES.length] })
@@ -134,7 +132,7 @@ struct GoodsDetailPage {
           .width('100%')
           .height(320)
           .loop(false)
-          // 只剩一张实拍图时别再挂一个翻页圆点
+          
           .indicator(this.g!.img.length === 0)
 
           Text('‹ 返回')

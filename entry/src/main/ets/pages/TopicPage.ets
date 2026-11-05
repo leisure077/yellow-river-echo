@@ -35,11 +35,10 @@ interface ChipArg {
   title: string;
 }
 
-// 知识网络：照片节点按年代顺序排在椭圆时间轨道上，关系架成拱桥，下方列关系清单
 @Entry
 @Component
 struct TopicPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('redraw') rev: number = 0;
   @State scope: string = '';
@@ -95,7 +94,7 @@ struct TopicPage {
         }
       }
     }
-    // 椭圆按年代顺序走：仰韶→宋，排不进年代的放最后
+    
     ns.sort((a: SiteInfo, b: SiteInfo): number => {
       let ia = ERAS.indexOf(a.eras[0]);
       let ib = ERAS.indexOf(b.eras[0]);
@@ -141,7 +140,6 @@ struct TopicPage {
     return '';
   }
 
-  // 一对遗址只架一座桥：年代 > 城市 > 标签
   relOf(a: SiteInfo, b: SiteInfo): Rel | undefined {
     let era = this.sharedEra(a, b);
     if (era.length > 0) {
@@ -176,7 +174,6 @@ struct TopicPage {
       y: u * u * p0.y + 2 * u * t * pc.y + t * t * p1.y };
   }
 
-  // 拱桥：向椭圆圆心一侧鼓起的二次曲线，桥上等距画短刻度当桥墩
   drawBridge(c: CanvasRenderingContext2D, p0: Pt, p1: Pt, ctr: Pt, color: string,
     width: number, dashed: boolean): void {
     let mid: Pt = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
@@ -234,7 +231,7 @@ struct TopicPage {
     if (ns.length === 1) {
       pts.push({ x: ctr.x, y: ctr.y });
     } else {
-      // 椭圆轨道：从正上方起，按年代顺时针
+      
       for (let i = 0; i < ns.length; i++) {
         let a = -Math.PI / 2 + Math.PI * 2 * i / ns.length;
         pts.push({ x: ctr.x + rx * Math.cos(a), y: ctr.y + ry * Math.sin(a) });
@@ -248,7 +245,6 @@ struct TopicPage {
       c.setLineDash([]);
     }
 
-    // 先算全部关系：桥画在 Canvas 上，清单存进状态
     let rels: Rel[] = [];
     for (let i = 0; i < ns.length; i++) {
       for (let j = i + 1; j < ns.length; j++) {
@@ -290,7 +286,6 @@ struct TopicPage {
     return t === undefined ? [] : t.siteIds;
   }
 
-  // 建完直接切进新主题并弹成员表，免得停在空网络上以为没建成
   async create(): Promise<void> {
     let name = this.newName.trim();
     if (name.length === 0) {

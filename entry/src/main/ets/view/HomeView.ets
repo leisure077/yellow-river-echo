@@ -26,8 +26,6 @@ interface TileRec {
   act: () => void;
 }
 
-// 宫格印章的画法：全部用基础形叠出来，不引图片资源。
-// 每一枚都是"纸底 + 双线框 + 一件小器物"，按下会缩一下再弹回来。
 @Builder
 function artOf(kind: string, scale: number) {
   if (kind === 'scroll') {
@@ -165,11 +163,9 @@ function artOf(kind: string, scale: number) {
   }
 }
 
-// 宫格按钮：无框写实风——器物直接立在纸面上，脚下一道柔和落影托住，
-// 不描边、不加底板，像参考图那样"图 + 名"两截干净地浮着。按下沉一点再弹回。
 @Component
 struct RelicTile {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @Prop kind: string = '';
   @Prop title: string = '';
@@ -192,7 +188,7 @@ struct RelicTile {
   build() {
     Column({ space: 5 }) {
       Stack({ alignContent: Alignment.Bottom }) {
-        // 落影：一枚压扁的径向渐变椭圆，让器物像放在台面上而非贴纸
+        
         Column()
           .width(34)
           .height(9)
@@ -225,10 +221,6 @@ struct RelicTile {
   }
 }
 
-// 首页照故宫式排布：通栏海报 → 「黄河续响平台」大卡（实景打卡 / 数字文物双卡 + 我的档案行）
-// → 八枚功能印章宫格（两排，一排四枚）→ 为你推荐 → 文创市集。被四段版收掉的入口（测验、课程、
-// 知识网络）全部在宫格里回来，另加行程与颜色两个新工坊。河工、同步两枚已撤出首页，
-// 侧栏里仍然进得去。
 @Component
 export struct HomeView {
   @StorageLink('dataRev') @Watch('reload') dataRev: number = 0;
@@ -245,20 +237,20 @@ export struct HomeView {
   @State noteN: number = 0;
   @State wSway: number = -7;
   @State mapFloat: boolean = false;
-  // 「问」按钮的红点：没用过助手才挂，用过永久收掉
+  
   @StorageLink('assistantSeen') askSeen: boolean = false;
-  // 给右下角悬浮河小导发滚动信号：滚起来先收进边里，别压着内容
+  
   private fabSignalAt: number = 0;
 
   aboutToAppear(): void {
     this.reload();
-    // 数字文物卡里的中央文物缓摆，暗示进去是个能转的 3D 展台
+    
     animateTo({
       duration: 5200, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
       this.wSway = 7;
     });
-    // 地图窗里的红标轻轻浮，像导览图上正在定位的那一下
+    
     animateTo({
       duration: 3000, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
@@ -301,7 +293,6 @@ export struct HomeView {
     return this.routeStops.length > 0 ? this.routeStops[0].name : '沿河遗存';
   }
 
-  // 今日一句那一帧的底图：用诗句所属遗址的配图，换个日期换张图
   verseCover(): string {
     let v = this.verse;
     if (v === undefined) {
@@ -318,7 +309,6 @@ export struct HomeView {
     return StudioStore.get().unread(ContentRepo.get().feed().length);
   }
 
-  // 点开邮件图标就当这一屏动态都看过了，角标跟着收掉
   readFeed(): void {
     let ids: string[] = [];
     for (let p of ContentRepo.get().feed()) {
@@ -353,7 +343,6 @@ export struct HomeView {
     ];
   }
 
-  // 顶栏叠在海报上：半透明圆片托住白色符号，海报的色彩能透上来
   @Builder
   topBar() {
     Row({ space: 8 }) {
@@ -397,12 +386,12 @@ export struct HomeView {
           .borderRadius(16)
           .backgroundColor(CLAY)
           .textAlign(TextAlign.Center)
-        // 右上角这颗和右下角的球是同一个开关：assistantSheet 一置真，弹的都是同一个 FloatingAssistant
+        
           .onClick((): void => {
             openAssistantSheet();
           })
         if (!this.askSeen) {
-          // 还没用过助手时挂个红点，用过一次就永久收掉（askSeen 落在 preferences）
+          
           Circle()
             .width(9)
             .height(9)
@@ -445,7 +434,6 @@ export struct HomeView {
     .hitTestBehavior(HitTestMode.Transparent)
   }
 
-  // 海报上压一层由透到暗的渐变：白字直接压在示意图上会糊，垫一层才立得住
   @Builder
   scrim() {
     Column()
@@ -488,7 +476,6 @@ export struct HomeView {
     .onClick(act)
   }
 
-  // 今日一句收进海报第二帧：首页少一张卡，诗句反而更醒目
   @Builder
   verseFrame() {
     Stack({ alignContent: Alignment.BottomStart }) {
@@ -537,7 +524,6 @@ export struct HomeView {
     })
   }
 
-  // 通栏海报：四帧轮播，右下角一枚 n/4 的页码片，照参考图那个位置
   @Builder
   hero() {
     Stack({ alignContent: Alignment.BottomEnd }) {
@@ -579,7 +565,6 @@ export struct HomeView {
     .clip(true)
   }
 
-  // 大卡右上角的视觉锚点：一束简牍＋一道编绳＋一枚陶印
   @Builder
   archiveArt() {
     Stack({ alignContent: Alignment.BottomEnd }) {
@@ -599,8 +584,6 @@ export struct HomeView {
     .opacity(0.92)
   }
 
-  // 地图导览子卡：卡里开一扇「地图窗」，露一段手绘导览图 + 一枚浮动的红标，
-  // 点整卡进 ArkWeb 手绘地图（发现/建筑/展览/打卡/餐饮/文创/卫生间/游客服务全在里头）
   @Builder
   mapCard() {
     Column({ space: 7 }) {
@@ -643,8 +626,6 @@ export struct HomeView {
     })
   }
 
-  // 数字文物入口卡：整卡一个入口，卡里三件文物做微缩 3D 展台（中央件缓摆），
-  // 底色调成纸色让文物边缘自然融进卡面，点整卡进展台页
   @Builder
   workshopCard() {
     Column({ space: 6 }) {
@@ -657,7 +638,7 @@ export struct HomeView {
         .fontSize(fs(this.ts, 9))
         .fontColor(SUB)
       Stack({ alignContent: Alignment.Center }) {
-        // 展台净底：与文物图烘进去的纸色同值，边缘才融得干净
+        
         Column()
           .width('100%')
           .height(58)
@@ -692,7 +673,6 @@ export struct HomeView {
     })
   }
 
-  // 档案大卡：标题「黄河续响平台」，双卡 + 我的档案行，卡顶压住海报下沿
   @Builder
   todayCard() {
     Column({ space: 11 }) {
@@ -780,7 +760,6 @@ export struct HomeView {
     .onClick(act)
   }
 
-  // 为你推荐：两列图卡，每张都写清为什么推给你
   @Builder
   recoCard(sg: Suggestion, i: number) {
     Column({ space: 5 }) {
@@ -815,7 +794,7 @@ export struct HomeView {
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
-      // 有偏好才写"为什么推给你"；冷启动四张卡理由是同一句，写出来像 bug，不如放摘要
+      
       if (sg.score > 0) {
         Text(sg.reason)
           .fontSize(fs(this.ts, 10))
@@ -861,7 +840,6 @@ export struct HomeView {
     .alignItems(HorizontalAlign.Start)
   }
 
-  // 文创市集：商品有实拍图就贴图，没图的才让 ArtCover 现画
   @Builder
   shopCard(g: Goods, i: number) {
     Column({ space: 5 }) {
@@ -884,7 +862,7 @@ export struct HomeView {
           .fontSize(fs(this.ts, 12))
           .fontColor(CLAY)
           .fontWeight(FontWeight.Medium)
-        // 出土地那串字给不了固定宽度就会顶出格子，压进剩余空间里省略
+        
         Text(g.origin)
           .fontSize(fs(this.ts, 10))
           .fontColor(RIVER)
@@ -938,7 +916,7 @@ export struct HomeView {
               this.shopGrid()
             }
             .width('100%')
-            // 留出右下角悬浮河小导的位置，滚到底时页脚不会被它压住
+            
             .padding({ left: 14, right: 14, bottom: 92 })
             .alignItems(HorizontalAlign.Start)
           }
@@ -951,7 +929,7 @@ export struct HomeView {
           if (yOffset === 0) {
             return;
           }
-          // 每帧都写 AppStorage 没必要，80ms 一次足够让悬浮球判定"还在滚"
+          
           let now = Date.now();
           if (now - this.fabSignalAt < 80) {
             return;

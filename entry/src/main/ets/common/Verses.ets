@@ -1,7 +1,5 @@
 import { SiteRepo } from '../service/SiteRepo';
 
-// 「今日一句」素材池。两条是库内真实收录的唐诗（带作者与出处），
-// 其余是按各遗址公开档案写的拟咏，界面上必须显式标「拟咏」，不冒充古人。
 export interface Verse {
   text: string;
   from: string;
@@ -39,7 +37,6 @@ function dayOfYear(ts: number): number {
   return Math.floor((d.getTime() - start.getTime()) / 86400000);
 }
 
-// 按日期确定性取一条：无随机，演示时同一天结果可复现。
 export function verseOf(ts: number): Verse {
   return VERSES[dayOfYear(ts) % VERSES.length];
 }

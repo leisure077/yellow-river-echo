@@ -11,9 +11,6 @@ interface FilterRow {
   options: string[];
 }
 
-// 三行筛选写死成表，行渲染只认 which 去取状态数组。
-// 不能把选中的数组当参数传进 @Builder：按值传的是建时快照，点了不重画，
-// 看着就像标签压根没反应。
 const ROWS: FilterRow[] = [
   { title: '年代', which: 'era', options: ERAS },
   { title: '城市', which: 'city', options: CITIES },
@@ -23,7 +20,7 @@ const ROWS: FilterRow[] = [
 @Entry
 @Component
 struct ListPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') rev: number = 0;
   @State kw: string = '';
@@ -59,7 +56,6 @@ struct ListPage {
     return this.pickedOf(which).indexOf(opt) >= 0;
   }
 
-  // 数组内容变了但引用没变，@State 不一定刷新，干脆换个新数组
   toggle(which: string, opt: string): void {
     let cur = this.pickedOf(which);
     let next: string[] = cur.slice();
@@ -108,7 +104,6 @@ struct ListPage {
           this.kw = v;
         })
 
-      // ---- 筛选栏：条件行 + 实时条数 + 已选可单点撤销 ----
       Column() {
         Row({ space: 8 }) {
           Text('筛选').fontSize(fs(this.ts, 13)).fontColor(INK).fontWeight(FontWeight.Bold)
@@ -137,7 +132,7 @@ struct ListPage {
             Scroll() {
               Row({ space: 7 }) {
                 ForEach(row.options, (opt: string): void => {
-                  // key 里带上选中态：条件一变这个节点就重建，颜色必定跟着变
+                  
                   Text(opt)
                     .fontSize(fs(this.ts, 12))
                     .fontColor(this.has(row.which, opt) ? Color.White : INK)
@@ -168,7 +163,6 @@ struct ListPage {
       .margin({ left: 14, right: 14, top: 10 })
       .padding({ bottom: 6 })
 
-      // 已选条件：逐个可撤，点 × 只掉这一项
       if (this.pickedCount() > 0) {
         Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
           ForEach(ROWS, (row: FilterRow): void => {

@@ -35,7 +35,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   onBackground(): void {
-    // 退后台前把攒着的写盘请求落地，防杀进程丢数据
+    
     MemoryStore.get().flushNow();
     StudioStore.get().flushNow();
   }

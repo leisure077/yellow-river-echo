@@ -10,7 +10,7 @@ import { params } from '../common/Nav';
 @Entry
 @Component
 struct NoteEditPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') rev: number = 0;
   @StorageLink('syncRev') syncRev: number = 0;

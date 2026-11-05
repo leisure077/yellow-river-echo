@@ -7,8 +7,6 @@ import { PatternBg } from '../view/PatternBg';
 import { INK, SUB, CLAY, LINE, PAPER, RIVER, agoText, likeText, paletteOf, eraPalette, coverRes, fs } from '../common/Theme';
 import { goBack, params, goDetail } from '../common/Nav';
 
-// 社群动态详情：整卡点开的一页——大图、全文、点赞、关注、评论，
-// 随包评论只读，自己补的那几条写在本机 preferences。
 @Entry
 @Component
 struct PostPage {
@@ -51,7 +49,6 @@ struct PostPage {
     return this.post !== undefined && StudioStore.get().isMyPost(this.post.id);
   }
 
-  // 本机动态的 img 是相册 URI，直接给 Image；随包动态存的是资源名，要过 coverRes
   imgSrc(): string | Resource {
     let img = this.post !== undefined ? this.post.img : '';
     if (img.indexOf('://') >= 0) {
@@ -85,7 +82,7 @@ struct PostPage {
     if (this.post === undefined) {
       return 'yangshao';
     }
-    // 本机发的动态不挂在遗址上，头像跟着「我的」里选的那个走
+    
     if (this.isMine()) {
       let keys: string[] = ['yangshao', 'longshan', 'xiashang', 'zhou', 'hantang', 'song'];
       let n = StudioStore.get().profile.avatar;
@@ -98,7 +95,6 @@ struct PostPage {
     return eraPalette(s.eras.length > 0 ? s.eras[0] : '');
   }
 
-  // 随包的评论 + 本机补的评论按时间并到一起
   allComments(): PostComment[] {
     let out: PostComment[] = [];
     if (this.post === undefined) {
@@ -225,7 +221,6 @@ struct PostPage {
               }
               .width('100%').borderRadius(14).clip(true)
 
-              // 作者行：头像、名号、关注（自己这条不给自己关注）
               Row({ space: 10 }) {
                 Column() {
                   Text(this.post!.author.substring(0, 1))
@@ -268,7 +263,6 @@ struct PostPage {
               .borderRadius(12)
               .border({ width: 1, color: LINE })
 
-              // 全文：详情页不截断
               Text(this.post!.text)
                 .fontSize(fs(this.ts, 15)).fontColor(INK).lineHeight(fs(this.ts, 24)).width('100%')
                 .padding({ left: 4, right: 4 })

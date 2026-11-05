@@ -13,8 +13,6 @@ interface SecCard {
   body: string;
 }
 
-// 详情页（扩展设计方案 §2.5）：头图视差 + 诗词逐字浮现 + 在此打卡 + 同一段河 + 河道缩略。
-// 阅读页不做动效主角：河道缩略只在正文之外出现一次，正文卡片保持不透底。
 @Entry
 @Component
 struct DetailPage {
@@ -22,8 +20,7 @@ struct DetailPage {
   @StorageLink('studioRev') @Watch('syncCheckin') studioRev: number = 0;
   @StorageLink('textScale') ts: number = 1;
   @State site: SiteInfo | undefined = undefined;
-  // 收藏/已读/笔记/标签都存在 MemoryStore（普通单例，ArkUI 观察不到），
-  // dataRev 一变就抄成 @State，按钮和列表才跟着实时变
+  
   @State favOn: boolean = false;
   @State readOn: boolean = false;
   @State notes: NoteRec[] = [];
@@ -169,7 +166,6 @@ struct DetailPage {
     .borderRadius(12)
   }
 
-  // 诗词：竖排 + 自右向左逐列浮现（每列 260ms 间隔），首次可见才播
   @Builder
   poemCard() {
     Column({ space: 10 }) {
@@ -236,7 +232,6 @@ struct DetailPage {
         .alignItems(HorizontalAlign.Start)
         .padding(14)
 
-        // 打卡印章：盖在头图右下角
         Stack({ alignContent: Alignment.BottomEnd }) {
           Column() {
             Text(this.sealChar())
@@ -425,7 +420,7 @@ struct DetailPage {
           this.scrollY = next < 0 ? 0 : next;
         })
         .onScrollIndex((first: number, last: number): void => {
-          // 前 5 行是头图/操作/打卡/进度/河道缩略，正文从第 6 个 ListItem 起
+          
           let max = this.secs().length - 1;
           let secIdx = Math.min(Math.max(last - 5, 0), max);
           if (this.site !== undefined) {

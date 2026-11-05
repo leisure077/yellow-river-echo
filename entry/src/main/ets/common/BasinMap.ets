@@ -4,33 +4,27 @@ import { StudioStore } from '../service/StudioStore';
 import { fs, WATER_FLOW, WATER_OFF } from '../common/Theme';
 import { effectiveWaterMode } from '../common/River';
 
-// 河图洛书·流域图：把整条黄河（源—几字弯—晋陕峡谷—出潼关—入海）连同两侧支流
-// 画成一张可以缩放的古地图。干流用"外晕—中亮—内白芯—流动光斑"四层描边做出缓慢
-// 流动的黄色荧光，支流走青蓝，点河道溅起的水花从柠檬黄渐变到橘。
-// 河线来自 HydroRIVERS v1 的黄河连通流域，城市与遗址位置为导览标注。
-
 const TAU: number = Math.PI * 2;
 const FRAME_MS: number = 40;
 const DEG: number = Math.PI / 180;
 
-// 图幅范围（含四周边缘的山系）
 const LON0: number = 95.6;
 const LON1: number = 120.4;
 const LAT0: number = 31.9;
 const LAT1: number = 42.0;
-const COS: number = Math.cos(37.2 * DEG);   // 纬线压缩系数
-const STR: number = 1.35;                    // 纵向拉伸，让 2:1 的流域填满竖画面
+const COS: number = Math.cos(37.2 * DEG);
+const STR: number = 1.35;
 const FIT_PAD: number = 12;
 const MAX_ZOOM: number = 9;
-const SITE_ZOOM: number = 1.55;              // 放大到这一步才出现遗址圈
-const HIT_RIVER: number = 15;                // 点河道的命中半径（vp）
+const SITE_ZOOM: number = 1.55;
+const HIT_RIVER: number = 15;
 const HIT_SITE: number = 19;
-const FLOW_VP: number = 15;                  // 光斑每秒顺流推进的 vp，慢速
+const FLOW_VP: number = 15;
 
 interface Chain {
   name: string;
-  pts: number[];      // [lon,lat,...]
-  big: boolean;       // 干级支流：有名称、有流动光斑
+  pts: number[];
+  big: boolean;
 }
 
 interface RiverReach {
@@ -64,7 +58,7 @@ interface City {
   name: string;
   lon: number;
   lat: number;
-  lv: number;         // 1 一直显示，2 略放大，3 要看细节
+  lv: number;
 }
 
 interface Lake {
@@ -90,7 +84,7 @@ interface Drop {
   r: number;
   life: number;
   max: number;
-  hue: number;        // 0 柠檬黄 → 1 橘
+  hue: number;
 }
 
 interface Halo {
@@ -107,10 +101,6 @@ interface Flash {
   life: number;
   max: number;
 }
-
-// 干流：约古宗列曲 → 扎陵/鄂陵湖 → 玛曲第一弯 → 贵德龙羊峡 → 兰州 → 宁夏 →
-// 河套"几"字弯 → 晋陕峡谷 → 壶口·龙门 → 潼关折东 → 三门峡·洛阳·郑州·开封 → 山东入海
-
 
 const TRIB: Chain[] = [
   { name: '渭河', big: true, pts: [104.32, 34.82, 105.1, 34.85, 105.75, 34.62, 106.6, 34.55,
@@ -147,7 +137,6 @@ const TRIB: Chain[] = [
   { name: '白河', big: false, pts: [101.9, 33.7, 102.25, 33.5, 102.45, 33.4] }
 ];
 
-// 山系：垫出地形骨架，也让上下留白不像空的
 const RIDGES: Ridge[] = [
   { name: '巴颜喀拉山', pts: [96.2, 35.3, 98.2, 35.0, 100.3, 34.5, 101.6, 34.3] },
   { name: '西倾山', pts: [102.3, 33.1, 103.5, 33.6, 104.6, 34.0] },
@@ -194,7 +183,6 @@ const CITIES: City[] = [
   { name: '菏泽', lon: 115.47, lat: 35.26, lv: 3 }
 ];
 
-// 20 处遗址在图上的落点（近似经纬；数据里没有经纬字段，只能在这儿对着地名标定）
 const SITE_GEO: Geo[] = [
   { id: 's01', lon: 111.75, lat: 34.78 },
   { id: 's02', lon: 110.9, lat: 34.46 },
@@ -244,11 +232,11 @@ function geoOf(id: string): Geo | undefined {
 
 @Component
 export struct BasinMap {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @Prop activeId: string = '';
   @Prop mapHeight: number = 264;
-  @Watch('onFlashReq') @Prop flashReq: string = '';   // 'siteId|nonce'：父组件盖章成功后要炸开的那团光
+  @Watch('onFlashReq') @Prop flashReq: string = '';
   @StorageLink('studioRev') @Watch('refresh') rev: number = 0;
   onSitePick: (id: string) => void = (): void => {
   };
@@ -263,7 +251,7 @@ export struct BasinMap {
   private zoom: number = 1;
   private clon: number = 108.0;
   private clat: number = 37.4;
-  private k: number = 1;                  // 当前每"1°经度×COS"对应的 vp
+  private k: number = 1;
   private w: number = 0;
   private h: number = 0;
   private fitK: number = 1;
@@ -318,7 +306,6 @@ export struct BasinMap {
     this.ensureTimer();
   }
 
-  // ---- 投影：屏幕坐标 = 中心点相对位移，不用 ctx.scale，线宽与字号自己控 ----
   private fitScale(): number {
     let dw = (LON1 - LON0) * COS;
     let dh = (LAT1 - LAT0) * STR;
@@ -356,7 +343,7 @@ export struct BasinMap {
     }
     let hw = this.w * 0.5 / (COS * this.k);
     let hh = this.h * 0.5 / (STR * this.k);
-    // 只在确实看得见的范围里留 15% 余量，避免把河拖出画外
+    
     let s = 0.85;
     if (this.clon - hw * s < LON0) {
       this.clon = LON0 + hw * s;
@@ -372,7 +359,6 @@ export struct BasinMap {
     }
   }
 
-  // ---- 定时器：流动档常开，静水/关闭档只有水花在跑 ----
   ensureTimer(): void {
     if (this.timer >= 0) {
       return;
@@ -417,7 +403,6 @@ export struct BasinMap {
     }
   }
 
-  // 预设视图的缓动推进（不用 animateTo，避免和 Canvas 重绘抢帧）
   stepGlide(dt: number): void {
     let tg = this.target;
     if (tg === undefined) {
@@ -458,7 +443,7 @@ export struct BasinMap {
     if (z1 === this.zoom) {
       return;
     }
-    // 让锚点（手指/图章位置）在缩放前后停在原地
+    
     if (this.w > 0) {
       let gl0 = this.invLon(ax);
       let gg0 = this.invLat(ay);
@@ -501,7 +486,6 @@ export struct BasinMap {
     return Math.sqrt(best);
   }
 
-  // 点在河上吗（干流 + 所有支流）
   private onWater(x: number, y: number): boolean {
     if (this.nearestOnChain(this.main, x, y) <= HIT_RIVER) {
       return true;
@@ -514,7 +498,6 @@ export struct BasinMap {
     return false;
   }
 
-  // 触点 → 命中遗址圈则回调选中，否则一律溅一下水花
   tap(x: number, y: number): void {
     if (this.w <= 0) {
       return;
@@ -623,7 +606,6 @@ export struct BasinMap {
     }
   }
 
-  // ---- 画笔 ----
   private trace(c: CanvasRenderingContext2D, pts: number[], i0: number, i1: number): void {
     c.beginPath();
     for (let i = i0; i <= i1; i++) {
@@ -642,7 +624,6 @@ export struct BasinMap {
     c.fillRect(0, 0, this.w, this.h);
   }
 
-  // Cache the static river network; click particles and golden flow stay independent.
   private paintNetwork(c: CanvasRenderingContext2D, dim: boolean): void {
     let key = `${this.w}|${this.h}|${this.k}|${this.clon}|${this.clat}|${dim}|${this.main.length}`;
     if (key === this.terrainKey && this.terrainCache !== undefined) {
@@ -702,7 +683,6 @@ export struct BasinMap {
     }
   }
 
-  // 干流：暗岸 → 外晕 → 中亮 → 内芯 → 顺流光斑，逐段加宽（下游水量更大）
   private paintMain(c: CanvasRenderingContext2D, flow: boolean, glowOn: boolean): void {
     if (this.main.length < 4) { return; }
     let n = Math.floor(this.main.length / 2) - 1;
@@ -711,7 +691,7 @@ export struct BasinMap {
     c.lineJoin = 'round';
     c.lineCap = 'round';
     let breathe = glowOn ? 1 + 0.1 * Math.sin(this.time * 0.55) : 1;
-    // 河漫滩：先垫一条暖沙色宽底，荧光才有"河床"可落，不会像飘在空中的霓虹
+    
     for (let ch = 0; ch < chunks; ch++) {
       let i0 = Math.floor(ch * n / chunks);
       let i1 = Math.floor((ch + 1) * n / chunks);
@@ -754,7 +734,7 @@ export struct BasinMap {
       }
     }
     if (glowOn) {
-      // 沙金细流：疏齿 + 缓慢偏移 = 顺流而下的光斑
+      
       c.save();
       c.setLineDash([12, 18]);
       c.lineDashOffset = -(this.phase % 30);
@@ -842,7 +822,7 @@ export struct BasinMap {
 
   private paintSites(c: CanvasRenderingContext2D): void {
     if (this.zoom < SITE_ZOOM) {
-      // 全流域尺度下这 20 处挤成一团，只给一个"往这儿放大"的提示
+      
       let x = this.X(112.9);
       let y = this.Y(34.85, 112.9);
       c.beginPath();
@@ -910,7 +890,7 @@ export struct BasinMap {
   }
 
   private paintFx(c: CanvasRenderingContext2D): void {
-    // 冲击光：黄 → 橘 → 透明
+    
     for (let f of this.flashes) {
       let k = f.life / f.max;
       let rad = 4 + k * 42;
@@ -925,7 +905,7 @@ export struct BasinMap {
       c.fillStyle = gr;
       c.fill();
     }
-    // 光晕环：椭圆透视 + 双层，越扩越橘
+    
     for (let h of this.halos) {
       if (h.life < 0) {
         continue;
@@ -952,7 +932,7 @@ export struct BasinMap {
       c.stroke();
       c.restore();
     }
-    // 水珠：按年纪从柠檬黄渐变到橘
+    
     for (let p of this.drops) {
       let k = p.life / p.max;
       let a = (1 - k) * 0.94;
@@ -974,7 +954,7 @@ export struct BasinMap {
 
   private paintHud(c: CanvasRenderingContext2D): void {
     let w = this.w;
-    // 指北 + 图名
+    
     c.font = '9px sans-serif';
     c.fillStyle = 'rgba(226,220,206,0.5)';
     c.fillText('N', 14, 18);
@@ -994,7 +974,7 @@ export struct BasinMap {
     c.font = '9.5px sans-serif';
     c.fillStyle = 'rgba(226,220,206,0.45)';
     c.fillText(this.networkStatus, 13, 44);
-    // 视图名
+    
     let vn = '全流域';
     if (this.zoom > 1.12) {
       if (this.clon < 102.5) {
@@ -1017,7 +997,7 @@ export struct BasinMap {
     c.fillStyle = 'rgba(255,228,168,0.72)';
     let tw2 = c.measureText(vn).width;
     c.fillText(vn, w - tw2 - 14, 22);
-    // 比例尺：先算每 vp 多少千米，再挑一个顺手的整段
+    
     let kmPerVp = 111 / (STR * this.k);
     let opts: number[] = [50, 100, 200, 300, 500, 1000];
     let pickKm = opts[opts.length - 1];

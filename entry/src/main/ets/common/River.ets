@@ -6,18 +6,11 @@ import {
   SUB, fs
 } from '../common/Theme';
 
-// 河道母题（扩展设计方案 §1）：一条纯矢量干流 + 两岸遗址点，
-// 首页开篇、详情页缩略、测试结果页共用这一份几何，不各画一套。
-
 export function effectiveWaterMode(): string {
-  // 河道动效已按要求撤掉：河还是画出来，但不再有常开的流水帧。
-  // 侧栏那个「河道动效/静水/关闭」开关也一并删了，这里固定回静水，
-  // BasinMap 里的水花、点选缓动照旧按忙闲起停，只是不再常年占一帧。
+  
   return WATER_STILL;
 }
 
-// 干流中轴：u∈[0,1] 自西向东，返回归一化纵坐标。
-// 用两条正弦叠加，得到"几"字弯的手感，且任意 u 都能精确取点（落点/高光带共用）。
 export function riverY(u: number): number {
   let v = 0.5 + 0.20 * Math.sin(u * Math.PI * 1.7 + 0.42) + 0.055 * Math.sin(u * Math.PI * 3.1 + 1.1);
   if (v < 0.12) {
@@ -26,8 +19,6 @@ export function riverY(u: number): number {
   return v > 0.88 ? 0.88 : v;
 }
 
-// 遗址落点：横轴=年代（仰韶→宋），纵轴=城市在名单里的次序（自西向东）偏移。
-// 这是示意排布，不是真实经纬度，界面上必须带着 note 那句话。
 export function siteU(s: SiteInfo): number {
   let era = s.eras.length > 0 ? s.eras[0] : ERAS[0];
   let i = ERAS.indexOf(era);
@@ -45,7 +36,6 @@ export function siteLane(s: SiteInfo): number {
   return (i - (CITIES.length - 1) / 2) * 0.11;
 }
 
-// 同年代同城市的遗址会撞在同一个点上，按 id 做确定性抖开（不是随机，重进页面位置不变）
 function hashOf(s: string): number {
   let n = 0;
   for (let i = 0; i < s.length; i++) {
@@ -59,8 +49,6 @@ export interface DotPos {
   y: number;
 }
 
-// 遗址在河道带里的落点（单位 vp）。RiverRibbon 按它画点，打卡页按它做点击命中，
-// 两边共用一份几何，否则"点得中的地方"和"看得见的点"会错开。
 export function siteDot(s: SiteInfo, w: number, h: number): DotPos {
   let hsh = hashOf(s.id);
   let u = siteU(s) + ((hsh % 5) - 2) * 0.006;
@@ -76,7 +64,7 @@ export function siteDot(s: SiteInfo, w: number, h: number): DotPos {
 
 @Component
 export struct RiverRibbon {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @Prop activeId: string = '';
   @Prop showDots: boolean = true;
@@ -148,12 +136,10 @@ export struct RiverRibbon {
     }
     let bandW = Math.max(h * 0.17, 7);
 
-    // 主河道 + 水面亮线
     this.strokeRiver(c, w, h, 0, 1, 'rgba(200,161,96,0.34)', bandW);
     this.strokeRiver(c, w, h, 0, 1, 'rgba(200,161,96,0.55)', bandW * 0.55);
     this.strokeRiver(c, w, h, 0, 1, 'rgba(255,251,242,0.62)', Math.max(h * 0.03, 1.4));
 
-    // 三条高光带沿中轴向东移；静水档只留首带，位置固定
     let bands: number[][] = [
       [0, 0.055, 0.30, 3.2],
       [0.34, 0.030, 0.22, 2.0],

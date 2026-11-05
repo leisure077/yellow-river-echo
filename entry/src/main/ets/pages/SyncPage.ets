@@ -5,7 +5,6 @@ import { SiteRepo } from '../service/SiteRepo';
 import { NoteRec } from '../model/Models';
 import { fs, INK, SUB, LOESS, CLAY, RIVER, fmtTime } from '../common/Theme';
 
-// @Builder 收对象字面量才会在数值变化后重画，普通参数是快照
 interface MetricArg {
   title: string;
   value: string;
@@ -14,7 +13,7 @@ interface MetricArg {
 @Entry
 @Component
 struct SyncPage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('syncRev') @Watch('sync') syncRev: number = 0;
   @StorageLink('dataRev') rev: number = 0;
@@ -30,7 +29,6 @@ struct SyncPage {
     this.sync();
   }
 
-  // 面板要能看着变，数值先抄到状态上再显示
   sync(): void {
     let s = SyncService.get();
     this.hint = s.hint;

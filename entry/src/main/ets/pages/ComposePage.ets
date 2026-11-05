@@ -6,15 +6,12 @@ import { PatternBg } from '../view/PatternBg';
 import { StudioStore } from '../service/StudioStore';
 import { ContentRepo } from '../service/ContentRepo';
 
-// @Builder 收对象字面量才会跟着状态重画，普通参数只是建时快照（真机实测：chip 点了不变色）
 interface TopicArg {
   text: string;
   on: boolean;
   act: () => void;
 }
 
-// 发动态：写完只落在这台设备的 userPosts 表里，回社群页按时间顶到最前面。
-// 页里不配选题、不传图——先把「写了能发、发了看得见」这条链跑通。
 const MAX_LEN: number = 200;
 
 @Entry
@@ -23,7 +20,7 @@ struct ComposePage {
   @StorageLink('textScale') ts: number = 1;
   @State draft: string = '';
   @State topic: string = '';
-  // 选来的相册图：PhotoViewPicker 返回的 URI 对本应用长期可读，直接存进动态表就行
+  
   @State photo: string = '';
   @State picking: boolean = false;
 
@@ -50,7 +47,6 @@ struct ComposePage {
     this.picking = false;
   }
 
-  // 返回空串 = 没写够；返回正文 = 可以发
   readyText(): string {
     let t = this.draft.trim();
     if (t.length < 4) {
@@ -117,7 +113,7 @@ struct ComposePage {
 
         Scroll() {
           Column({ space: 12 }) {
-            // 怎么发：三条说明摆出来，别让人猜要不要配图、发出去谁能看到
+            
             Column({ space: 6 }) {
               Text('怎么发').fontSize(fs(this.ts, 12)).fontColor(INK).fontWeight(FontWeight.Medium)
               Text('① 写下你在河边看到的、想到的，一到两行最容易被回话；')
@@ -156,7 +152,6 @@ struct ComposePage {
             .width('100%')
             .alignItems(HorizontalAlign.Start)
 
-            // 配图：选一张就缩略显示，右上角 ✕ 撤掉，随时能换
             Column({ space: 6 }) {
               Text('添加照片（可不加）').fontSize(fs(this.ts, 12)).fontColor(INK).fontWeight(FontWeight.Medium)
               if (this.photo.length === 0) {

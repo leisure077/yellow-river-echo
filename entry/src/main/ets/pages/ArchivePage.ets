@@ -9,11 +9,11 @@ import { params } from '../common/Nav';
 @Entry
 @Component
 struct ArchivePage {
-  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
+  
   @StorageLink('textScale') ts: number = 1;
   @State tab: number = 0;
   @StorageLink('dataRev') @Watch('syncCount') rev: number = 0;
-  // 角标读的是普通单例，ArkUI 观察不到；dataRev 一变就把数量抄进 @State
+  
   @State favN: number = 0;
   @State noteN: number = 0;
 
@@ -31,8 +31,7 @@ struct ArchivePage {
   }
 
   badgeOf(idx: number): string {
-    // 角标从 @State 里取，不能在 @Builder 的普通参数里传值：
-    // 传值是快照，favN 变了这一段不会跟着刷
+    
     if (idx === 1) {
       return `${this.favN}`;
     }

@@ -5,6 +5,7 @@ import { ContentRepo } from './ContentRepo';
 import { MemoryStore } from './MemoryStore';
 import { StudioStore } from './StudioStore';
 import { SyncService } from './SyncService';
+import { BackupService } from './BackupService';
 import { AiStore } from './AiStore';
 
 export class Boot {
@@ -23,6 +24,9 @@ export class Boot {
     await SiteRepo.get().load(ctx);
     await ContentRepo.get().load(ctx);
     await MemoryStore.get().init(ctx);
+    // 开机先做一次目录体检：现场只想看「快照放在哪儿应用读得到」，
+    // 不必点界面，hilog | grep HH_BACKUP 就有结果。
+    BackupService.probeAtBoot(ctx);
     await StudioStore.get().init(ctx);
     StudioStore.get().pruneGoods(ContentRepo.get().goods.map((g: Goods): string => g.id));
     await AiStore.get().init(ctx);

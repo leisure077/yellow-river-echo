@@ -5,7 +5,8 @@ HarmonyOS（ArkTS / Stage 模型）端的黄河流域文化导览应用。遗址
 只有「河小导」问答这一处走 AI 后端（自建 Dify）。
 
 这份 README 回答两件事：**这台机器之外的怎么把它跑起来**，以及**提交的源码包怎么自查**。
-AI 后端的部署细节单独放在 [dify/README.md](dify/README.md)，演示流程放在 [docs/演示SOP.md](docs/演示SOP.md)。
+AI 后端的部署细节单独放在 [dify/README.md](dify/README.md)；
+现场怎么在三档后端之间切换（免装的假 Dify / 局域网真 Dify / USB 转发），见下面 §4。
 
 ---
 
@@ -40,6 +41,15 @@ hdc install -r entry/build/default/outputs/default/entry-default-unsigned.hap
 hdc shell aa start -a EntryAbility -b com.example.demo01
 ```
 
+这两条在 DevEco 模拟器上是实测过的：未签名包 `install bundle successfully`，能正常启动，
+App 自己存的偏好（地址、Key、对话记录）在 `install -r` 前后原样保留。真机不吃未签名包，
+要按 §6 那条自备签名 profile。
+
+**换签名会重置登录态**——同一台模拟器上 signed → unsigned → signed 来回装一次，App 会退回
+「欢迎续响者」那个登录页。这页上 `uitest` 的点击不生效（勾协议、点本机账号、点快捷登录都试过，
+界面不动，原因没查出来），所以进到首页这一步得人来点，脚本接不住。别把两种包交替装来验证，
+一次选一种。
+
 仓库里的 `build-profile.json5` 故意把 `signingConfigs` 留成空数组：签名证书是**按机器**的东西，
 写进包里别人机器上没有这些文件，第一步构建就失败。需要签名包时，在 DevEco 里
 `File → Project Structure → Signing Configs` 勾上「Automatically generate...」，让 IDE 把
@@ -55,7 +65,6 @@ entry/         ArkTS 应用（页面/组件/服务/资源）
 server/        手机号短信/号码认证联调用的小型 Node 服务，演示主线不依赖
 dify/          AI 后端的复现说明、.env 模板、应用配置快照
 tools/         资产烘焙脚本 + hdc/uitest 自验脚本 + 演示前一键预检 + 提交包导出脚本
-docs/          演示 SOP
 ```
 
 ## 4. 河小导（Dify AI）在别人电脑上怎么调试
@@ -104,8 +113,31 @@ set HH_APP_KEY=app-...          # 或者写到 .tmp/app_key.txt（已被 .gitign
 python tools/set_dify_cfg.py "http://10.0.2.2/v1"   # 一键写进 App 设置页并自校验
 ```
 
-**不想在这台机器上起 Dify 也能演示 AI 链路**：`python tools/stall_mock.py 8899 5`
-起一个最小假 Dify，App 地址填 `http://10.0.2.2:8899/v1` 即可（Key 随便填非空串）。
+### 现场接哪一档后端
+
+| 档 | 什么时候用 | 这台机器要装什么 | App 地址填 |
+|---|---|---|---|
+| 假 Dify | 组委会现场、没有 Docker、只想看界面跑通 | 只要 Python 3 | `http://10.0.2.2:8899/v1` |
+| 真 Dify 同机 | 我们自己的完整演示 | Docker + Dify 1.13.2 + Ollama bge-m3 + 智谱 Key | `http://10.0.2.2/v1` |
+| 真 Dify 走 USB | 评委用自己的电脑插我们的设备 | 同第二档，再加 `hdc rport` | `http://127.0.0.1:8080/v1` |
+
+第一档不用碰 Dify：
+
+```bash
+python tools/stall_mock.py 8899 0        # 第二个参数是首字前静默几秒，0 就是当后端用
+```
+
+这一档能验到的（都实测过）：`GET /v1/parameters` 带 Bearer 回 200，所以设置页「测一下」是绿的
+（不带 Key 回 401，走错路径回 404，这两个分支也留着给人对）；`POST /v1/chat-messages` 按 SSE 吐字，
+界面上的流式、引用位、看门狗都照常工作。它答的是写死的「模拟回答：……」，**不接知识库也不接模型**，
+只证明链路和界面，别拿它当回答质量讲。
+
+两个坑：8899 是新端口，本机测的时候是从宿主自己 `curl` 的，**模拟器侧这一发我还没实测过**
+（App 当时卡在登录页进不去）。如果假 Dify 起了、地址填对、设置页却报「连不上」，先怀疑 Windows
+防火墙没放行 8899——我们自己那台 80 是早就放行过的，换个端口就得重新放行一次。另外
+`tools/` 里只有 4 个资产烘焙脚本用到 PIL / numpy / scipy / cv2，上面这几个现场链路的脚本全是
+标准库，装个 Python 3 就能跑。
+
 `tools/stale_conv_mock.py` 同理，专门用来验会话号自愈。
 
 ## 5. 提交源码包：导出与自查
@@ -144,6 +176,5 @@ python tools/export_package.py --check .tmp/pkg/yellow-river-echo-src-xxxxxxx.zi
 | 河小导首字延迟 | Ollama 设 `OLLAMA_KEEP_ALIVE=-1`（bge-m3 常驻）后 Dify 侧实测：冷态首字 14.5s、命中缓存后 1.45–2.2s；App 端到端首字对应为冷 23.9s / 热 6.1s（不含 KEEP_ALIVE 时冷态回到 34.5s 那一档） |
 | 生成模型在云端 | 换成 Ollama 的 `qwen2.5:1.5b` 就能完全离线复现，代价是回答质量明显下降，需自己权衡 |
 | 真机走 WiFi 连宿主 Dify | 本机 WLAN 的网络配置文件是 Public，Windows 默认拒绝入站；放行需要管理员权限，校园网若开 AP 隔离仍不通。推荐用 §4 的 USB 转发 |
-| 签名 | 仓库配置为空签名，出的是 unsigned debug hap；真机安装需自备对应签名 profile |
-
-演示当天的操作动线与话术见 [docs/演示SOP.md](docs/演示SOP.md)。
+| 签名 | 仓库配置为空签名，出的是 unsigned debug hap；模拟器实测可直接 `hdc install -r` 跑起来，真机需自备对应签名 profile |
+| 源码包里没有 AI 凭证 | 包里不含 Dify App Key（§5 断言 2 就是拦这个），`dify/` 只有部署说明、`.env` 模板和配置快照，没有 compose 文件。拿到包的人要验 AI 链路只有两条路：按 §4 起假 Dify 验界面，或自己装一套 Dify。回答质量这件事只能现场看我们这台机器 |

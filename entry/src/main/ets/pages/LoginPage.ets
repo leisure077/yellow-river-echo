@@ -46,7 +46,9 @@ struct LoginPage {
   @State demoCode: string = '';
   @State avatar: number = 0;
   @State agree: boolean = false;
+  @StorageLink('studioRev') @Watch('onStoreChange') studioRev: number = 0;
   private cdTimer: number = -1;
+  private seenRemoteAcc: number = 0;
 
   aboutToAppear(): void {
     let last = StudioStore.get().lastAccount();
@@ -54,7 +56,25 @@ struct LoginPage {
       this.nick = last.nick;
       this.avatar = last.avatar;
     }
+    this.seenRemoteAcc = AppStorage.get<number>('remoteAccAt') ?? 0;
     this.tick();
+  }
+
+  // 另一台设备的档案到了（分布式通道或刚导入的快照）：静默把昵称填好，只提示不打断
+  onStoreChange(): void {
+    let at = AppStorage.get<number>('remoteAccAt') ?? 0;
+    if (at <= this.seenRemoteAcc) {
+      return;
+    }
+    this.seenRemoteAcc = at;
+    let rec = StudioStore.get().adoptedAccount();
+    if (rec === undefined) {
+      return;
+    }
+    this.nick = rec.nick;
+    this.avatar = rec.avatar;
+    this.mode = 'login';
+    promptAction.showToast({ message: `另一台设备的「${rec.nick}」到了，免密就能进` });
   }
 
   aboutToDisappear(): void {
@@ -151,13 +171,18 @@ struct LoginPage {
   fillLast(): void {
     let last = StudioStore.get().lastAccount();
     if (last === undefined) {
-      promptAction.showToast({ message: '这台设备还没有注册过账号' });
+      promptAction.showToast({ message: '这台设备还没有账号，注册一个，或导入另一台设备的快照' });
       return;
     }
     this.nick = last.nick;
     this.avatar = last.avatar;
     this.mode = 'login';
-    promptAction.showToast({ message: `已填入「${last.nick}」，输口令就能进` });
+    if (last.adopted === true && last.digest.length === 0) {
+      this.pwd = '';
+      promptAction.showToast({ message: `「${last.nick}」是从另一台设备来的档案，直接点登录免密进入` });
+    } else {
+      promptAction.showToast({ message: `已填入「${last.nick}」，输口令就能进` });
+    }
   }
 
   inputType(kind: string): InputType {

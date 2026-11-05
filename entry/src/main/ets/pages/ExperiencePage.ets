@@ -59,7 +59,7 @@ struct ExperiencePage {
     try {
       let name = decodeURIComponent(url.substring(this.origin.length).split('?')[0]);
       if (name.includes('..') || !/^[a-zA-Z0-9_./-]+$/.test(name)) { throw new Error('Invalid resource'); }
-      let bytes = (getContext(this) as common.UIAbilityContext).resourceManager.getRawFileContentSync('experience/' + name);
+      let bytes = (getContext(this) as common.UIAbilityContext).resourceManager.getRawFileContentSync(name.startsWith('sites/') ? name : 'experience/' + name);
       let mime = name.endsWith('.html') ? 'text/html' : name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' :
         name.endsWith('.png') ? 'image/png' : name.endsWith('.jpg') ? 'image/jpeg' : name.endsWith('.glb') ? 'model/gltf-binary' : 'application/octet-stream';
       response.setResponseData(bytes.buffer as ArrayBuffer);

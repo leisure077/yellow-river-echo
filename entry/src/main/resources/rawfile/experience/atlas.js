@@ -100,9 +100,9 @@ function poi(id) {
 function poiDetail(p) {
   const source=mapSources[p.source];
   sheet(`<div class="poi-heading"><small>${esc(p.city)} / ${esc(p.cat)} ${p.demo?'· 服务点':'· 文化地标'}</small><h2>${esc(p.name)}</h2></div>
-    <p>${esc(p.intro||'该服务点由平台标注，营业信息以现场为准。')}</p>
-    <p class="muted">${p.demo?'':'地标名称与简介依据公开资料整理；插画与位置经过艺术编排。'}</p>
-    <div class="row"><button onclick="toggleFavorite('${p.id}')">${favorites.includes(p.id)?'取消收藏':'收藏地标'}</button><button onclick="checkin('${p.id}')">记录足迹</button></div>
+    ${p.intro?`<p>${esc(p.intro)}</p>`:''}
+    ${p.photo?`<img class="poi-photo" src="${p.photo}" alt="${esc(p.name)}实景">`:''}
+    <div class="row"><button onclick="toggleFavorite('${p.id}')">${favorites.includes(p.id)?'取消收藏':'收藏地标'}</button><button onclick="lightPlace('${p.id}')">记录足迹</button></div>
     ${source?`<details><summary>资料来源</summary><p>${esc(source.name)}<br><span class="source-url">${esc(source.url)}</span><br>核对日期：2026-10-29</p></details>`:''}`);
 }
 function toggleFavorite(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];persist();poiDetail(getPOI(id))}
@@ -134,6 +134,6 @@ function footprintMap(){
  const lit=records.some(r=>r.city===p.city&&r.name===p.name);
  return `<g role="button" tabindex="0" aria-label="记录${esc(p.name)}足迹" onclick="footprintPlace('${p.id}')" onkeydown="if(event.key==='Enter'||event.key===' ')footprintPlace('${p.id}')"><circle cx="${p.x}" cy="${p.y}" r="${lit?24:16}" fill="${lit?'#5df1df':'#607780'}" stroke="#c7e0da" stroke-width="3"/><rect x="${Math.max(8,Math.min(744,p.x-130))}" y="${p.y+32}" width="260" height="56" rx="14" fill="#09212bd9"/><text x="${Math.max(138,Math.min(874,p.x))}" y="${p.y+70}" text-anchor="middle" fill="white" font-size="30">${esc(p.name)}</text></g>`}).join('')}</svg>`;
 }
-function footprintPlace(id){const p=getPOI(id);if(!p)return;city=p.city;addRecord();document.querySelector('#recName').value=p.name;document.querySelector('#recCity').value=p.city;}
+function footprintPlace(id){lightPlace(id)}
 function footprintPlaces(){return '<div class="footprint-places">'+cities.map(c=>'<details><summary>'+esc(c)+' · 选择具体地点</summary>'+mapPOIs.filter(p=>p.city===c&&!p.demo).map(p=>'<button class="saved-place" onclick="footprintPlace(\''+p.id+'\')">'+(records.some(r=>r.city===p.city&&r.name===p.name)?'● ':'○ ')+esc(p.name)+'</button>').join('')+'</details>').join('')+'</div>';}
 function loadBaidu(){}

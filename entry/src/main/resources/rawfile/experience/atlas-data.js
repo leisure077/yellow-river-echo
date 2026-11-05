@@ -74,14 +74,14 @@ const mapSources = {
 };
 // site + uv：落在景区手绘图上的位置，u 自西向东、v 自北向南，均为 0~1 图幅比例（示意）。
 const mapPOIs = [
-  { id:'hangu', name:'函谷关', city:'三门峡', cat:'建筑', x:260, y:245, lng:110.860, lat:34.550, site:'hangu', uv:[0.48,0.42], source:'hangu', intro:'位于灵宝的历史文化景区，以关隘文化和老子文化为主题。公开资料列有函谷关城楼、太初宫、道德天书等景点。', demo:false },
-  { id:'longmen', name:'龙门石窟', city:'洛阳', cat:'建筑', x:800, y:495, lng:112.466, lat:34.556, site:'longmen', uv:[0.46,0.42], source:'longmen', intro:'龙门石窟位于洛阳，景区包括西山石窟、东山石窟、香山寺和白园。', demo:false },
-  { id:'emperors', name:'炎黄二帝塑像', city:'郑州', cat:'建筑', x:285, y:795, lng:113.470, lat:34.950, site:'yellowriver', uv:[0.48,0.42], source:'zhengzhou', intro:'郑州黄河文化公园的代表性景观。公园位于黄河之滨，公开资料还列有五龙峰、岳山寺、大禹山、星海湖等景区。', demo:false },
-  { id:'iron-tower', name:'开封铁塔', city:'开封', cat:'建筑', x:790, y:1110, lng:114.375, lat:34.812, site:'tieta', uv:[0.48,0.30], source:'kaifeng', intro:'建于北宋皇祐元年（1049 年）的琉璃塔。褐色琉璃砖呈铁色，是开封具有代表性的历史建筑。', demo:false },
-  { id:'qicheng', name:'戚城遗址', city:'濮阳', cat:'建筑', x:285, y:1350, lng:115.020, lat:35.760, site:'qicheng', uv:[0.50,0.50], source:'qicheng', intro:'濮阳的全国重点文物保护单位，地上可见古城残垣，地下保存多个历史时期的遗存。图中土垣为艺术化表现。', demo:false },
-  { id:'miaodigou', name:'庙底沟仰韶文化博物馆', city:'三门峡', cat:'展览', x:345, y:345, lng:111.170, lat:34.780, source:'museums', intro:'河南黄河文化博物馆群中的文化展示场馆，聚焦仰韶文化。此处提供场馆文化入口，不发布未经核验的临展与开放时间。', demo:false },
-  { id:'erlitou', name:'二里头夏都遗址博物馆', city:'洛阳', cat:'展览', x:695, y:610, lng:112.720, lat:34.600, source:'museums', intro:'位于洛阳的遗址博物馆，是了解早期王朝文化的窗口。长卷位置仅用于展示，不表示与龙门石窟相邻。', demo:false },
-  { id:'shangdu', name:'郑州商都遗址博物院', city:'郑州', cat:'展览', x:435, y:905, lng:113.680, lat:34.740, source:'museums', intro:'河南黄河文化博物馆群中的文化展示场馆。可结合郑州商都遗址了解商代都城文化。', demo:false },
+  { id:'hangu', name:'函谷关', city:'三门峡', cat:'建筑', x:260, y:245, lng:110.860, lat:34.550, site:'hangu', uv:[0.48,0.42], source:'hangu', photo:'sites/s02.jpg', intro:'位于灵宝的历史文化景区，以关隘文化和老子文化为主题。公开资料列有函谷关城楼、太初宫、道德天书等景点。', demo:false },
+  { id:'longmen', name:'龙门石窟', city:'洛阳', cat:'建筑', x:800, y:495, lng:112.466, lat:34.556, site:'longmen', uv:[0.46,0.42], source:'longmen', photo:'sites/s08.jpg', intro:'龙门石窟位于洛阳，景区包括西山石窟、东山石窟、香山寺和白园。', demo:false },
+  { id:'emperors', name:'炎黄二帝塑像', city:'郑州', cat:'建筑', x:285, y:795, lng:113.470, lat:34.950, site:'yellowriver', uv:[0.48,0.42], source:'zhengzhou', photo:'sites/s09.jpg', intro:'郑州黄河文化公园的代表性景观。公园位于黄河之滨，公开资料还列有五龙峰、岳山寺、大禹山、星海湖等景区。', demo:false },
+  { id:'iron-tower', name:'开封铁塔', city:'开封', cat:'建筑', x:790, y:1110, lng:114.375, lat:34.812, site:'tieta', uv:[0.48,0.30], source:'kaifeng', photo:'sites/s16.jpg', intro:'建于北宋皇祐元年（1049 年）的琉璃塔。褐色琉璃砖呈铁色，是开封具有代表性的历史建筑。', demo:false },
+  { id:'qicheng', name:'戚城遗址', city:'濮阳', cat:'建筑', x:285, y:1350, lng:115.020, lat:35.760, site:'qicheng', uv:[0.50,0.50], source:'qicheng', photo:'sites/s19.jpg', intro:'濮阳的全国重点文物保护单位，地上可见古城残垣，地下保存多个历史时期的遗存。图中土垣为艺术化表现。', demo:false },
+  { id:'miaodigou', name:'庙底沟仰韶文化博物馆', city:'三门峡', cat:'展览', x:345, y:345, lng:111.170, lat:34.780, source:'museums', photo:'sites/s01.jpg', intro:'河南黄河文化博物馆群中的文化展示场馆，聚焦仰韶文化。此处提供场馆文化入口，不发布未经核验的临展与开放时间。', demo:false },
+  { id:'erlitou', name:'二里头夏都遗址博物馆', city:'洛阳', cat:'展览', x:695, y:610, lng:112.720, lat:34.600, source:'museums', photo:'sites/s04.jpg', intro:'位于洛阳的遗址博物馆，是了解早期王朝文化的窗口。长卷位置仅用于展示，不表示与龙门石窟相邻。', demo:false },
+  { id:'shangdu', name:'郑州商都遗址博物院', city:'郑州', cat:'展览', x:435, y:905, lng:113.680, lat:34.740, source:'museums', photo:'sites/s10.jpg', intro:'河南黄河文化博物馆群中的文化展示场馆。可结合郑州商都遗址了解商代都城文化。', demo:false },
   // 服务点为百度本地检索返回的真实门店/设施（2026-11 抓取），坐标为百度经纬度；
   // 带 site 的表示落在对应景区 2.5km 内，景区视图与全河视图都会显示。
   { id:'r-eat-lm1', name:'楠溪王捌鸡·洛阳土菜院子', city:'洛阳', cat:'餐饮', x:845, y:505, lng:112.47941, lat:34.5517, site:'longmen', demo:false },

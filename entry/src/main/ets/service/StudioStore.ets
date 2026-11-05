@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { Profile, AccountRec, WorkRec, CheckinRec, QuizRun, LocalComment, Post, CartLine } from '../model/Models';
+import { Profile, AccountRec, AccProfile, WorkRec, CheckinRec, QuizRun, LocalComment, Post, CartLine } from '../model/Models';
 import { VerifyGate } from './VerifyGate';
 import { SCALE_STEPS } from '../common/Theme';
 
@@ -26,6 +26,9 @@ export class StudioStore {
   scaleStep: number = 1;
   siteCheckins: CheckinRec[] = [];
   quizRuns: QuizRun[] = [];
+  // 账号档案出本机的那一路挂钩（分布式通道由 SyncService 挂上来）。
+  // 只喂 AccProfile，digest 在这一步之前就已经被剥掉。
+  accOut: ((id: string, payload: string, ts: number) => void) | null = null;
 
   private p: preferences.Preferences | null = null;
 
@@ -47,6 +50,8 @@ export class StudioStore {
     this.accounts = this.readArr<AccountRec>('accounts');
     for (let a of this.accounts) {
       a.phone = a.phone ?? '';
+      a.updatedAt = a.updatedAt ?? a.createdAt;
+      a.adopted = a.adopted ?? false;
     }
     this.cart = this.readArr('cart');
     this.cartLines = this.readArr<CartLine>('cartLines');
@@ -200,14 +205,118 @@ export class StudioStore {
       createdAt: Date.now(), lastAt: Date.now(), phone: VerifyGate.mask(VerifyGate.digits(phone)) };
     this.accounts.push(rec);
     this.save('accounts', this.accounts);
+    this.emitAcc(rec);
     this.applySession(rec);
     return '';
+  }
+
+  private emitAcc(a: AccountRec): void {
+    let p: AccProfile = {
+      nick: a.nick, avatar: a.avatar, createdAt: a.createdAt,
+      phoneMask: a.phone, updatedAt: a.updatedAt ?? Date.now(), deleted: false
+    };
+    if (this.accOut !== null) {
+      this.accOut(p.nick, JSON.stringify(p), p.updatedAt);
+    }
+  }
+
+  accountsAsProfiles(): AccProfile[] {
+    let out: AccProfile[] = [];
+    for (let a of this.accounts) {
+      out.push({ nick: a.nick, avatar: a.avatar, createdAt: a.createdAt,
+        phoneMask: a.phone, updatedAt: a.updatedAt ?? a.createdAt, deleted: false });
+    }
+    return out;
+  }
+
+  upsertProfile(p: AccProfile, from: string): boolean {
+    let name = (p.nick ?? '').trim();
+    if (name.length === 0 || name.length > 12) {
+      console.warn('skip bad acc profile from ' + from + ' : nick=' + name.length);
+      return false;
+    }
+    let i = this.accounts.findIndex((x: AccountRec): boolean => x.nick === name);
+    if (i >= 0) {
+      let old = this.accounts[i];
+      if ((old.updatedAt ?? old.createdAt) >= p.updatedAt) {
+        return false;
+      }
+      old.avatar = p.avatar;
+      old.createdAt = p.createdAt;
+      old.phone = p.phoneMask;
+      old.updatedAt = p.updatedAt;
+      if (old.digest.length === 0) {
+        old.adopted = true;
+      }
+      console.info('acc updated from ' + from + ' : ' + name);
+    } else {
+      // digest 留空串：这台设备从来没有过这条档案的口令，走免密分支
+      this.accounts.push({ nick: name, digest: '', avatar: p.avatar, createdAt: p.createdAt,
+        lastAt: 0, phone: p.phoneMask, updatedAt: p.updatedAt, adopted: true });
+      console.info('acc adopted from ' + from + ' : ' + name);
+    }
+    this.save('accounts', this.accounts);
+    let r = AppStorage.get<number>('remoteAccAt') ?? 0;
+    AppStorage.setOrCreate('remoteAccAt', r < p.updatedAt ? p.updatedAt : r);
+    return true;
+  }
+
+  adoptedAccount(): AccountRec | undefined {
+    let best: AccountRec | undefined = undefined;
+    for (let a of this.accounts) {
+      if (a.adopted === true && a.digest.length === 0 && (best === undefined || a.lastAt < best.lastAt)) {
+        best = a;
+      }
+    }
+    return best;
+  }
+
+  applyRemoteAcc(payload: string): boolean {
+    try {
+      return this.upsertProfile(JSON.parse(payload) as AccProfile, 'kv');
+    } catch (e) {
+      console.warn('applyRemoteAcc parse: ' + JSON.stringify(e));
+      return false;
+    }
+  }
+
+  enterWithoutPassword(nick: string): boolean {
+    let rec = this.accountOf(nick);
+    if (rec === undefined || rec.adopted !== true || rec.digest.length > 0) {
+      return false;
+    }
+    rec.lastAt = Date.now();
+    rec.updatedAt = rec.updatedAt ?? rec.createdAt;
+    this.save('accounts', this.accounts);
+    this.applySession(rec);
+    return true;
+  }
+
+  restoreProfiles(list: AccProfile[]): number {
+    if (list === undefined || list.length === 0) {
+      return 0;
+    }
+    let n = 0;
+    for (let p of list) {
+      if (this.upsertProfile(p, 'snapshot')) {
+        n += 1;
+      }
+    }
+    return n;
   }
 
   login(nick: string, pwd: string): string {
     let rec = this.accountOf(nick);
     if (rec === undefined) {
       return this.accounts.length === 0 ? '这台设备还没有账号，先注册一个' : `本机没有「${nick.trim()}」这个账号`;
+    }
+    // 从另一台设备过来的档案只有身份、没有口令（digest 是空串），
+    // 这种记录免密进入；本机自己注册过的记录 digest 非空，仍走口令校验。
+    if (rec.adopted === true && rec.digest.length === 0) {
+      rec.lastAt = Date.now();
+      this.save('accounts', this.accounts);
+      this.applySession(rec);
+      return '';
     }
     if (rec.digest !== StudioStore.digest(rec.nick, pwd)) {
       return '口令不对，再想想';
@@ -216,6 +325,60 @@ export class StudioStore {
     this.save('accounts', this.accounts);
     this.applySession(rec);
     return '';
+  }
+
+  setLocalPassword(nick: string, pwd: string, confirm: string): string {
+    let rec = this.accountOf(nick);
+    if (rec === undefined) {
+      return '本机没有这个账号';
+    }
+    if (pwd.length < 6 || pwd.length > 16) {
+      return '口令要 6-16 位';
+    }
+    if (pwd !== confirm) {
+      return '两次口令对不上';
+    }
+    rec.digest = StudioStore.digest(rec.nick, pwd);
+    rec.adopted = false;
+    this.save('accounts', this.accounts);
+    return '';
+  }
+
+  backupAccountsNow(): void {
+    if (this.p === null) {
+      return;
+    }
+    this.p.put('prev_accounts', JSON.stringify(this.accounts));
+    this.p.put('prev_acc_at', Date.now());
+    this.scheduleFlush();
+  }
+
+  undoAccounts(): boolean {
+    if (this.p === null) {
+      return false;
+    }
+    let raw = this.p.getSync('prev_accounts', '') as string;
+    if (raw.length === 0) {
+      return false;
+    }
+    try {
+      this.accounts = JSON.parse(raw) as AccountRec[];
+    } catch (e) {
+      console.warn('prev_accounts broken: ' + JSON.stringify(e));
+      return false;
+    }
+    this.save('accounts', this.accounts);
+    this.p.put('prev_accounts', '');
+    this.p.put('prev_acc_at', 0);
+    this.scheduleFlush();
+    return true;
+  }
+
+  prevAccountsAt(): number {
+    if (this.p === null) {
+      return 0;
+    }
+    return this.p.getSync('prev_acc_at', 0) as number;
   }
 
   private applySession(rec: AccountRec): void {

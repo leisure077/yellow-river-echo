@@ -16,7 +16,6 @@ CANDS = [
     ('glm-4.7-flashx', {'thinking': {'type': 'disabled'}}),
 ]
 
-
 def one(model, extra, tries=3, gap=12):
     last = None
     for i in range(tries):
@@ -63,7 +62,6 @@ def one(model, extra, tries=3, gap=12):
             return err, None, time.time() - t0, '', i + 1
         time.sleep(gap)
     return last, None, None, '', tries
-
 
 for model, extra in CANDS:
     err, ttft, tot, text, n = one(model, extra)

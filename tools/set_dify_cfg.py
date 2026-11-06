@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """在模拟器里把「河小导 → 设置」的 Dify 地址和 App Key 改对并保存。
 
 为什么要点 UI 而不是改 preferences 文件：hdc shell 是 uid=2000(shell)，
@@ -26,14 +25,12 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # hdc 路径、设备号、Dify Key 都按"环境变量 > 探测 > 报错"取，不写死
+import hh_env
 
 PREFS = "/data/app/el2/100/base/com.example.demo01/haps/entry/preferences/hh_ai"
 
-
 def sh(args):
     return hh_env.shell(args)
-
 
 def rows():
     """dumpLayout 后返回 [(text, type, cx, cy)]，坐标一律取控件自己的 bounds 中心。"""
@@ -61,24 +58,20 @@ def rows():
     walk(d if "attributes" in d else d.get("root", d))
     return out
 
-
 def by_text(needle, ty=None):
     for r in rows():
         if needle in r[0] and (ty is None or r[1] == ty):
             return r
     return None
 
-
 def tap(x, y):
     sh("uinput -T -c %d %d" % (x, y))
     time.sleep(0.9)
-
 
 def inputs():
     rs = [r for r in rows() if r[1] == "TextInput"]
     rs.sort(key=lambda r: r[3])
     return rs
-
 
 def clear(idx):
     """删到空为止。
@@ -96,7 +89,6 @@ def clear(idx):
         time.sleep(0.2)
     return inputs()[idx][0] == ""
 
-
 def fill(idx, text):
     f = inputs()[idx]
     tap(f[2], f[3])
@@ -104,7 +96,6 @@ def fill(idx, text):
         if not clear(idx):
             print("第 %d 栏删不干净，还剩 %d 字符" % (idx + 1, len(inputs()[idx][0])))
             continue
-        # ASCII 走原生按键（实测能触发 onChange）；中文交给 uitest，原生 -t 不吃非 ASCII
         if text.isascii():
             sh("uinput -K -t " + text)
         else:
@@ -115,7 +106,6 @@ def fill(idx, text):
             return True
         print("第 %d 栏打完是 %d 字符，期望 %d，重来" % (idx + 1, got, len(text)))
     return False
-
 
 def open_settings():
     """把界面弄回能点 设置 的样子再进卡片。
@@ -138,24 +128,19 @@ def open_settings():
         time.sleep(1.0)
     return False
 
-
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     base = sys.argv[1]
     key = sys.argv[2] if len(sys.argv) > 2 else None
     if key is None:
-        # 取 Key 的顺序：HH_APP_KEY > .tmp/app_key.txt > 本机 Docker 里的 Dify 库。
-        # 取不到会直接把三种给法打印出来，不会静默用错一把。
         key = hh_env.app_key()
     assert key.startswith("app-"), "拿到的不是 Dify 的 app- 开头 Key"
 
-    # 1. 打开设置卡片
     if not open_settings():
         print("进不去设置卡片：请确认停在河小导全屏页（首页右上角「问」→ 去全屏 ›）")
         return 1
     print("设置卡片已打开")
 
-    # 2. 两个输入框按屏幕顺序：上面是地址，下面是 Key
     if len(inputs()) < 2:
         print("输入框数量不对:", [(r[0][:20], r[1]) for r in inputs()])
         return 1
@@ -164,7 +149,6 @@ def main():
     if not fill(1, key):
         print("App Key 栏没写好"); return 1
 
-    # 3. 键盘弹起后 保存 会移位，必须重新找
     sv = by_text("保存")
     if not sv:
         print("没找到 保存")
@@ -173,8 +157,6 @@ def main():
     time.sleep(1.5)
     print("已点保存，接入设置卡片是否还在：", bool(by_text("接入设置")))
 
-    # 4. 以落盘值为准：preferences 文件 shell 只读得动，写得动的是 App 自己。
-    #    设备上的 shell 没有 awk/tr，只能 cat 回来在本地解析；Key 只报长度和前缀。
     raw = sh("cat " + PREFS).replace("\n", "")
     got = {}
     for k in ("baseUrl", "appKey"):
@@ -185,7 +167,6 @@ def main():
           % (len(got.get("appKey") or ""), (got.get("appKey") or "")[:4],
              got.get("appKey") == key, "sk-ws" not in raw))
     return 0 if got.get("baseUrl") == base and got.get("appKey") == key else 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

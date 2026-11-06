@@ -4,7 +4,6 @@ import {
   drawPaper, drawBand, drawRimFoot, drawPedestal
 } from '../common/PotteryArt';
 
-
 @Component
 export struct PotteryCanvas {
   @Prop @Watch('repaint') shape: string = '罐';

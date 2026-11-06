@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """把提交源码包导出这一步变成"能跑的检查"，而不是"我看过目录，挺干净的"。
 
 用法：
@@ -34,7 +33,6 @@ import zipfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(ROOT, ".tmp", "pkg")
 
-# 1) 产物与缓存：命中即为不干净
 JUNK = [
     (r"(^|/)build/", "编译产物 build/"),
     (r"(^|/)oh_modules/", "依赖缓存 oh_modules/"),
@@ -55,9 +53,6 @@ JUNK = [
     (r"(^|/)dist/", "前端产物 dist/"),
 ]
 
-# 2) 凭据与本机痕迹：对每个文件的文本内容做匹配（二进制按字节读，跳过）。
-# 每条可以带第三个参数限定后缀：签名口令字段只在意配置文件——它是"评委机器上没有证书
-# 文件、构建直接失败"的信号，文档里提这个名字不算泄漏（README 就在描述这条规则本身）。
 LEAKS = [
     (rb"app-[A-Za-z0-9_-]{16,}", "Dify App Key 原文", None),
     (rb"sk-[A-Za-z0-9_-]{16,}", "智谱/OpenAI 风格 Key 原文", None),
@@ -69,12 +64,10 @@ LEAKS = [
     (rb"[A-Za-z]:[/\\]Users[/\\]", "本机绝对路径（写死到别人机器上就断了）", None),
 ]
 
-# 跳过内容扫描的二进制目录/后缀：图片、模型、字体这些不参与凭据判断
 SKIP_EXT = (".png", ".jpg", ".jpeg", ".gif", ".webp", ".glb", ".gltf", ".bin",
             ".ttf", ".woff", ".woff2", ".mp4", ".mov", ".wav", ".mp3", ".svgz",
             ".ico", ".zip", ".pak")
 
-# 4) 复现必需文件：少了就编不起来
 REQUIRED = [
     "build-profile.json5",
     "oh-package.json5",
@@ -91,12 +84,10 @@ REQUIRED = [
     "tools/export_package.py",
 ]
 
-
 def git(*args):
     r = subprocess.run(["git"] + list(args), cwd=ROOT, capture_output=True,
                        text=True, encoding="utf-8", errors="replace")
     return (r.stdout or "") + (r.stderr or "")
-
 
 def norm(name):
     """git archive 写中文文件名时可能不带 UTF-8 标记，zipfile 会按 cp437 解，这里翻回来。"""
@@ -107,10 +98,8 @@ def norm(name):
             return name
     return name.replace("\\", "/")
 
-
 def head():
     return git("rev-parse", "--short", "HEAD").strip()
-
 
 def dirty_report():
     """工作树里那些没进包的东西，必须让人看见——尤其是 IDE 偷偷写的签名配置。"""
@@ -132,7 +121,6 @@ def dirty_report():
         out.append("未跟踪文件 %d 个（不进包，正常）：顶层在 %s" % (len(untracked), "、".join(top[:12])))
     return "\n".join(out)
 
-
 def export(ref):
     if not os.path.isdir(OUT_DIR):
         os.makedirs(OUT_DIR)
@@ -147,25 +135,21 @@ def export(ref):
         raise SystemExit("git archive 失败：" + err.strip())
     return path
 
-
 def check(path, ref):
     z = zipfile.ZipFile(path)
     names = [norm(n) for n in z.namelist()]
-    # git archive 带路径前缀时（--prefix）统一去掉，便于比对
     files = [n for n in names if not n.endswith("/")]
     fails, notes = [], []
 
     def section(t):
         notes.append("\n== %s ==" % t)
 
-    # --- 0 包身份 ---
     section("包")
     notes.append("文件 %d 个；zip %s；来源提交 %s"
                  % (len(files), _hsize(os.path.getsize(path)), ref[:7]))
     if len(files) == 0:
         fails.append("包是空的")
 
-    # --- 1 产物与缓存 ---
     section("1 产物与缓存")
     hit = {}
     for n in files:
@@ -179,7 +163,6 @@ def check(path, ref):
         notes.append("没命中任何产物/缓存规则（build、oh_modules、.hvigor、__pycache__、"
                      "*.hap、*.log、shots、.tmp、.idea、local.properties 全查过）")
 
-    # --- 2 凭据与本机痕迹 ---
     section("2 凭据与本机路径")
     leaks = []
     for n in files:
@@ -198,8 +181,6 @@ def check(path, ref):
     else:
         notes.append("文本文件里没匹配到 Key / 私钥 / 口令字段 / 证书目录 / 本机绝对路径")
 
-    # --- 3 签名配置 ---
-    # 只有根 build-profile.json5 有 signingConfigs；entry/ 那份是模块配置，本来就没这个字段。
     section("3 签名配置")
     target = [n for n in files if n.endswith("build-profile.json5")]
     if not target:
@@ -218,7 +199,6 @@ def check(path, ref):
         else:
             notes.append("%s：signingConfigs 为空数组 ✓" % n)
 
-    # --- 4 复现必需文件 ---
     section("4 复现必需文件")
     missing = [r for r in REQUIRED if r not in files]
     if missing:
@@ -226,7 +206,6 @@ def check(path, ref):
     else:
         notes.append("%d 项都在（含 README、dify/README、tools/hh_env.py）" % len(REQUIRED))
 
-    # --- 5 体积 ---
     section("5 体积")
     total = sum(z.getinfo(n).file_size for n in files)
     big = sorted(files, key=lambda n: -z.getinfo(n).file_size)[:8]
@@ -236,7 +215,6 @@ def check(path, ref):
 
     return fails, notes, files, total
 
-
 def _hsize(b):
     if b > 1024 * 1024:
         return "%.1f MB" % (b / 1048576.0)
@@ -244,10 +222,7 @@ def _hsize(b):
         return "%.1f KB" % (b / 1024.0)
     return "%d B" % b
 
-
-# 产物里必须有这几句：本轮改的排错入口确实被打进了 hap，而不是只改了源码
 SENTINELS = ["测一下", "最近一次失败", "HH_AI"]
-
 
 def deveco_root():
     """从 hdc 的路径倒推 DevEco Studio 安装目录。
@@ -266,7 +241,6 @@ def deveco_root():
         d = os.path.dirname(d)
     return d
 
-
 def _wipe(d):
     r"""先删干净，才配叫"干净目录"。
 
@@ -283,7 +257,6 @@ def _wipe(d):
         shutil.rmtree(d, ignore_errors=True)
     if os.path.isdir(d):
         raise SystemExit("删不掉 %s（多半是被占用），关掉 DevEco 或换个目录再跑" % d)
-
 
 def verify(path, ref):
     """把包解压到一个干净目录，只按 README §2 那条命令重新构建。
@@ -339,7 +312,6 @@ def verify(path, ref):
     print("复现构建通过：包解压 → 只按 README 的命令 → 出 hap → 新代码在产物里")
     return True
 
-
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -377,7 +349,6 @@ def main():
               "那才是\"组委会可复现\"的正面证据）")
     print("提醒：包里是 %s 的内容，此后任何改动都要重新跑本脚本再导一次。" % ref[:7])
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

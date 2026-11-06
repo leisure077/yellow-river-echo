@@ -34,7 +34,6 @@ export interface Suggestion {
   score: number;
 }
 
-
 export interface FavRec {
   siteId: string;
   tagIds: string[];
@@ -96,7 +95,6 @@ export interface QuizRun {
   at: number;
   picks: number[];
 }
-
 
 export interface SpecKV {
   k: string;
@@ -178,7 +176,6 @@ export interface LocalComment {
   at: number;
 }
 
-
 export interface CartLine {
   id: string;
   n: number;
@@ -213,8 +210,6 @@ export interface AccountRec {
   adopted?: boolean;
 }
 
-// 跨端只走这一份白名单结构：没有 digest、也没有放口令的位置。
-// lastAt / joinedAt 属于「这台设备哪次点的登录」，是会话状态，同样不上通道。
 export interface AccProfile {
   nick: string;
   avatar: number;
@@ -224,7 +219,6 @@ export interface AccProfile {
   deleted: boolean;
 }
 
-// 导入前先存一份本机原样，「撤销这次恢复」就回到这里
 export interface PrevImport {
   favs: FavRec[];
   tags: TagRec[];
@@ -233,7 +227,6 @@ export interface PrevImport {
   topics: TopicRec[];
 }
 
-// formatVer 1 = 只有五类记忆数据；2 = 多了账号档案（AccProfile，不含口令摘要）
 export interface BackupData {
   formatVer: number;
   appVer: string;
@@ -248,7 +241,6 @@ export interface BackupData {
   accounts?: AccProfile[];
 }
 
-// 备份文件清单行：目录 + 文件名 + 大小，供面板上直接点选恢复
 export interface SnapshotRow {
   dir: string;
   name: string;
@@ -258,7 +250,6 @@ export interface SnapshotRow {
   mine: boolean;
 }
 
-// 目录体检结果：这个目录应用读得到吗、里面有几份快照
 export interface DirStat {
   dir: string;
   readable: boolean;

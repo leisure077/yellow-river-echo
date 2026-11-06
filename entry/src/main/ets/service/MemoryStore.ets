@@ -148,7 +148,6 @@ export class MemoryStore {
     }, 0);
   }
 
-
   favsActive(): FavRec[] {
     return this.favs.filter((f: FavRec): boolean => !f.deleted);
   }
@@ -206,7 +205,6 @@ export class MemoryStore {
     MemoryStore.bumpRev();
   }
 
-
   tagsActive(): TagRec[] {
     return this.tags.filter((t: TagRec): boolean => !t.deleted);
   }
@@ -260,7 +258,6 @@ export class MemoryStore {
     this.emit('tag', id, rec);
     MemoryStore.bumpRev();
   }
-
 
   static ordOf(n: NoteRec): number {
     return n.ord !== undefined ? n.ord : n.updatedAt;
@@ -363,7 +360,6 @@ export class MemoryStore {
     await this.addNote(src.siteId, src.text, []);
   }
 
-
   progressOf(siteId: string): ProgressRec | undefined {
     return this.prog.find((p: ProgressRec): boolean => p.siteId === siteId);
   }
@@ -401,7 +397,6 @@ export class MemoryStore {
     return this.prog.filter((p: ProgressRec): boolean => p.read).length;
   }
 
-
   touchView(siteId: string): void {
     this.views = this.views.filter((v: ViewLog): boolean => v.siteId !== siteId);
     this.views.unshift({ siteId: siteId, at: Date.now() });
@@ -419,7 +414,6 @@ export class MemoryStore {
     await this.persist('views', this.views);
     MemoryStore.bumpRev();
   }
-
 
   topicsActive(): TopicRec[] {
     return this.topics.filter((t: TopicRec): boolean => !t.deleted);
@@ -481,7 +475,6 @@ export class MemoryStore {
     this.emit('topic', id, rec);
     MemoryStore.bumpRev();
   }
-
 
   async applyRemote(entity: string, payload: string): Promise<void> {
     if (entity === 'fav') {
@@ -555,8 +548,6 @@ export class MemoryStore {
     return this.topics.find((x: TopicRec): boolean => x.id === id);
   }
 
-
-  // 给 BackupService 存「已知的快照清单」用：记住 hdc 搬走之前本机见过哪些备份文件
   setJson(key: string, val: Object): void {
     if (this.p === null) {
       return;
@@ -588,7 +579,6 @@ export class MemoryStore {
     }
   }
 
-
   exportAll(siteCount: number, accounts: AccProfile[]): BackupData {
     let data: BackupData = {
       formatVer: 2, appVer: '1.0.0', exportedAt: Date.now(), siteCount: siteCount,
@@ -600,8 +590,6 @@ export class MemoryStore {
     return data;
   }
 
-  // 校验和覆盖「会被恢复的正文」。v1 文件没有 accounts 段，正文口径与旧版一致，
-  // 这样老备份文件在新版本上仍然能验通。
   private static bodyOf(d: BackupData): string {
     let body = JSON.stringify(d.favorites) + JSON.stringify(d.notes) +
       JSON.stringify(d.tags) + JSON.stringify(d.progress) + JSON.stringify(d.topics);
@@ -653,7 +641,6 @@ export class MemoryStore {
     return this.p.getSync('prev_import_from', '') as string;
   }
 
-  // 兜底：恢复搞错了 / 文件不是想要的那份，把本机数据退回导入前的原样
   async undoImport(): Promise<boolean> {
     let prev = this.prevOf();
     if (prev === null || this.p === null) {

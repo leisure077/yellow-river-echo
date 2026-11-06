@@ -25,9 +25,6 @@ export default class EntryAbility extends UIAbility {
     });
   }
 
-  // 关键不是「弹过窗」，而是把用户的选择读回来：
-  // authResults 里 0 = 已授予，-1 = 拒绝。老写法只 catch 了异常，
-  // 弹窗成功后同步侧依旧不知道权限已经到手。
   private askSyncPermission(ctx: common.UIAbilityContext): void {
     let perms: Array<Permissions> = ['ohos.permission.DISTRIBUTED_DATASYNC'];
     let atManager = abilityAccessCtrl.createAtManager();

@@ -8,7 +8,7 @@ import urllib.request
 
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 KEY = hh_env.zhipu_key()
 URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
@@ -22,7 +22,6 @@ CONTEXT = (
 Q = '仰韶彩陶有什么特点？两句话说清楚。'
 
 MODELS = ['glm-5.3-flash', 'glm-5.3-flashx', 'glm-4.5-air', 'glm-4.7']
-
 
 def probe(model):
     body = {
@@ -77,7 +76,6 @@ def probe(model):
         'chars': len(''.join(text)),
         'pieces': chunks,
     }
-
 
 if __name__ == '__main__':
     out = []

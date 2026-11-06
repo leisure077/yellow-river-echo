@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """黄河沙盘实景地形底图烘焙。
 
 数据源（全部公开、可离线随包）：
@@ -31,19 +29,15 @@ SHOTS = os.path.join(ROOT, 'shots')
 TMP = os.path.join(ROOT, '.tmp')
 RAWFILE = os.path.join(ROOT, 'entry', 'src', 'main', 'resources', 'rawfile', 'sandtable')
 
-# 河南 bbox（DataV 410000 实测：E110.36-116.65 / N31.38-36.37），外扩一点留边
 BBOX = (110.10, 116.90, 31.20, 36.55)
 TILE = 256
 
-
-# ---------------------------------------------------------------- 瓦片与栅格
 def xy(lon, lat, z):
     n = 2.0 ** z
     x = (lon + 180.0) / 360.0 * n
     r = math.radians(lat)
     y = (1.0 - math.log(math.tan(r) + 1.0 / math.cos(r)) / math.pi) / 2.0 * n
     return x, y
-
 
 def lonlat_of(px, py, z, x0, y0):
     """栅格像素 -> 经纬度（等距圆柱 Web Mercator 反算）"""
@@ -52,7 +46,6 @@ def lonlat_of(px, py, z, x0, y0):
     yy = (y0 + py / TILE) / n
     lat = math.degrees(math.atan(math.sinh(math.pi * (1.0 - 2.0 * yy))))
     return lon, lat
-
 
 def fetch_tile(args):
     z, x, y, refresh = args
@@ -64,7 +57,6 @@ def fetch_tile(args):
         with open(path, 'wb') as f:
             f.write(data)
     return path
-
 
 def load_dem(z, refresh):
     x0 = int(math.floor(xy(BBOX[0], BBOX[3], z)[0]))
@@ -83,14 +75,11 @@ def load_dem(z, refresh):
     h = nrows * TILE
     elev = np.zeros((h, w), np.float32)
     for (tz, tx, ty, _), p in zip(jobs, paths):
-        # 按瓦片自身的行列号落位，不能靠 enumerate 顺序猜（x 外层/y 内层会转置）
         gx, gy = tx - x0, ty - y0
         a = np.asarray(Image.open(p).convert('RGB')).astype(np.int32)
         d = a[:, :, 0] * 256 + a[:, :, 1] + a[:, :, 2] / 256.0 - 32768
         elev[gy * TILE:(gy + 1) * TILE, gx * TILE:(gx + 1) * TILE] = d
     from scipy import ndimage
-    # terrarium 的 void/no-data 编码成 -32768+... 的大负值（实测 -2148）。55 个像素，
-    # 但要是不填掉，山体阴影会出现假凹坑，谷底判定也会被一个 -2148 整窗带跑。
     bad = elev < -100
     if bad.any():
         _, nn = ndimage.distance_transform_edt(bad, return_indices=True)
@@ -107,15 +96,12 @@ def load_dem(z, refresh):
     return dict(elev=elev, sm=sm, z=z, x0=x0, y0=y0, w=w, h=h, lon_left=lon_left, lat_top=lat_top,
                 lon_right=lon_right, lat_bottom=lat_bottom, m_per_px=m_per_px)
 
-
 def px_of(dem, lon, lat):
     """经纬度 -> 原始 DEM 栅格像素（线性）"""
     fx, _ = xy(lon, lat, dem['z'])
     _, fy = xy(lon, lat, dem['z'])
     return (fx - dem['x0']) * TILE, (fy - dem['y0']) * TILE
 
-
-# ---------------------------------------------------------------- 省界
 def load_boundary():
     path = os.path.join(CACHE, '410000.json')
     if not os.path.exists(path):
@@ -130,7 +116,6 @@ def load_boundary():
                 polys.append([(c[0], c[1]) for c in ring])
     print('boundary rings: %s pts' % [len(p) for p in polys])
     return polys
-
 
 def dp(points, eps):
     """Douglas-Peucker 简化"""
@@ -148,7 +133,6 @@ def dp(points, eps):
         return dp(points[:i + 1], eps)[:-1] + dp(points[i:], eps)
     return [a, b]
 
-
 def simplify(polys, eps):
     out = []
     for p in polys:
@@ -156,7 +140,6 @@ def simplify(polys, eps):
         if len(s) >= 6:
             out.append(s)
     return out
-
 
 def draw_mask(shape, polys, dem, scale):
     """省界 -> 目标尺寸二值掩膜（scale = 目标像素 / 原始像素）"""
@@ -171,8 +154,6 @@ def draw_mask(shape, polys, dem, scale):
         dr.polygon(pts, fill=255)
     return np.asarray(m, np.float32) / 255.0
 
-
-# ---------------------------------------------------------------- 晕渲与配色
 def hillshade(elev, m_per_px, azimuth, altitude, exaggeration):
     dzdx, dzdy = np.gradient(elev.astype(np.float64), m_per_px * 1.0)
     dzdx *= exaggeration
@@ -184,10 +165,7 @@ def hillshade(elev, m_per_px, azimuth, altitude, exaggeration):
     out = (np.cos(al) * np.cos(slope) + np.sin(al) * np.sin(slope) * np.cos(aspect - az)).astype(np.float32)
     return np.clip(out, 0, 1)
 
-
-RAMP = [  # (高程 m, RGB) —— 印刷体 3D 晕渲：平原绿 -> 岗地黄 -> 丘陵土黄 -> 中山褐 -> 高山亮
-    # 这些值是"shade=1.0 时的本色"，明暗全部交给下面的山体阴影系数，
-    # 所以不能再偏亮：上一版 (163,196,128) 乘到 1.6 倍时绿通道直接 clipped 成 255，整张图洗白。
+RAMP = [
     (0, (126, 162, 96)),
     (150, (140, 172, 100)),
     (300, (172, 180, 108)),
@@ -199,18 +177,15 @@ RAMP = [  # (高程 m, RGB) —— 印刷体 3D 晕渲：平原绿 -> 岗地黄 
     (3100, (222, 216, 208)),
 ]
 
-
 def colorize(elev):
     rgb = np.empty(elev.shape + (3,), np.float32)
     for i in range(3):
         rgb[:, :, i] = np.interp(elev, [r[0] for r in RAMP], [r[1][i] for r in RAMP])
     return rgb
 
-
 def norm01(a):
     lo, hi = np.percentile(a, [1.0, 99.0])
     return np.clip((a - lo) / max(hi - lo, 1e-6), 0, 1)
-
 
 def bake(dem, polys, out_w, paper=(245, 239, 228), knock=0.05):
     """实景晕渲：主光 315°/42° 出体积感，补光 160° 抬阴面，低地叠一层高频微起伏防"死平"。
@@ -230,7 +205,6 @@ def bake(dem, polys, out_w, paper=(245, 239, 228), knock=0.05):
     fine = norm01(hillshade(small, mpp, 300, 30, 9.0))
     rgb = colorize(small)
     shade = 0.58 + 0.80 * hs
-    # 平原（<220m）几乎不吃山体阴影，用高频项补一点肌理
     plain = np.clip((220.0 - small) / 220.0, 0, 1).astype(np.float32)[:, :, None]
     shade = shade[:, :, None] * (1 - plain) + (shade[:, :, None] * (0.90 + 0.22 * fine[:, :, None])) * plain
     rgb = np.clip(rgb * shade, 0, 255)
@@ -240,32 +214,24 @@ def bake(dem, polys, out_w, paper=(245, 239, 228), knock=0.05):
     img = rgb * mask[:, :, None] + bg * (1 - mask[:, :, None])
     return np.clip(img, 0, 255).astype(np.uint8), mask, scale
 
-
-# ---------------------------------------------------------------- 河道吸附
 def sample(dem, lon, lat):
     x, y = px_of(dem, lon, lat)
     xi = min(max(int(round(x)), 0), dem['w'] - 1)
     yi = min(max(int(round(y)), 0), dem['h'] - 1)
     return float(dem['elev'][yi, xi])
 
-
-# 河床高程先验（黄河自豫西入豫至台前出境的实测大致水位，单位 m）：
-# 用它做"高程匹配"而不是"找最低点"——矿坑 / 水库 / 采砂坑在 DEM 里比河床低一两百米，
-# 纯找最低点会把河道吸到这些伪影上去（实测 111.09E 附近有个 89m 的坑，比下游开封还低）。
 RIVER_PROFILE = [(110.4, 340.0), (111.0, 305.0), (111.5, 285.0), (112.0, 240.0), (112.4, 200.0),
                  (112.9, 150.0), (113.4, 110.0), (113.9, 82.0), (114.4, 62.0), (114.9, 52.0),
                  (115.4, 46.0), (115.9, 42.0), (116.9, 38.0)]
 
-
 def expected_elev(lon):
     return float(np.interp(lon, [p[0] for p in RIVER_PROFILE], [p[1] for p in RIVER_PROFILE]))
-
 
 def snap(dem, lon, lat, radius_deg=0.06, min_relief=120.0, elev_w=1.0, dist_w=25.0, max_drift_km=8.0):
     """山区段：按"河床高程先验 + 距离罚"吸附到与水位相符的谷底。
     平原段（±0.04° 窗口起伏 <120m）不动——那里没有山脊可穿帮，人工走向更可信。"""
     deg_px = (dem['lon_right'] - dem['lon_left']) / dem['w']
-    km_px = dem['m_per_px'] / 1000.0  # 投影保角，横纵向每像素地面距离相同
+    km_px = dem['m_per_px'] / 1000.0
     x = min(max(px_of(dem, lon, lat)[0], 1.0), dem['w'] - 2.0)
     y = min(max(px_of(dem, lon, lat)[1], 1.0), dem['h'] - 2.0)
     r_small = 0.04 / deg_px
@@ -292,7 +258,6 @@ def snap(dem, lon, lat, radius_deg=0.06, min_relief=120.0, elev_w=1.0, dist_w=25
         return lon, lat, relief, round(drift, 2), 'capped'
     return float(nlon), float(nlat), relief, round(drift, 2), 'valley'
 
-
 def catmull(pts, segs=14):
     """Catmull-Rom 沿程采样，用来检查"线"而不是只检查"点"。"""
     P = [pts[0]] + list(pts) + [pts[-1]]
@@ -309,7 +274,6 @@ def catmull(pts, segs=14):
             out.append((mix(0), mix(1)))
     out.append(pts[-1])
     return out
-
 
 def floor_ratio(dem, pts, win_deg=0.02, tol=80.0):
     """沿程谷底率：每个采样点与 ±win_deg 窗口最低点的高差 <= tol 米，算"没骑山脊"。"""
@@ -330,32 +294,22 @@ def floor_ratio(dem, pts, win_deg=0.02, tol=80.0):
     n = len(pts) * 14
     return round(100.0 * (n - bad) / max(n, 1), 1), worst
 
-
 def win_size(dem, xi0, xi1, yi0, yi1):
     return max(0, xi1 - xi0) * max(0, yi1 - yi0)
 
-
-# 今道（汉唐—当代）用 Natural Earth 10m 真实中心线重采样；禹河 / 夺淮 两条历史分流
-# 没有任何矢量数据可比，按史实手工布点，与今道共用出山口（桃花峪）以西的段。
-FRAME = (110.20, 34.30, 116.80, 36.60)     # 河南境内黄河可见段 lon_min, lat_min, lon_max, lat_max
+FRAME = (110.20, 34.30, 116.80, 36.60)
 N_SPINE = 40
-# 分流起点（经度）：黄河出山口后才摆动，山区段三条线完全重合
 DAYU_DIVERGE = 113.85
 DUO_DIVERGE = 114.30
 DAYU_BRANCH = [(114.05, 35.20), (114.35, 35.60), (114.75, 36.00), (115.15, 36.40), (115.50, 36.75)]
 DUO_BRANCH = [(114.85, 34.72), (115.30, 34.52), (115.75, 34.28), (116.20, 34.05), (116.70, 33.85)]
 CANAL = [(112.45, 34.63), (112.95, 34.72), (113.30, 34.90), (114.30, 34.79),
-         (115.05, 34.48), (115.60, 34.30), (116.30, 33.98)]                          # 汴渠：洛阳—汴口—商丘—永城
+         (115.05, 34.48), (115.60, 34.30), (116.30, 33.98)]
 
-# 山名标签（lon, lat）——用 DEM 复核必须落在高地上。
-# 2026-11-01 逐个用 ±0.22° 高程网格重新配准：王屋山原坐标落在黄河谷坡（366m）、
-# 外方山落在禹州丘陵（459m）、嵩山偏到嵩北平原（487m）、桐柏山偏到淮山过渡带（409m），全部上移到山体。
-# 崤山再东移到 111.95/34.34（洛宁—崤山东段，960m）：原坐标的标签和"三门峡"注记在 390px 上挤成一团。
 MOUNTAINS = [('太行山', 113.55, 35.95), ('王屋山', 112.10, 35.26), ('崤山', 111.95, 34.34),
              ('小秦岭', 110.60, 34.28), ('熊耳山', 111.35, 34.10), ('外方山', 112.42, 33.90),
              ('伏牛山', 111.85, 33.75), ('嵩山', 112.99, 34.52), ('桐柏山', 113.26, 32.38),
              ('大别山', 115.10, 31.55)]
-
 
 def load_ne():
     path = os.path.join(TMP, 'geo_ne_rivers.json')
@@ -363,7 +317,6 @@ def load_ne():
         import river_from_ne
         river_from_ne.main()
     return json.load(open(path, encoding='utf-8'))
-
 
 def chain(lines, tol_km=12.0):
     """同一条河被切成的多段中心线按端点就近串成一条（顺序无所谓，最后统一按经度定向）。"""
@@ -395,7 +348,6 @@ def chain(lines, tol_km=12.0):
         out.reverse()
     return out
 
-
 def resample(pts, n):
     """按地面距离等弧长重采样成 n 个控制点。"""
     km = [0.0]
@@ -412,7 +364,6 @@ def resample(pts, n):
         a, b = pts[j], pts[j + 1]
         out.append((round(a[0] + (b[0] - a[0]) * t, 4), round(a[1] + (b[1] - a[1]) * t, 4)))
     return out
-
 
 def build_spines(ne):
     """今道 = 真实中心线等弧长重采样；禹河 / 夺淮 = 与今道共用出山口以西的点，
@@ -433,10 +384,8 @@ def build_spines(ne):
           % (len(line), N_SPINE, DAYU_DIVERGE, k_of(jin, DAYU_DIVERGE), jin[k_of(jin, DAYU_DIVERGE)][0], jin[k_of(jin, DAYU_DIVERGE)][1]))
     return {'jin': jin, 'dayu': dayu, 'duohuai': duo}, line
 
-
 def k_of(spine, lon):
     return next((i for i, p in enumerate(spine) if p[0] > lon), len(spine) - 1)
-
 
 def main():
     ap = argparse.ArgumentParser()
@@ -467,7 +416,6 @@ def main():
                    grid=[dem['lon_left'], dem['lat_top'], dem['lon_right'], dem['lat_bottom']]),
               open(os.path.join(TMP, 'geo_boundary.json'), 'w', encoding='utf-8'), ensure_ascii=False)
 
-    # ---- 脊柱：今道取真实中心线，两条历史分流手工布点；只校验，不再吸附
     ne = load_ne()
     spines, full = build_spines(ne)
     out = {'spines': spines, 'canal': [list(p) for p in CANAL], 'huang_full': [[round(a, 4), round(b, 4)] for a, b in full]}
@@ -483,7 +431,6 @@ def main():
     for k, spine in spines.items():
         out['spines'][k] = [[round(p[0], 4), round(p[1], 4)] for p in spine]
         print('%-9s 水位 %s' % (k, [int(sample(dem, p[0], p[1])) for p in spine]))
-    # 山名标签必须落在高地上，用 DEM 复核，避免"伏牛山"标到平原里
     marks = {}
     for name, lon, lat in MOUNTAINS:
         e = int(sample(dem, lon, lat))
@@ -492,7 +439,6 @@ def main():
     out['mountains'] = {k: v[:2] for k, v in marks.items()}
     json.dump(out, open(os.path.join(TMP, 'geo_rivers.json'), 'w', encoding='utf-8'), ensure_ascii=False)
     print('wrote .tmp/geo_boundary.json .tmp/geo_rivers.json shots/terrain_preview.png')
-
 
 if __name__ == '__main__':
     sys.stdout.reconfigure(encoding='utf-8')

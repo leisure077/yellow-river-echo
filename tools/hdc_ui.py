@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """模拟器 UI 自动化小工具（开发用，不进 App 代码）。
 
 用法：
@@ -13,17 +12,15 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # hdc 在哪、连哪台设备：环境变量 > 自动探测 > 明确报错
+import hh_env
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_TMP = os.path.join(ROOT, ".tmp")
-
 
 def sh(args):
     cmd = [hh_env.hdc(), "-t", hh_env.device(), "shell"]
     cmd += [args] if isinstance(args, str) else list(args)
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     return (r.stdout or "") + (r.stderr or "")
-
 
 def dump(kw=None):
     out = sh("uitest dumpLayout -p /data/local/tmp/ui.json")
@@ -53,11 +50,9 @@ def dump(kw=None):
         print("%-28s | %-30s | %s | en=%s" % (t[:28], b, ty, en))
     return rows
 
-
 def center(bounds):
     x1, y1, x2, y2 = [int(v) for v in bounds.replace("][", " ").replace("[", "").replace("]", "").split()]
     return (x1 + x2) // 2, (y1 + y2) // 2
-
 
 def find(text):
     rows = dump()
@@ -65,7 +60,6 @@ def find(text):
         if text in t:
             return center(b)
     return None
-
 
 def main():
     if len(sys.argv) < 2:
@@ -92,7 +86,6 @@ def main():
         print(local, os.path.getsize(local) if os.path.exists(local) else "MISSING")
     else:
         print(__doc__)
-
 
 if __name__ == "__main__":
     main()

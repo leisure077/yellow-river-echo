@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """假 Dify：专门造一个「本机存着的会话号在服务端不存在」的场景，用来验会话自愈。
 
 真实复现路径是今天演示时踩到的那一种：先用假服务问过一句，本地存下了 mock 的会话号，
@@ -28,10 +27,8 @@ NOT_FOUND = json.dumps({
     "status": 404,
 }).encode("utf-8")
 
-
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # 「测一下」打的是 /v1/parameters，这里回 200 让它能区分「地址通不通」
         if self.path.endswith("/parameters"):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -76,7 +73,6 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, *a):
         pass
-
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")

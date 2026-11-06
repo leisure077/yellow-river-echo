@@ -1,7 +1,6 @@
 import { Palette } from './Theme';
 import { profileOf, grid, mixHex } from './PotteryArt';
 
-
 export interface ShotBox {
   c: CanvasRenderer;
   p: Palette;
@@ -392,7 +391,6 @@ function kiln(b: ShotBox, k: number, cx: number, baseY: number, rw: number, rh: 
   c.restore();
 }
 
-
 function fishPts(cx: number, cy: number, L: number, H: number): number[] {
   let pts: number[] = [];
   let n = 26;
@@ -755,7 +753,6 @@ function c01s5(b: ShotBox): void {
   }
   watermark(b, b.w * 0.88, b.h * 0.14, b.h * 0.12, 0.07);
 }
-
 
 function c02s1(b: ShotBox): void {
   let c = b.c;

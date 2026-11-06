@@ -26,7 +26,6 @@ SSE_ERR = ('data: ' + json.dumps({
 SSE_MODE = '--sse' in sys.argv
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else 8899
 
-
 class H(BaseHTTPRequestHandler):
     def do_POST(self):
         n = int(self.headers.get('Content-Length') or 0)
@@ -53,7 +52,6 @@ class H(BaseHTTPRequestHandler):
 
     def log_message(self, *a):
         pass
-
 
 print('mock dify on', PORT, 'mode', 'sse-1305' if SSE_MODE else 'http-429', flush=True)
 HTTPServer(('0.0.0.0', PORT), H).serve_forever()

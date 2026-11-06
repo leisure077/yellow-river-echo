@@ -60,7 +60,6 @@ struct LoginPage {
     this.tick();
   }
 
-  // 另一台设备的档案到了（分布式通道或刚导入的快照）：静默把昵称填好，只提示不打断
   onStoreChange(): void {
     let at = AppStorage.get<number>('remoteAccAt') ?? 0;
     if (at <= this.seenRemoteAcc) {

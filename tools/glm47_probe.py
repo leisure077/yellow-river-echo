@@ -5,7 +5,7 @@ import io, json, re, sys, time, urllib.request
 
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 sys.stdout.reconfigure(encoding='utf-8')
 KEY = hh_env.zhipu_key()
@@ -17,7 +17,6 @@ CASES = [
     ('命中-遗址', '仰韶村遗址在哪里，有什么值得看的'),
     ('命中-文创', '黄河沿岸有哪些文创产品'),
 ]
-
 
 def ask(model, q, extra):
     body = {'model': model, 'messages': [{'role': 'user', 'content': q}], 'stream': True}
@@ -62,7 +61,6 @@ def ask(model, q, extra):
         err = type(e).__name__ + ' ' + str(e)[:120]
     return ''.join(content), ''.join(reason), ttft, time.time() - t0, err
 
-
 def ascii_lines(text):
     out = []
     for ln in text.split('\n'):
@@ -73,7 +71,6 @@ def ascii_lines(text):
         if len([c for c in chars if ord(c) < 128]) / max(1, len(chars)) > 0.7:
             out.append(s)
     return out
-
 
 for model, extra in [('glm-4.7-flash', {'thinking': {'type': 'disabled'}}),
                      ('glm-4.7-flash', {'thinking': {'type': 'enabled'}})]:

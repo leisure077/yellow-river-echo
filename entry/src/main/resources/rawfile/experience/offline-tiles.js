@@ -1,5 +1,4 @@
 window.inkAtlasLevels={"spring": 3, "winter": 3, "autumn": 3, "summer": 3};
-// Local raster pyramid: no external map engine, geographic tiles or AK requests.
 loadBaidu=function(){};
 const baseMapPage=mapPage;
 mapPage=function(){baseMapPage();refreshTiles();mountSeason();};
@@ -62,5 +61,4 @@ const seasonStyle=document.createElement('style');seasonStyle.textContent=`
 @media(prefers-reduced-motion:reduce){.season-weather{display:none}#rasterTiles{transition:none}}
 `;document.head.append(seasonStyle);
 
-// Ink-blue architectural labels stay visually aligned with the painted buildings.
 const inkStyle=document.createElement("style");inkStyle.textContent=`.pin .pin-scale{transition:opacity .2s}.pin:hover .building-anchor,.pin:focus .building-anchor{fill:#fff5cf;stroke:#465f69}#rasterTiles image{image-rendering:auto}.season-button{color:#526f78;border-color:#9caeac}`;document.head.append(inkStyle);

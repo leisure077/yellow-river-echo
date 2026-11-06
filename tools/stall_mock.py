@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """假 Dify：换一台电脑也能把河小导的界面整条跑通，顺便备着六组演示问答。
 
 App 只认两头发：GET /v1/parameters（设置页「测一下」）和 POST /v1/chat-messages
@@ -23,11 +22,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8899
 STALL = float(sys.argv[2]) if len(sys.argv) > 2 else 30.0
 
-# 演示档：命中式的六组问答，答案是从 tools/kb/docs 那 23 个 md 里抄的真实段落。
-# document_name 必须和知识库文件名一致，App 的 AiService.kindOf 是按 "s01-xxx.md"
-# 这种前缀认站点的，写成别的名字引用位就不显示。
-# 后两组是故意不带引用的：花园口那座桥库里没有，就不编；隐私这条要讲清默认关的开关，
-# 编不出「绝对不上传」这种话——这两条比前四条更值得演。
 CANNED = [
     (("仰韶", "渑池", "彩陶文化"),
      "仰韶村遗址在三门峡渑池县，黄河南岸的台地上，是仰韶文化的命名地。1921 年安特生在这里试掘，"
@@ -73,18 +67,14 @@ FALLBACK = ("演示档备着六组问题：仰韶村遗址、二里头遗址、�
             "「花园口大铁桥是谁设计的」（库里没有就不编）、还有收藏笔记会不会传给别人。"
             "换别的机器要真回答，按 dify/README 起一套 Dify。")
 
-
 def pick(query):
     for keys, answer, cite in CANNED:
         if any(k in query for k in keys):
             return answer, cite
     return FALLBACK, None
 
-
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # App 设置页的「测一下」打的是 GET /v1/parameters，只认状态码不解析正文
-        # （见 AiService.probe()）。没有这段，评委拿假 Dify 演界面时那一行永远是红的。
         p = self.path.split("?")[0].rstrip("/")
         if not p.endswith("/parameters"):
             self.send_response(404)
@@ -109,8 +99,6 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         n = int(self.headers.get("Content-Length") or 0)
-        # 中文 Windows 的 cmd 里 curl 发的是 GBK 字节，这里严格 utf-8 解码会整条请求崩掉。
-        # query 只用来打日志，解码不了就让它乱着，别把服务拖死。
         raw = self.rfile.read(n).decode("utf-8", "replace")
         try:
             body = json.loads(raw or "{}")
@@ -142,7 +130,6 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, *a):
         pass
-
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")

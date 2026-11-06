@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """把 .tmp/geo_*.json（bake_terrain.py 的产物）转成 index.html 里的 GEO 常量块。
 
 写死在 HTML 里而不是运行时 fetch，是为了让沙盘在 ArkWeb 里少一次异步、少一处失败面；
@@ -16,47 +15,30 @@ import os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMP = os.path.join(ROOT, '.tmp')
 
-# 与 terrain.jpg 严格对应：z9、列 412..422、行 200..209（11 列 x 10 行）
 Z, X0, Y0, COLS, ROWS = 9, 412, 200, 11, 10
 N = 2.0 ** Z
 
-
 def merc_x(lon):
     return (lon + 180.0) / 360.0 * N
-
 
 def merc_y(lat):
     s = math.sin(math.radians(lat))
     return (1.0 - math.log((1.0 + s) / (1.0 - s)) / (2.0 * math.pi)) / 2.0 * N
 
-
 def ux(lon):
     return (merc_x(lon) - X0) / COLS * 100.0
 
-
 def uy(lat):
-    # 除以 COLS（不是 ROWS）：一个栅格像素是正方形，横向 100 单位 = COLS 瓦片
     return (merc_y(lat) - Y0) / COLS * 100.0
-
 
 def pts(seq):
     return '[' + ','.join('[%.2f,%.2f]' % (ux(p[0]), uy(p[1])) for p in seq) + ']'
-
 
 def city_js(t):
     n, lon, lat, k = t[0], t[1], t[2], t[3]
     extra = ",a:'%s'" % t[4] if len(t) > 4 else ''
     return "{n:'%s',p:[%.2f,%.2f],k:'%s'%s}" % (n, ux(lon), uy(lat), k, extra)
 
-
-# 城镇与分段标注：坐标一律经度/纬度，改这里再重跑本脚本，别直接动 HTML 里的数字
-# 城市集合按赛题口径来：黄河在河南流经 三门峡/洛阳/郑州/开封/濮阳 五市，
-# 且与 rawfile/huanghe_sites.json 的 20 处遗址分布一致（洛阳5 郑州5 开封4 三门峡3 濮阳3）。
-# big=四段河史的剧情支点（汴渠西端与商胡之决），small=其余沿黄城市。
-# 次级城一律放在河槽南岸：汉唐段河宽按叙事放大到 50km 级别，贴着中心线画会被河带盖住。
-# 商丘是唯一的例外：它属淮河流域，只因为汴渠（通济渠）穿城而过才留在图上，「注」里已交代。
-# 第 5 项可选：标签锚位，缺省 'bottom'（点下方），'top'=点上方。
-# 濮阳的标签必须朝上：当代段与汉唐段的河带正好从濮阳点南边穿过，朝下会被河盖住。
 CITIES = [
     ('洛阳',   112.45, 34.62, 'big'),
     ('开封',   114.35, 34.79, 'big'),
@@ -65,11 +47,6 @@ CITIES = [
     ('濮阳',   115.03, 35.76, 'small', 'top'),
     ('商丘',   115.64, 34.44, 'small'),
 ]
-# s=所属阶段（0 大禹 / 1 汉唐 / 2 宋元 / 3 当代）
-# 注记字号 1.85 单位，一个汉字≈1.85 单位宽；1 单位≈7km，390px 屏上 1 单位≈4.2px。
-# 挪坐标的原则：标签中心横向至少隔开"两个字宽"（≈4 单位），否则窄屏上糊成一片。
-# 2026-11-01 按 390px 实测重排：疏浚河道从河谷挪到河北岸（原位置和"黄河"河名叠字）、
-# 小浪底从 112.18/35.22 东挪（那里正是王屋山标签）、沿黄生态廊道从郑州头顶挪到北岸。
 ANNO = [
     (0, '积石',        110.70, 34.95),
     (0, '疏浚河道',    113.15, 35.05),
@@ -84,17 +61,11 @@ ANNO = [
 ]
 TITLE = ('河 南 省', 114.95, 33.15)
 
-
-# 脊柱导出时切掉头部若干点：Natural Earth 的黄河中心线是从内蒙古/晋陕峡谷一路连过来的，
-# 沙盘讲的是"河南境内四段河史"，把陕县以西的峡谷段留在图外，起点落在灵宝—潼关这个河南西大门。
-# 只切头不切尾：三条脊柱共用上游前缀、下游各自摆动，同索引切才保得住逐点 morph 的对齐。
 TRIM_HEAD = 9
-
 
 HTML = os.path.join(ROOT, 'entry', 'src', 'main', 'resources', 'rawfile', 'sandtable', 'index.html')
 MARK_A = '  /* >>> GEO 由 tools/emit_geo.py 生成，勿手改 >>> */'
 MARK_B = '  /* <<< GEO <<< */'
-
 
 def splice(body):
     """把 GEO 段写回 index.html 的两道标记之间；标记不在就拒绝，免得静默插歪。"""
@@ -103,7 +74,6 @@ def splice(body):
     s = s[:a] + '\n' + body + '\n' + s[b:]
     io.open(HTML, 'w', encoding='utf-8', newline='\n').write(s)
     print('已写回 %s（%d 字节）' % (os.path.relpath(HTML, ROOT), len(s.encode('utf-8'))))
-
 
 def main():
     geo = json.load(open(os.path.join(TMP, 'geo_boundary.json'), encoding='utf-8'))
@@ -123,8 +93,6 @@ def main():
     a = ', '.join("{s:%d,t:'%s',p:[%.2f,%.2f]}" % (s, t, ux(lon), uy(lat)) for s, t, lon, lat in ANNO)
     lines.append('  var ANNO = [%s];' % a)
     lines.append("  var TITLE = { t: '%s', p: [%.2f, %.2f] };" % (TITLE[0], ux(TITLE[1]), uy(TITLE[2])))
-    # 可视图框取省界包围盒 + 2.5 单位（约 25 km）余量：栅格本身比河南大一圈，
-    # 直接按栅格铺满会让手机上一屏里全是纸色空白。
     xs = [ux(a) for a, b in ring]
     ys = [uy(b) for a, b in ring]
     fx0, fx1 = min(xs) - 2.5, max(xs) + 2.5
@@ -147,7 +115,6 @@ def main():
     for t in CITIES:
         print('  %-4s %8.2f,%7.2f -> %6.2f,%6.2f  %s'
               % (t[0], t[1], t[2], ux(t[1]), uy(t[2]), t[4] if len(t) > 4 else 'bottom'))
-
 
 if __name__ == '__main__':
     main()

@@ -7,20 +7,13 @@ import { MemoryStore } from './MemoryStore';
 import { StudioStore } from './StudioStore';
 import { SiteRepo } from './SiteRepo';
 
-// 快照在设备上的三个落点。第一个是应用自己的沙箱（hdc file recv 实测能取，
-// file send 实测进不来）；后两个是「外部放进来的收件箱」，这台镜像上实测
-// shell 写进去的文件应用侧 SELinux 读不到（777 也读不到），所以留着自动探，
-// 真机上如果开放就能直接用上；模拟器上的跨设备迁移走局域网那一条。
 const SANDBOX_DIR = 'backups';
 const INBOX_DIRS: string[] = ['/data/local/tmp/hh_inbox', '/data/local/tmp'];
 const MAX_ROW = 40;
 
 export class BackupService {
-  // 上一次成功拉取的地址，面板开回来直接填好，现场不用在手机上敲全串
   static lastUrl: string = '';
 
-  // 启动时跑一次目录体检，把结果打进日志：现场不用点界面就能用
-  // hilog | grep HH_BACKUP 看出「hdc 能写的收件箱，应用到底读不读得到」
   static probeAtBoot(ctx: common.Context): void {
     let rows = BackupService.probeDirs(ctx);
     for (let r of rows) {
@@ -48,7 +41,6 @@ export class BackupService {
     let st = StudioStore.get();
     let data = MemoryStore.get().exportAll(SiteRepo.get().sites.length, st.accountsAsProfiles());
     let text = JSON.stringify(data);
-    // 备份文件要离开这台设备，口令摘要绝不能进去
     if (text.indexOf('"digest"') >= 0) {
       console.error('[HH_BACKUP] export aborted: digest leaked');
       return '导出中止：快照里出现了口令摘要，请把这份文件发给作者';
@@ -70,7 +62,6 @@ export class BackupService {
         ' favs=' + data.favorites.length + ' topics=' + data.topics.length +
         ' accs=' + (data.accounts ?? []).length +
         ' checksum=' + data.checksum);
-      // 记下本机已知文件名，别的设备用 hdc 往里塞文件时才能分辨出「新来的」
       let rows = BackupService.listSnapshots(ctx);
       MemoryStore.get().setJson('known_snaps', rows.map((r: SnapshotRow): string => r.path));
     }
@@ -102,7 +93,6 @@ export class BackupService {
     return BackupService.restoreFromPath(ctx, uris[0]);
   }
 
-  // 从具体路径/URI 恢复。picker 选中的文件、收件箱里的文件都走这一条。
   static async restoreFromPath(ctx: common.Context, path: string): Promise<string> {
     let text = BackupService.readText(path);
     if (text.length === 0) {
@@ -112,9 +102,6 @@ export class BackupService {
     return BackupService.restoreFromText(text, BackupService.baseName(path));
   }
 
-  // 局域网导入：另一台设备导出的快照，在电脑上用 python -m http.server 摊出来，
-  // 这台设备填 http://10.0.2.2:8899/hhmem_backup_xxx.json 直接拉。
-  // 模拟器里 127.0.0.1 是模拟器自己，所以宿主机的地址固定是 10.0.2.2。
   static async importFromUrl(ctx: common.Context, url: string): Promise<string> {
     let u = url.trim();
     if (u.indexOf('http://') !== 0 && u.indexOf('https://') !== 0) {
@@ -152,7 +139,6 @@ export class BackupService {
     return msg;
   }
 
-  // 落库前的统一闸门：先验校验和，再验档案里没带口令字段。
   static async restoreFromText(text: string, name: string): Promise<string> {
     let data: BackupData | null = null;
     try {
@@ -199,7 +185,6 @@ export class BackupService {
     return '已退回恢复前的本机数据（原文件：' + (from.length > 0 ? from : '未知') + '）';
   }
 
-  // 目录可读性体检：hdc 能写的地方应用能不能读，一次跑出来，面板上直接写清楚
   static probeDirs(ctx: common.Context): DirStat[] {
     let out: DirStat[] = [];
     let cand: string[] = [BackupService.backupDir(ctx)].concat(INBOX_DIRS);

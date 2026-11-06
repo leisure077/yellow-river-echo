@@ -1,6 +1,3 @@
-// x/y 是长卷插画锚点；lng/lat 是按公开资料整理的近似坐标，只用于二维地图落点，
-// 精度到 0.01° 级，不作为导航依据。demo:true 的服务点为所在城市附近的示意位置。
-// 黄河河南段干流中心线：Natural Earth 10m（公有领域）截取 110.2°E–116.1°E 后等距抽稀。
 const riverLine = [
   [110.27,34.637],[110.387,34.608],[110.427,34.596],[110.483,34.616],
   [110.54,34.584],[110.708,34.621],[110.883,34.666],[110.99,34.722],
@@ -17,7 +14,6 @@ const riverLine = [
   [115.42,35.644],[115.504,35.723],[115.681,35.768],[115.886,35.878],
   [115.858,35.916],[115.965,35.986],[116.078,36.051],[116.08,36.098]
 ];
-// 黄河面数据：中心线按分段半宽左右偏移成的闭合水涯环，同一份几何见 geo/river.json。
 const riverPolygon = [
   [110.275,34.669],[110.394,34.644],[110.424,34.634],[110.486,34.656],
   [110.539,34.626],[110.701,34.668],[110.871,34.718],[110.969,34.772],
@@ -50,8 +46,6 @@ const riverPolygon = [
   [110.275,34.669]
 ];
 const cities = ['三门峡', '洛阳', '郑州', '开封', '濮阳'];
-// 景区手绘总平面：art 为插画，lng/lat 为图幅中心，km 为图幅南北实地跨度（示意贴合，非测绘），
-// zoom 为进入该景区时的默认级别。图幅宽高比固定 1:1.5，与 art 图片一致。
 const sites = [
   { id:'longmen', name:'龙门石窟', city:'洛阳', art:'art/longmen.png', lng:112.466, lat:34.556, km:2.4, zoom:15,
     note:'伊河两岸石窟群 · 手绘总平面' },
@@ -72,7 +66,6 @@ const mapSources = {
   qicheng: { name: '豫台视窗 · 戚城遗址', url: 'https://ytsc.rootinhenan.gov.cn/sitesources/ytsc/page_pc/hnly/fjms/article683e56795f2b40aeb6efad34a6f4875e.html' },
   museums: { name: '文化和旅游部 · 黄河文化博物馆群', url: 'https://www.mct.gov.cn/wlbphone/wlbydd/xxfb/qglb/hn/202410/t20241023_955851.html' }
 };
-// site + uv：落在景区手绘图上的位置，u 自西向东、v 自北向南，均为 0~1 图幅比例（示意）。
 const mapPOIs = [
   { id:'hangu', name:'函谷关', city:'三门峡', cat:'建筑', x:260, y:245, lng:110.860, lat:34.550, site:'hangu', uv:[0.48,0.42], source:'hangu', photo:'sites/s02.jpg', intro:'位于灵宝的历史文化景区，以关隘文化和老子文化为主题。公开资料列有函谷关城楼、太初宫、道德天书等景点。', demo:false },
   { id:'longmen', name:'龙门石窟', city:'洛阳', cat:'建筑', x:800, y:495, lng:112.466, lat:34.556, site:'longmen', uv:[0.46,0.42], source:'longmen', photo:'sites/s08.jpg', intro:'龙门石窟位于洛阳，景区包括西山石窟、东山石窟、香山寺和白园。', demo:false },
@@ -82,8 +75,6 @@ const mapPOIs = [
   { id:'miaodigou', name:'庙底沟仰韶文化博物馆', city:'三门峡', cat:'展览', x:345, y:345, lng:111.170, lat:34.780, source:'museums', photo:'sites/s01.jpg', intro:'河南黄河文化博物馆群中的文化展示场馆，聚焦仰韶文化。此处提供场馆文化入口，不发布未经核验的临展与开放时间。', demo:false },
   { id:'erlitou', name:'二里头夏都遗址博物馆', city:'洛阳', cat:'展览', x:695, y:610, lng:112.720, lat:34.600, source:'museums', photo:'sites/s04.jpg', intro:'位于洛阳的遗址博物馆，是了解早期王朝文化的窗口。长卷位置仅用于展示，不表示与龙门石窟相邻。', demo:false },
   { id:'shangdu', name:'郑州商都遗址博物院', city:'郑州', cat:'展览', x:435, y:905, lng:113.680, lat:34.740, source:'museums', photo:'sites/s10.jpg', intro:'河南黄河文化博物馆群中的文化展示场馆。可结合郑州商都遗址了解商代都城文化。', demo:false },
-  // 服务点为百度本地检索返回的真实门店/设施（2026-11 抓取），坐标为百度经纬度；
-  // 带 site 的表示落在对应景区 2.5km 内，景区视图与全河视图都会显示。
   { id:'r-eat-lm1', name:'楠溪王捌鸡·洛阳土菜院子', city:'洛阳', cat:'餐饮', x:845, y:505, lng:112.47941, lat:34.5517, site:'longmen', demo:false },
   { id:'r-eat-lm2', name:'麓山鱼宴(龙门石窟店)', city:'洛阳', cat:'餐饮', x:775, y:455, lng:112.45374, lat:34.57347, site:'longmen', demo:false },
   { id:'r-eat-kf1', name:'宋风雅宴·宋文化地标餐厅', city:'开封', cat:'餐饮', x:600, y:1075, lng:114.36859, lat:34.80804, site:'tieta', demo:false },
@@ -118,7 +109,6 @@ const mapPOIs = [
   { id:'r-svc-zz1', name:'桃花峪滑雪场-售票处', city:'郑州', cat:'游客服务', x:445, y:915, lng:113.49559, lat:34.96085, site:'yellowriver', demo:false },
   { id:'r-svc-py1', name:'戚城考古遗址公园-游客服务中心', city:'濮阳', cat:'游客服务', x:345, y:1355, lng:115.0426, lat:35.75823, site:'qicheng', demo:false },
 
-  // 景区内地标：位置按手绘图目测对齐，名称与业态为示意，不代表实地营业信息。
   { id:'lm-east', name:'东山石窟', city:'洛阳', cat:'建筑', x:830, y:470, site:'longmen', uv:[0.70,0.46], demo:false },
   { id:'lm-xiangshan', name:'香山寺', city:'洛阳', cat:'建筑', x:860, y:430, site:'longmen', uv:[0.78,0.13], demo:false },
   { id:'lm-baiyuan', name:'白园', city:'洛阳', cat:'建筑', x:770, y:530, site:'longmen', uv:[0.26,0.72], demo:false },

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """从 Natural Earth 10m 河流中心线（公有领域）里抽河南境内的黄河、淮河、洛、沁等干流折线。
 
 不引 GDAL/pyshp：shapefile 的 PolyLine 记录和 dbf 的字符字段都是定长的，手写解析 ~50 行。
@@ -16,10 +14,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(os.path.expanduser('~'), 'demcache')
 TMP = os.path.join(ROOT, '.tmp')
 URL = 'https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_rivers_lake_centerlines.zip'
-BBOX = (110.0, 31.0, 117.5, 36.6)          # 河南 + 邻省边缘一点
+BBOX = (110.0, 31.0, 117.5, 36.6)
 WANT = {'Huang': '黄河', 'Wei': '渭河', 'Huangshui': '湟水', 'Qin': '沁河', 'Huai': '淮河',
         'Hudi': '沣河', 'Ying': '颍河', 'Zhang': '漳河'}
-
 
 def ensure_zip():
     os.makedirs(CACHE, exist_ok=True)
@@ -30,7 +27,6 @@ def ensure_zip():
             f.write(urllib.request.urlopen(URL, timeout=120).read())
     print('zip %.1f MB' % (os.path.getsize(path) / 1048576.0))
     return path
-
 
 def read_dbf_names(z):
     """返回 {记录序号: name 字段值}"""
@@ -59,7 +55,6 @@ def read_dbf_names(z):
             out[i] = vals.get('name') or vals.get('NAME') or ''
         return out
 
-
 def read_shp_polylines(z):
     with z.open('ne_10m_rivers_lake_centerlines.shp') as f:
         data = f.read()
@@ -70,7 +65,7 @@ def read_shp_polylines(z):
         body = data[pos + 8:pos + 8 + clen * 2]
         pos += 8 + clen * 2
         st = struct.unpack('<I', body[:4])[0]
-        if st != 3:                      # 只要 PolyLine
+        if st != 3:
             out.append([])
             continue
         nparts, npoints = struct.unpack('<II', body[36:44])
@@ -83,7 +78,6 @@ def read_shp_polylines(z):
             lines.append(coords[bounds[i]:bounds[i + 1]])
         out.append(lines)
     return out
-
 
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
@@ -102,7 +96,6 @@ def main():
             continue
         kept = []
         for ln in lines:
-            # 不裁断：保留完整中心线，交给下游按需要取子链（裁断会把同一河段切成好几截）
             if len(ln) > 3:
                 kept.append(ln)
                 inside = sum(1 for p in ln if BBOX[0] <= p[0] <= BBOX[2] and BBOX[1] <= p[1] <= BBOX[3])
@@ -112,7 +105,6 @@ def main():
     os.makedirs(TMP, exist_ok=True)
     json.dump(hits, open(os.path.join(TMP, 'geo_ne_rivers.json'), 'w', encoding='utf-8'), ensure_ascii=False)
     print('wrote .tmp/geo_ne_rivers.json keys=%s' % list(hits))
-
 
 if __name__ == '__main__':
     main()

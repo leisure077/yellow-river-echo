@@ -26,7 +26,6 @@ GREET = ('您好', '你好', '我是河小导', '很高兴', '您好呀', '亲�
 RUN = re.compile(r"[A-Za-z][A-Za-z ,;:'\"\-()./0-9]{14,}")
 BENIGN = re.compile(r'^(Dify|Wi.?Fi|G20|X|App)$', re.I)
 
-
 def ask(q, pc, user):
     body = json.dumps({'inputs': {'personal_context': pc}, 'query': q,
                        'response_mode': 'streaming', 'conversation_id': '',
@@ -57,7 +56,6 @@ def ask(q, pc, user):
                 for m in (ev.get('metadata') or {}).get('retriever_resources', []) or []:
                     cites.append(m.get('document_name') or '?')
     return ''.join(parts), ttft, time.time() - t0, cites, err
-
 
 log = io.open('.tmp/regress_v3.txt', 'a', encoding='utf-8')
 log.write('\n===== %s prompt V3 + glm-4.7-flash thinking:false =====\n' % time.strftime('%H:%M:%S'))

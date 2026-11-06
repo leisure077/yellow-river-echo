@@ -30,7 +30,6 @@ struct SyncPage {
   @State dirs: DirStat[] = [];
   @State canUndo: boolean = false;
   @State accN: number = 0;
-  // 演示时不想在手机上敲整条地址：拉过一次就把这条留着
   @State snapUrl: string = 'http://10.0.2.2:8877/hhmem_latest.json';
 
   aboutToAppear(): void {

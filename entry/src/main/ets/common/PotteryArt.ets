@@ -1,6 +1,5 @@
 import { Palette } from './Theme';
 
-
 export const V_TOP: number = 0.12;
 export const V_BOT: number = 0.76;
 

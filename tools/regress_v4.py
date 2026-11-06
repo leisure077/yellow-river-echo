@@ -6,7 +6,7 @@ import io, json, re, sys, time, urllib.request
 
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -34,7 +34,6 @@ RUN = re.compile(r"[A-Za-z][A-Za-z ,;:'\"\-()./0-9]{14,}")
 BENIGN = re.compile(r'^(Dify|Wi.?Fi|G20|X|App)$', re.I)
 CITIES = ('三门峡', '洛阳', '郑州', '开封', '濮阳', '渑池', '安阳')
 
-
 def same_day_far(text):
     """按天/半天切段，段内出现两个相距远的城市 = 违反行程常识。"""
     hits = []
@@ -47,7 +46,6 @@ def same_day_far(text):
         if len(far) == 2:
             hits.append(seg.strip()[:40])
     return hits
-
 
 def ask(q, pc, user):
     body = json.dumps({'inputs': {'personal_context': pc}, 'query': q,
@@ -79,7 +77,6 @@ def ask(q, pc, user):
                 for m in (ev.get('metadata') or {}).get('retriever_resources', []) or []:
                     cites.append(m.get('document_name') or '?')
     return ''.join(parts), ttft, time.time() - t0, cites, err
-
 
 log = io.open('.tmp/regress_v4.txt', 'w', encoding='utf-8')
 log.write('===== %s prompt V4 + glm-4.7-flash thinking:false =====\n' % time.strftime('%H:%M:%S'))

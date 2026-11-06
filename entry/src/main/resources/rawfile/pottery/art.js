@@ -1,14 +1,4 @@
-/*
- * ⚠ 生成文件，别手改：改 ets/common/PotteryArt.ets 或 Theme.ets，
- *   然后跑 `node tools/emit_pottery_art.mjs` 重新生成。
- *
- * 这是彩陶画法的唯一真值在 Web 侧的投影：ArkWeb 真 3D 页（pottery.js）用它把
- * 釉色渐变、六种纹样带、题字、纸底、展示座画进一张展开的 CanvasTexture，
- * 所以「真 3D 看到的纹样」和「二维版 / 降级转台罩的纹样」是同一份代码画的。
- * 类型注解按「只删注解不删数字」的规则剥掉，生成时断言过两边数字字面量逐个相等。
- */
 
-// ↓ Theme.ets 的色板与颜色工具
 const PALETTES = new Map([
   ['yangshao', { base: '#D9A173', deep: '#A6553D', accent: '#3A2A22', ink: '#F6E9DA', paper: '#F0DCC2' }],
   ['longshan', { base: '#5B5A57', deep: '#2E2D2C', accent: '#9C8A6E', ink: '#EDE7DC', paper: '#D8D2C6' }],
@@ -31,7 +21,6 @@ export function withAlpha(hex, a) {
   let g = parseInt(hex.substring(3, 5), 16);
   let b = parseInt(hex.substring(5, 7), 16);
   
-  
   let al = Math.round(Math.max(0, Math.min(1, a)) * 1000) / 1000;
   return `rgba(${r},${g},${b},${al})`;
 }
@@ -45,26 +34,6 @@ export function hexLum(hex) {
   let b = parseInt(hex.substring(5, 7), 16);
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
-
-// ↓ PotteryArt.ets 剥类型后的画法本体（export 原样保留）
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export const V_TOP = 0.12;
 export const V_BOT = 0.76;
@@ -118,7 +87,6 @@ export function bandOf(shape) {
   }
   return [0.32, 0.60];
 }
-
 
 export function tracePath(c, shape,
   w, h) {
@@ -335,8 +303,6 @@ export function petal(c, p, x0, x1,
   }
 }
 
-
-
 export function motifPainter(motif) {
   if (motif === '鸟纹') {
     return bird;
@@ -378,11 +344,6 @@ export function drawWord(c, p, word,
   }
   c.fillStyle = p.accent;
   
-  
-  
-  
-  
-  
   c.font = `${Math.round(size)}vp sans-serif`;
   c.textAlign = 'center';
   c.textBaseline = 'middle';
@@ -391,9 +352,6 @@ export function drawWord(c, p, word,
     c.fillText(cs[i], w / 2 - total / 2 + size * 0.59 + i * size * 1.18, wy);
   }
 }
-
-
-
 
 const HEXD = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   'A', 'B', 'C', 'D', 'E', 'F'];
@@ -416,17 +374,6 @@ function mixHex(a, b, k) {
   return '#' + hx2(ar + (br - ar) * k) + hx2(ag + (bg - ag) * k) + hx2(ab + (bb - ab) * k);
 }
 
-
-
-
-
-
-
-
-
-
-
-
 export function drawPaper(c, p, seed,
   w, h) {
   let g = c.createLinearGradient(0, 0, 0, h);
@@ -447,9 +394,6 @@ export function drawPaper(c, p, seed,
   }
 }
 
-
-
-
 export function drawBand(c, p, motif,
   seed, x0, x1, y0, y1, h) {
   c.fillStyle = 'rgba(255,255,255,0.16)';
@@ -464,9 +408,6 @@ export function drawBand(c, p, motif,
   c.lineTo(x1, y1 - (y1 - y0) * 0.03);
   c.stroke();
 }
-
-
-
 
 export function drawRimFoot(c, p, shape,
   w, h) {
@@ -489,14 +430,6 @@ export function drawRimFoot(c, p, shape,
   c.ellipse(w / 2, bot, fr, Math.max(fr * 0.16, 1.6), 0, 0, Math.PI * 2);
   c.stroke();
 }
-
-
-
-
-
-
-
-
 
 export function drawPedestal(c, p, shape,
   pedestal, bot, w, h) {
@@ -531,7 +464,6 @@ export function drawPedestal(c, p, shape,
     c.ellipse(w / 2, base, w * 0.24, h * 0.02, 0, 0, Math.PI * 2);
     c.fill();
   } else if (pedestal === '圆几') {
-    
     
     let rx = w * 0.30;
     let ry = h * 0.024;
@@ -574,5 +506,3 @@ export function drawPedestal(c, p, shape,
     c.fill();
   }
 }
-
-

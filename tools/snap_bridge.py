@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """快照摆渡：把一台设备导出的备份取到电脑、验一遍、再摊成局域网地址给另一台设备拉。
 
 为什么不是 hdc file send：这台镜像上 hdc shell 是 uid=2000(shell)、context=u:r:sh:s0，
@@ -29,7 +28,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # noqa: E402  hdc 路径、设备号按「环境变量 > 探测 > 报错」取
+import hh_env
 
 ROOT = hh_env.ROOT
 BUNDLE = "com.example.demo01"
@@ -37,20 +36,16 @@ REMOTE_DIR = "/data/app/el2/100/base/%s/haps/entry/files/backups" % BUNDLE
 OUT_DIR = os.path.join(ROOT, ".tmp", "snaps")
 LATEST = "hhmem_latest.json"
 DEFAULT_PORT = 8877
-# 快照里绝不该出现的口令类字段：AccProfile 只有 nick/avatar/createdAt/phoneMask/updatedAt/deleted
 SECRET_KEYS = ["digest", "pwd", "password", "passwd", "token", "secret"]
-
 
 def _hdc(args, timeout=180):
     r = subprocess.run([hh_env.hdc()] + args, capture_output=True,
                        text=True, encoding="utf-8", errors="replace", timeout=timeout)
     return (r.stdout or "") + (r.stderr or "")
 
-
 def _json_dump(v):
     """贴近 ArkTS 的 JSON.stringify：紧凑分隔符 + 不转义中文 + 不重排键。"""
     return json.dumps(v, separators=(",", ":"), ensure_ascii=False)
-
 
 def fnv16(s):
     """复刻 MemoryStore.fnv：按 UTF-16 code unit 逐个算，32 位回绕。"""
@@ -69,7 +64,6 @@ def fnv16(s):
         h = (h * 16777619) & 0xFFFFFFFF
     return h
 
-
 def body_of(d):
     """校验和覆盖的正文，口径和 MemoryStore.bodyOf 一致（v2 才带 accounts）。"""
     s = _json_dump(d["favorites"]) + _json_dump(d["notes"]) + _json_dump(d["tags"]) \
@@ -77,7 +71,6 @@ def body_of(d):
     if d.get("formatVer", 1) >= 2 and "accounts" in d:
         s += _json_dump(d["accounts"])
     return s
-
 
 def _leaks(text):
     """只找「字段名」形状的命中（"digest" 这种带引号的键），避免正文里正好写了这个词被误报。"""
@@ -87,14 +80,12 @@ def _leaks(text):
             hits.append(k)
     return hits
 
-
 def check(path):
     raw = open(path, encoding="utf-8").read()
     d = json.loads(raw)
     calc = fnv16(body_of(d))
     ok = calc == d.get("checksum")
     acc = d.get("accounts") or []
-    # 账号档案单独查一遍，再把整份文件（含笔记正文）也扫一遍，两处都干净才算过
     leak = sorted(set(_leaks(_json_dump(acc)) + _leaks(raw)))
     print("%s" % os.path.basename(path))
     print("  formatVer=%s appVer=%s siteCount=%s 笔记 %d / 收藏 %d / 标签 %d / 进度 %d / 专题 %d / 档案 %d"
@@ -105,7 +96,6 @@ def check(path):
     if acc:
         print("  档案字段：%s" % sorted(acc[0].keys()))
     print("  口令类字段：%s" % ("没找到" if not leak else "命中 " + "/".join(leak) + " ← 这份不能用"))
-    # 反向对照：改一个字的正文必须验不过，否则校验和这道闸是摆设
     if d.get("notes"):
         d2 = json.loads(raw)
         k = sorted(d2["notes"][0].keys())[0]
@@ -114,15 +104,12 @@ def check(path):
         print("  篡改一字：%s" % ("校验和立刻对不上（闸门有效）" if broke else "仍验得过（闸门是摆设）"))
     return ok and not leak
 
-
 def remote_list(dev):
     out = _hdc(["-t", dev, "shell", "ls -1 %s 2>/dev/null" % REMOTE_DIR])
     names = [n.strip() for n in out.splitlines()
              if n.strip().startswith("hhmem_backup_") and n.strip().endswith(".json")]
-    # 文件名里带的是毫秒时间戳，直接按名字排序就是按时间排序
     names.sort(key=lambda n: int(re.findall(r"\d+", n)[0]) if re.findall(r"\d+", n) else 0)
     return names
-
 
 def recv(dev):
     names = remote_list(dev)
@@ -143,7 +130,6 @@ def recv(dev):
         return None
     with open(dst, encoding="utf-8") as f:
         text = f.read()
-    # 落进服务目录之前先验，验过了才摊出去
     raw = json.loads(text)
     if fnv16(body_of(raw)) != raw.get("checksum"):
         print("这份快照校验和对不上，不摊到局域网里：%s" % newest)
@@ -157,7 +143,6 @@ def recv(dev):
     print("最新一份：%s（%d B）→ 复制成 %s" % (newest, os.path.getsize(dst), LATEST))
     return latest
 
-
 def serve(port):
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=OUT_DIR)
     with socketserver.ThreadingTCPServer(("0.0.0.0", port), handler) as httpd:
@@ -170,7 +155,6 @@ def serve(port):
             httpd.serve_forever()
         except KeyboardInterrupt:
             print("\n停了。")
-
 
 def main():
     try:
@@ -204,7 +188,6 @@ def main():
     print(__doc__)
     return 1
 
-
 def _flag(args, name, default):
     if name in args:
         i = args.index(name)
@@ -212,7 +195,6 @@ def _flag(args, name, default):
             return args[i + 1]
     return default
 
-
 if __name__ == "__main__":
-    import functools  # serve() 用到，放这里免得上面 import 块变长
+    import functools
     sys.exit(main())

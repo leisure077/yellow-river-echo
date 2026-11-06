@@ -2,7 +2,6 @@ import { image } from '@kit.ImageKit';
 import { common } from '@kit.AbilityKit';
 import { util } from '@kit.ArkTS';
 
-
 export interface ShapeMeta {
   key: string;
   label: string;

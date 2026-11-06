@@ -4,21 +4,6 @@ import { OrbitControls } from '../experience/vendor/OrbitControls.js';
 import { toCreasedNormals } from '../experience/vendor/BufferGeometryUtils.js';
 import { MeshoptDecoder } from '../experience/vendor/MeshoptDecoder.js';
 
-/* 六件扫描文物：模型均为公开藏品扫描，已离线压缩。
-   顺序即工坊里的 1/6…6/6，转台帧目录 turntable/<序号>/ 与 stills/<序号>.jpg
-   按这里的下标取图，改动顺序时必须一起重排。theme 是信息条上方的主题标签
-
-   文案模板（2026-11-02 统一，六件必须同格式，新增文物照抄）：
-     theme      四字主题标签，六件等长
-     note       一句话、20~28 字，只讲形制与工艺；不重复 era 的年代、不写收藏机构
-                （出土地看 scope，馆藏看 collection）
-     scope      「<文化圈> · <出土地>（<年代或文化归属> · <类别>）」；括号里六件都是两段，
-                出土地不明就写进前一段（如「出土地未著录」），不要占掉括号的年代位
-     material   材质短语；多段用顿号「、」连接——信息条里字段之间已经用「 · 」分隔，
-                材质内部再用「 · 」会和分隔符撞在一起看不出边界
-     collection 只写收藏机构中文名（必要时装原文括注），不写出土地、不写扫描方
-     credit     「藏品扫描：<来源> · <许可> · 压缩版」；压缩版属实——六个 glb 都带
-                EXT_meshopt_compression + KHR_mesh_quantization */
 const RELICS = [
   {
     file: 'models/dancer-brick.glb',
@@ -79,7 +64,6 @@ const RELICS = [
     theme: '青铜礼器',
     credit: '藏品扫描：Smithsonian Institution · Public Domain（Zenodo）· 压缩版',
     recomputeNormals: false,
-    /* 源模型的前脸正对 +Z，转到 -30° 才是能同时看见两个面的展示角度 */
     yaw: -Math.PI / 6,
     pitch: 0,
     elevation: 0.16,
@@ -154,7 +138,6 @@ let viewer = null;
 let hintTimer = 0;
 let hintShown = false;
 
-/* ---------- UI ---------- */
 function setLoading(show, text) {
   loading = show;
   ui.loading.classList.toggle('hidden', !show);
@@ -203,9 +186,6 @@ function updateFooter(relic, i) {
   ui.credit.textContent = relic.credit;
 }
 
-/* ---------- 无 WebGL 时的转台模式 ---------- */
-/* 模拟器等环境里 ArkWeb 不暴露 WebGL 上下文。这里用离线渲染的 24 张转台帧
-   代替实时渲染：左右拖动即可转动文物，双指缩放，松手后缓慢自转 */
 const TURN_FRAMES = 24;
 
 function bootTurntable(reason) {
@@ -276,7 +256,6 @@ function bootTurntable(reason) {
     };
   }
 
-  /* 指针交互：单指转台，双指缩放，松手后缓慢自转 */
   const pts = new Map();
   function onDown(e) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -362,9 +341,7 @@ function bootTurntable(reason) {
   viewer.load(index);
 }
 
-/* ---------- 3D 模式 ---------- */
 function makeRenderer() {
-  // 模拟器 / 部分机型在高性能上下文和 MSAA 上会直接拒绝，逐级退让
   const options = [
     { antialias: true, alpha: true, powerPreference: 'high-performance' },
     { antialias: false, alpha: true },
@@ -406,8 +383,6 @@ function boot3D() {
   const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 200);
   camera.position.set(0, 0.9, 6);
 
-  /* 环境贴图：画一张“暖纸墙 + 左上柔光箱”的简易影棚环境，
-     经 PMREM 卷积后给釉面提供柔和高光，不依赖外部 HDR 文件 */
   function makeEnvironment() {
     const w = 512;
     const h = 256;
@@ -454,7 +429,6 @@ function boot3D() {
   controls.maxDistance = 12;
   controls.target.set(0, 0, 0);
 
-  /* 纸面展台的光：环境贴图负责底光和釉面反射，三盏灯只做塑形 */
   scene.add(new THREE.HemisphereLight(0xfff8ec, 0xcbbba2, 0.5));
   const keyLight = new THREE.DirectionalLight(0xfff1d8, 1.05);
   keyLight.position.set(2.6, 3.6, 4.2);
@@ -466,7 +440,6 @@ function boot3D() {
   rimLight.position.set(-0.8, 2.2, -4.4);
   scene.add(rimLight);
 
-  /* 接触阴影：一张径向渐变贴图，不依赖 shadowMap，移动端更稳 */
   function makeShadowTexture() {
     const size = 256;
     const canvas = document.createElement('canvas');
@@ -498,11 +471,9 @@ function boot3D() {
   shadow.renderOrder = 1;
   scene.add(shadow);
 
-  /* ---------- loader ---------- */
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
 
-  /* ---------- 自转 ---------- */
   let holder = null;
   let loadToken = 0;
   let resumeTimer = 0;
@@ -532,7 +503,6 @@ function boot3D() {
     hideHint();
   }, { passive: true });
 
-  /* ---------- 显存 ---------- */
   function disposeObject(root) {
     if (!root) return;
     root.traverse((o) => {
@@ -556,13 +526,10 @@ function boot3D() {
     if (renderer.renderLists) renderer.renderLists.dispose();
   }
 
-  /* ---------- 摆位 ---------- */
   async function buildRoot(gltf, relic) {
     const root = gltf.scene;
 
     if (relic.recomputeNormals) {
-      /* 双龙耳瓶的扫描件是逐三角拆分、无法焊接的顶点，压缩后没有法线。
-         这里按 60° 折角重新计算，硬边保留、曲面转平滑。 */
       setLoadText('正在重算表面光照…');
       await new Promise((r) => setTimeout(r, 30));
       root.traverse((o) => {
@@ -588,14 +555,10 @@ function boot3D() {
       const mats = Array.isArray(o.material) ? o.material : (o.material ? [o.material] : []);
       mats.forEach((m) => {
         if (m.map) m.map.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-        /* 扫描件的光泽参数是照片反推出来的：三彩马粗糙度只有 0.096，
-           金属度最高到 0.25。陶器是电介质，按釉面收进合理区间，
-           否则低粗糙度 + 高金属度会在灯光下糊成一层塑料白 */
         if (typeof m.roughness === 'number') {
           m.roughness = THREE.MathUtils.clamp(m.roughness, 0.42, 0.94);
         }
         if (typeof m.metalness === 'number') m.metalness = Math.min(m.metalness, 0.08);
-        // 舞者砖的 ior 被写成 1000，F0 会贴近 1，等于给整块砖套一层镜面
         if (typeof m.ior === 'number') m.ior = THREE.MathUtils.clamp(m.ior, 1.0, 1.8);
         if (typeof m.specularIntensity === 'number') m.specularIntensity = Math.min(m.specularIntensity, 0.7);
         if ('envMapIntensity' in m) m.envMapIntensity = 0.6;
@@ -649,7 +612,6 @@ function boot3D() {
     controls.saveState();
   }
 
-  /* ---------- 加载 / 切换 ---------- */
   function loadRelic(i) {
     const relic = RELICS[i];
     if (!relic) return;
@@ -712,7 +674,6 @@ function boot3D() {
     );
   }
 
-  /* ---------- resize / 生命周期 ---------- */
   function resize() {
     const rect = stage.getBoundingClientRect();
     const w = Math.max(1, Math.round(rect.width));
@@ -786,7 +747,6 @@ function boot3D() {
     }
   };
 
-  /* 离线截帧钩子：headless Chrome 用它逐角度取图，生成无 WebGL 时的转台序列 */
   window.__relicSpin = (deg) => {
     if (!holder) return false;
     pauseAuto();
@@ -802,14 +762,11 @@ function boot3D() {
   tick();
 }
 
-/* ---------- 交互 ---------- */
 function step(delta) {
   if (!viewer || loading) return;
   viewer.load((index + delta + RELICS.length) % RELICS.length);
 }
 
-/* ArkWeb 里 touch-action:none 的容器会把触摸吃掉、不合成 click，
-   所以按钮同时监听 touchend 和 click，再用时间窗去重，避免一次点击走两步 */
 function bindTap(el, fn) {
   let last = 0;
   const run = (e) => {
@@ -841,7 +798,6 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowRight') step(1);
 });
 
-/* 允许鸿蒙侧用 evaluateJavascript 直接切换 */
 window.openRelic = (i) => {
   const n = Number(i);
   if (Number.isFinite(n) && n >= 0 && n < RELICS.length && n !== index) viewer && viewer.load(n);

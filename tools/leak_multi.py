@@ -6,7 +6,7 @@ import io, json, re, sys, time, urllib.request
 
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -21,10 +21,8 @@ TURNS = [
     '庙底沟遗址有什么值得看的，我想给孩子讲彩陶',
 ]
 
-# 连续 15 个以上拉丁字符（允许空格和常见标点）= 一句英文叙述
 RUN = re.compile(r"[A-Za-z][A-Za-z ,;:'\"\-()./0-9]{14,}")
 BENIGN = re.compile(r'^(Dify|App|AI|Wi‑Fi|X|G20)$', re.I)
-
 
 def run(q, conv):
     body = json.dumps({'inputs': {'personal_context': PC}, 'query': q,
@@ -58,7 +56,6 @@ def run(q, conv):
                     cites.append(m.get('document_name') or '?')
     return ''.join(parts), ttft, time.time() - t0, cites, err, cid
 
-
 def leaks(text):
     out = []
     for h in RUN.findall(text):
@@ -67,7 +64,6 @@ def leaks(text):
             continue
         out.append(h)
     return out
-
 
 log = io.open('.tmp/leak_multi.txt', 'a', encoding='utf-8')
 for trial in range(1, 6):

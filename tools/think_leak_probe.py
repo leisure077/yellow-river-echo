@@ -1,9 +1,8 @@
-# 探测：Dify 流式回答里是否混着推理文本（<think> 标签被 App 剥掉后剩下的裸文本）
 import json, re, sys, urllib.request
 
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 sys.stdout.reconfigure(encoding='utf-8')
 

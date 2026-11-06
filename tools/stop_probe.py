@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """按真实坐标点 停：验证中断标记。
 
 uitest uiInput inputText 会拉起软键盘，输入行会被顶到上面去，
@@ -11,15 +10,13 @@ import sys
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # hdc 在哪、连哪台设备：环境变量 > 自动探测 > 明确报错
+import hh_env
 
 DUMP = os.path.join(hh_env.ROOT, ".tmp", "stop_probe_dump.json")
-
 
 def run_shell(cmd):
     return subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "shell", cmd],
                           capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
-
 
 def tree():
     run_shell("uitest dumpLayout -p /data/local/tmp/ui.json")
@@ -27,7 +24,6 @@ def tree():
     subprocess.run([hh_env.hdc(), "-t", hh_env.device(), "file", "recv",
                     "/data/local/tmp/ui.json", DUMP], capture_output=True)
     return json.load(open(DUMP, encoding="utf-8"))
-
 
 def boxes(node, txt=None, min_len=0):
     out = []
@@ -51,11 +47,9 @@ def boxes(node, txt=None, min_len=0):
     walk(node)
     return out
 
-
 def center(items):
     x1, y1, x2, y2 = items[-1][1:]
     return (x1 + x2) // 2, (y1 + y2) // 2
-
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
@@ -65,7 +59,6 @@ def main():
     inp = boxes(tree(), min_len=0)
     tb = [r for r in inp if r[0] == ""]
     d = tree()
-    # 输入框：TextInput 没有 text，用 type 找
     def find_input(n):
         a = n.get("attributes", {})
         if a.get("type") in ("TextInput", "TextArea"):
@@ -110,7 +103,6 @@ def main():
     long = boxes(d, min_len=40)
     if long:
         print("LAST:", long[-1][0][:160])
-
 
 if __name__ == "__main__":
     main()

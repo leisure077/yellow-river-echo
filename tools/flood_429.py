@@ -5,7 +5,7 @@ import io, json, sys, threading, time, urllib.request
 
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 sys.stdout.reconfigure(encoding='utf-8')
 KEY = hh_env.app_key()
@@ -16,7 +16,6 @@ N = int(sys.argv[2]) if len(sys.argv) > 2 else 6
 stop = time.time() + DUR
 lock = threading.Lock()
 seen = {'429': 0, 'ok': 0, 'other': 0}
-
 
 def fire(i):
     while time.time() < stop:
@@ -37,7 +36,6 @@ def fire(i):
             k = 'other'
         with lock:
             seen[k] += 1
-
 
 ts = [threading.Thread(target=fire, args=(i,), daemon=True) for i in range(N)]
 for t in ts:

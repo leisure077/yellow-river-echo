@@ -6,7 +6,6 @@ import {
   SUB, fs
 } from '../common/Theme';
 
-
 export function effectiveWaterMode(): string {
   return WATER_STILL;
 }

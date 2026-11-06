@@ -56,7 +56,6 @@ for f in reversed(stem):
         for pt in path:
             if not main or pt != main[-1]: main.append(pt)
 
-# Small tolerance removes redundant collinear samples, preserving all junctions.
 def simplify(pts, eps=0.003):
     if len(pts)<3:return pts
     a,b=pts[0],pts[-1]; dx=b[0]-a[0];dy=b[1]-a[1];den=dx*dx+dy*dy

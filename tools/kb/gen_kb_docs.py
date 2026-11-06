@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """把 App 内置的黄河内容包导出成 Dify 知识库文档。
 
 用法（在项目根目录执行）：
@@ -27,15 +25,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 RAWFILE = ROOT / "entry" / "src" / "main" / "resources" / "rawfile"
 
-
 def load(name):
     with (RAWFILE / name).open(encoding="utf-8") as f:
         return json.load(f)
 
-
 def safe(name):
     return re.sub(r'[\\/:*?"<>|\r\n]+', "-", name).strip()
-
 
 def site_doc(s):
     lines = [
@@ -78,7 +73,6 @@ def site_doc(s):
     lines += ["", "## 资料来源", s.get("source", ""), ""]
     return "\n".join(lines)
 
-
 def goods_doc(goods):
     lines = ["# 文创市集", "", "站内文创商品目录，均为概念演示数据。", ""]
     for g in goods:
@@ -100,7 +94,6 @@ def goods_doc(goods):
         lines += ["", f"资料来源：{g.get('source', '')}", ""]
     return "\n".join(lines)
 
-
 def courses_doc(courses):
     lines = ["# 沿河课程", "", "站内手作与通识课程目录。", ""]
     for c in courses:
@@ -119,7 +112,6 @@ def courses_doc(courses):
         lines += ["", f"资料来源：{c.get('source', '')}", ""]
     return "\n".join(lines)
 
-
 def events_doc(events):
     lines = ["# 沿河活动", "", "站内线下活动排期。", ""]
     for e in events:
@@ -136,7 +128,6 @@ def events_doc(events):
             "",
         ]
     return "\n".join(lines)
-
 
 def main():
     ap = argparse.ArgumentParser()
@@ -164,7 +155,6 @@ def main():
     total = sum(p.stat().st_size for p in out.glob("*.md"))
     print(f"wrote {count} docs to {out}")
     print(f"total {total} bytes")
-
 
 if __name__ == "__main__":
     main()

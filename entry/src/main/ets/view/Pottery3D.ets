@@ -1,7 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
 
-
 export const PROBE_MS: number = 2500;
 
 function qstr(s: string): string {

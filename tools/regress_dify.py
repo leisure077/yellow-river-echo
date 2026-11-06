@@ -6,7 +6,7 @@ import io, json, re, sys, time, urllib.request
 
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import hh_env  # 地址/Key 都按 环境变量 > 自动探测 > 明确报错 取，不在脚本里写死
+import hh_env
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -25,13 +25,11 @@ CASES = [
 
 SMALLTALK = ('您好', '你好', '我是河小导', '很高兴', '您好呀')
 
-
 def ascii_heavy(s):
     chars = [c for c in s if not c.isspace()]
     if not chars:
         return False
     return len([c for c in chars if ord(c) < 128]) / len(chars) > 0.7
-
 
 def run(q):
     body = json.dumps({'inputs': {}, 'query': q, 'response_mode': 'streaming',
@@ -66,7 +64,6 @@ def run(q):
                 for m in (ev.get('metadata') or {}).get('retriever_resources', []) or []:
                     cites.append(m.get('document_name') or m.get('name') or '?')
     return ''.join(parts), ttft, time.time() - t0, cites, err
-
 
 log = io.open(OUT, 'a', encoding='utf-8')
 log.write('\n===== %s glm-4.7-flash + prompt V2 =====\n' % time.strftime('%H:%M:%S'))

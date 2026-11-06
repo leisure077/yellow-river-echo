@@ -169,7 +169,6 @@ export struct FloatingAssistant {
     }
   }
 
-
   private dockTx(): number {
     let left = -(Math.max(120, this.stageW - 2 * INSET - FAB_W));
     return this.side === 'left' ? left : 0;

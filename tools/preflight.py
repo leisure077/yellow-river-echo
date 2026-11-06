@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """演示前一条命令自检：后端起没起、模型常驻没常驻、设备连着没、包新不新。
 
 用法：
@@ -35,17 +34,14 @@ NEED_CONTAINERS = ["nginx", "api", "worker", "db_postgres", "redis", "weaviate",
 OK, WARN, FAIL = "ok  ", "WARN", "FAIL"
 rows = []
 
-
 def say(level, what, how):
     rows.append((level, what, how))
     print("[%s] %-34s %s" % (level, what, how if how else ""))
-
 
 def get(url, headers=None, timeout=6):
     req = urllib.request.Request(url, headers=headers or {})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.status, r.read().decode("utf-8", "replace")
-
 
 def check_docker():
     try:
@@ -71,7 +67,6 @@ def check_docker():
         say(OK, "Dify 容器", "%d 个在跑" % len([k for k in live if k.startswith("docker-")]))
     return live
 
-
 def check_dify():
     base = hh_env.base()
     key = hh_env.app_key()
@@ -96,7 +91,6 @@ def check_dify():
     else:
         say(FAIL, "Dify /v1 + App Key", "回 %d" % code)
 
-
 def check_ollama():
     try:
         code, body = get("http://127.0.0.1:11434/api/tags", timeout=5)
@@ -118,7 +112,6 @@ def check_ollama():
             "演示前先问一句预热，或给 Ollama 进程加这个环境变量")
     else:
         say(OK, "bge-m3 是否常驻", "常驻中（首字实测约 13s）")
-
 
 def check_device(quick):
     if quick:
@@ -159,7 +152,6 @@ def check_device(quick):
         else:
             say(WARN, "App 里的 Dify 地址", "%s 没带 /v1（App 会自己补，但别写成控制台地址）" % u)
 
-
 def check_build():
     hap = HAP if os.path.exists(HAP) else HAP_FALLBACK
     if not os.path.exists(hap):
@@ -179,7 +171,6 @@ def check_build():
     else:
         say(OK, "hap 新不新", "hap 不比源码旧（%.1f MB）" % (os.path.getsize(hap) / 1048576))
 
-
 def main():
     quick = "--quick" in sys.argv
     print("项目根 " + ROOT)
@@ -196,6 +187,5 @@ def main():
     print("\n%d 项通过 / %d 项注意 / %d 项连不通"
           % (sum(1 for lv, _, _ in rows if lv == OK), w, f))
     sys.exit(1 if f else (2 if w else 0))
-
 
 main()

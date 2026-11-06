@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """在河小导全屏页问一句，量 App 界面侧的首字时间，并判断这次是出答案还是报错。
 
 配合 tools/stall_mock.py 用：把 App 的 Dify 地址指到假服务，
@@ -11,17 +10,15 @@ import sys
 import time
 
 sys.path.insert(0, __file__.replace("\\", "/").rsplit("/", 1)[0])
-import set_dify_cfg as ui   # 复用同一套 dumpLayout / 点击封装
+import set_dify_cfg as ui
 
 ERR_MARKS = ("翻得有点久", "够不着", "开不了门", "找不到档案室", "没听清", "走神")
-
 
 def exact(needle):
     for r in ui.rows():
         if r[0] == needle:
             return r
     return None
-
 
 def ensure_fullscreen():
     """走到河小导全屏页，模拟器刚开机停在首页也能自己走进去。
@@ -37,22 +34,21 @@ def ensure_fullscreen():
         if on_page and ins and ins[-1][3] > 2400:
             return True
         g = ui.by_text("去全屏")
-        if g:                                     # 助手悬浮卡片：先进全屏
+        if g:
             ui.tap(g[2], g[3])
             time.sleep(1.2)
             continue
         if on_page and ins and ins[-1][3] <= 2400:
-            ui.sh("uitest uiInput keyEvent Back")  # 键盘把输入行顶到上面了，先收键盘
+            ui.sh("uitest uiInput keyEvent Back")
             time.sleep(1.0)
             continue
         q = exact("问")
-        if q and q[3] < 400:                       # 首页右上角的入口
+        if q and q[3] < 400:
             ui.tap(q[2], q[3])
             time.sleep(1.2)
             continue
         return False
     return False
-
 
 def ask(q, max_wait):
     sh = ui.sh
@@ -70,7 +66,6 @@ def ask(q, max_wait):
         return 1
     t0 = time.time()
     ui.tap(a[2], a[3])
-    # 以「点问之前屏上已有的文案」为底，之后新出现的长文本才算回答，免得把界面固定话术认成答案
     before = set(r[0] for r in ui.rows())
 
     ttft = None
@@ -85,7 +80,7 @@ def ask(q, max_wait):
                 if mark in r[0]:
                     err = r[0]
             if err:
-                continue                      # 报错文案也是新出现的长文本，别当成回答
+                continue
             if r[0] in before or len(r[0]) <= 20:
                 continue
             if ttft is None:
@@ -93,7 +88,6 @@ def ask(q, max_wait):
             body = r[0]
         if err:
             break
-        # 流完的标志：问 按钮回来了（用精确匹配，输入框占位符也带「问」字）
         if ttft is not None and exact("问") and body:
             break
         time.sleep(2)
@@ -104,7 +98,6 @@ def ask(q, max_wait):
         return 2
     print("回答开头：%s" % body[:40])
     return 0
-
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")

@@ -6,7 +6,6 @@ import { drawBand, drawPaper, drawPedestal, drawWord, tracePath } from '../commo
 import { ShapeMeta, TurntableFrames, TurntableIndex } from '../service/TurntableFrames';
 import { PotteryCanvas } from './PotteryCanvas';
 
-
 const SLABS: number = 8;
 const SPIN_MS: number = 120;
 const RESUME_MS: number = 2500;

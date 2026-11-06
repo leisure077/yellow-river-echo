@@ -4,7 +4,6 @@ import { StudioStore } from '../service/StudioStore';
 import { fs, WATER_FLOW, WATER_OFF } from '../common/Theme';
 import { effectiveWaterMode } from '../common/River';
 
-
 const TAU: number = Math.PI * 2;
 const FRAME_MS: number = 40;
 const DEG: number = Math.PI / 180;
@@ -97,8 +96,6 @@ interface Flash {
   life: number;
   max: number;
 }
-
-
 
 const TRIB: Chain[] = [
   { name: '渭河', big: true, pts: [104.32, 34.82, 105.1, 34.85, 105.75, 34.62, 106.6, 34.55,

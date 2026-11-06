@@ -123,7 +123,6 @@ function routeList(){
   sheet('<h2>游览路线</h2><small>按文化长卷的浏览顺序串联，不代表实地道路或距离。</small>'+cards+
     '<button class="route-new" onclick="if(window.Native)Native.journey();else toast(\'在鸿蒙应用中创建行程\')">＋ 创建我的行程</button>');
 }
-// 「长卷查看」= 切回离线手绘长卷并按线路镜头放大，与真实底图各走各的动线。
 function viewRouteInAtlas(i){localStorage.setItem('hh-map-mode','offline');selectRoute(i);}
 function selectRoute(i){if(!routes[i])return;selectedRoute=i;selectedPOI='';category='建筑';city='全部';scale=1;offset={x:0,y:0};closeSheet();show('map');if(routes[i].demo){scale=2.3;offset={x:ATLAS_W/2-350*scale,y:ATLAS_H*.44-880*scale};applyTransform(true)}}
 function atlasIntro(){sheet('<h2>一卷看见黄河文明</h2><p>函谷关、龙门石窟、炎黄二帝塑像、开封铁塔与戚城遗址，在山水手绘中串联起五城记忆。</p><p>点分类，标记依次浮现；点地标，地图居中放大。</p><p class="muted">山水与建筑外形经艺术化处理，可用于行前的文化浏览与路线构思。</p><button onclick="closeSheet()">开始探索</button>')}

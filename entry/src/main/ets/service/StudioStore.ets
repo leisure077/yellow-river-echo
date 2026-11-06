@@ -26,8 +26,6 @@ export class StudioStore {
   scaleStep: number = 1;
   siteCheckins: CheckinRec[] = [];
   quizRuns: QuizRun[] = [];
-  // 账号档案出本机的那一路挂钩（分布式通道由 SyncService 挂上来）。
-  // 只喂 AccProfile，digest 在这一步之前就已经被剥掉。
   accOut: ((id: string, payload: string, ts: number) => void) | null = null;
 
   private p: preferences.Preferences | null = null;
@@ -140,7 +138,6 @@ export class StudioStore {
     this.save('profile', this.profile);
   }
 
-
   static digest(nick: string, pwd: string): string {
     let s = nick + '|' + pwd;
     let a = 5381;
@@ -250,7 +247,6 @@ export class StudioStore {
       }
       console.info('acc updated from ' + from + ' : ' + name);
     } else {
-      // digest 留空串：这台设备从来没有过这条档案的口令，走免密分支
       this.accounts.push({ nick: name, digest: '', avatar: p.avatar, createdAt: p.createdAt,
         lastAt: 0, phone: p.phoneMask, updatedAt: p.updatedAt, adopted: true });
       console.info('acc adopted from ' + from + ' : ' + name);
@@ -310,8 +306,6 @@ export class StudioStore {
     if (rec === undefined) {
       return this.accounts.length === 0 ? '这台设备还没有账号，先注册一个' : `本机没有「${nick.trim()}」这个账号`;
     }
-    // 从另一台设备过来的档案只有身份、没有口令（digest 是空串），
-    // 这种记录免密进入；本机自己注册过的记录 digest 非空，仍走口令校验。
     if (rec.adopted === true && rec.digest.length === 0) {
       rec.lastAt = Date.now();
       this.save('accounts', this.accounts);

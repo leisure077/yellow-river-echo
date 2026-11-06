@@ -26,7 +26,6 @@ export interface SyncLog {
   msg: string;
 }
 
-// deviceStateChange 回调的载荷形状（SDK 用的是匿名对象类型，这里给个名字好标注）
 export interface DeviceStateEvent {
   action: distributedDeviceManager.DeviceStateChange;
   device: distributedDeviceManager.DeviceBasicInfo;
@@ -112,7 +111,6 @@ export class SyncService {
           this.onRemote(data.insertEntries.concat(data.updateEntries));
         });
       this.devMgr = distributedDeviceManager.createDeviceManager(bundleName);
-      // 账号档案出本机的第二路挂钩：只喂 AccProfile，正文里出现口令类字段会被 push 挡下
       StudioStore.get().accOut = (id: string, payload: string, ts: number): void => {
         this.push('acc', id, payload, ts);
       };
@@ -151,7 +149,6 @@ export class SyncService {
     this.notify();
   }
 
-  // EntryAbility 拿到授权结果后调这里。init 之前调也安全，结果会存着等 init 收尾时补做。
   setPerm(granted: boolean, detail: string): void {
     this.permGranted = granted;
     this.note(granted ? 'ok' : 'warn', '分布式权限：' + (granted ? '已授予' : '未授予') + '（' + detail + '）');
@@ -174,7 +171,6 @@ export class SyncService {
     }
   }
 
-  // 设备上线自动续传，不用人再点「立即重试」
   private watchDevices(): void {
     if (this.devMgr === undefined || this.watching) {
       return;
@@ -197,8 +193,6 @@ export class SyncService {
     }
   }
 
-  // dataChange 只报「将来」的变化。开机先扫一遍本地 KV 里的 acc: 键，
-  // 把之前没收到通知的档案补上（KV 同步是整库复制，通道一通这些键就在本机库里）。
   private hydrateAccounts(): void {
     if (this.kv === undefined) {
       return;
@@ -246,7 +240,6 @@ export class SyncService {
     this.notify();
   }
 
-  // 只有拿到成功回执，才把这一批账本销掉（旧写法是 4 秒后无条件清，等于假装送达）
   private settleInflight(): void {
     let cleared = 0;
     for (let k of this.inflightKeys) {
@@ -271,7 +264,6 @@ export class SyncService {
 
   private push(entity: string, id: string, payload: string, ts: number): void {
     let key = entity + ':' + id;
-    // 口令类字段一律不许上通道。StudioStore 只发 AccProfile，这里是最后一道闸。
     if (payload.indexOf('"digest"') >= 0 || payload.indexOf('"pwd"') >= 0) {
       this.note('error', '拒绝上通道：' + key + ' 的正文里有口令类字段');
       return;
@@ -386,8 +378,6 @@ export class SyncService {
       if (this.ackTimer >= 0) {
         clearTimeout(this.ackTimer);
       }
-      // 拿不到回执就把这一批留在账本里，只放开「同步中」的闸门。
-      // 旧写法是 4 秒后 dirty.clear()，等于没确认就宣称已经送达。
       this.ackTimer = setTimeout((): void => {
         this.ackTimer = -1;
         if (this.inflightKeys.length === 0) {
@@ -439,8 +429,6 @@ export class SyncService {
         let entity = key.substring(0, sep);
         let id = key.substring(sep + 1);
         let localTs = store.localTs(entity, id);
-        // 账号档案不在 MemoryStore 的五类记忆里，走通用分支会被当成未知实体丢掉。
-        // 谁新用谁由 StudioStore.upsertProfile 自己判（本机更新就原样不动），这里只负责销账和留痕。
         if (entity === 'acc') {
           if (payload.indexOf('"digest"') >= 0 || payload.indexOf('"pwd"') >= 0) {
             this.note('error', '拒收档案 ' + key + '：正文里出现了口令类字段');
@@ -495,8 +483,6 @@ export class SyncService {
     this.scheduleFlush();
   }
 
-  // 账本必须真的落到磁盘：进程被杀之后重新开机还能看到「这几条没送出去」，
-  // 这就是「最终一致」而不是「尽力而为」的落点。800ms 合并一次，避免每条变更都触发 IO。
   private scheduleFlush(): void {
     if (this.flushTimer >= 0 || this.p === null) {
       return;

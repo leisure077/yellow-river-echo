@@ -21,12 +21,11 @@ DEBUG = ROOT / '.tmp/river-recolor'
 SEASONS = ('spring', 'summer', 'autumn', 'winter')
 LOGICAL = (1024, 1536)
 TILE, MAX_LEVEL = 256, 3
-TARGET_HUE = 0.53                        # 青蓝
+TARGET_HUE = 0.53
 GROW = dict(hue=(0.060, 0.170), sat=0.28, val=0.55, std=0.10)
 WATER = dict(hue=(0.060, 0.180), sat=0.26, val=0.52)
 CORRIDOR, SEED_SHRINK = 14, 5
 
-# 河道中心线，长卷 1024x1536 的分数坐标，自上游峡谷顺流到画面下缘
 CENTER = [
     (0.440, 0.075), (0.455, 0.100), (0.470, 0.125), (0.500, 0.155), (0.520, 0.180),
     (0.500, 0.210), (0.475, 0.235), (0.470, 0.260), (0.480, 0.290), (0.500, 0.315),
@@ -37,7 +36,6 @@ CENTER = [
     (0.600, 0.955), (0.590, 0.990),
 ]
 
-
 def stitch(season, level=MAX_LEVEL):
     factor = 2 ** (MAX_LEVEL - level)
     size = (LOGICAL[0] // factor, LOGICAL[1] // factor)
@@ -47,7 +45,6 @@ def stitch(season, level=MAX_LEVEL):
             p = OUT / 'seasons' / season / str(level) / str(tx) / f'{ty}.jpg'
             canvas.paste(Image.open(p).convert('RGB'), (tx * TILE, ty * TILE))
     return canvas
-
 
 def fields(rgb):
     a = np.asarray(rgb).astype(np.float32) / 255.0
@@ -61,11 +58,9 @@ def fields(rgb):
     sq = cv2.boxFilter(L * L, -1, (9, 9))
     return np.mod(h, 1.0), sat, mx, np.sqrt(np.maximum(sq - mean * mean, 0))
 
-
 def window(h, sat, mx, std, spec):
     ok = (h >= spec['hue'][0]) & (h <= spec['hue'][1]) & (sat >= spec['sat']) & (mx >= spec['val'])
     return ok if 'std' not in spec else ok & (std < spec['std'])
-
 
 def grow_from(seed, allowed, max_iter=1500):
     mask = seed & allowed
@@ -76,16 +71,14 @@ def grow_from(seed, allowed, max_iter=1500):
         mask = nxt | mask
     return mask, it
 
-
 def finish(raw, h, sat, mx):
     raw = cv2.morphologyEx(raw, cv2.MORPH_CLOSE, np.ones((9, 9), np.uint8))
     flood = np.zeros((raw.shape[0] + 2, raw.shape[1] + 2), np.uint8)
-    cv2.floodFill(flood, None, (0, 0), 255)                       # 河心的沙洲、船、波纹算作河道
+    cv2.floodFill(flood, None, (0, 0), 255)
     filled = np.where((flood[1:-1, 1:-1] == 0) | (raw > 0), 255, 0).astype(np.uint8)
     water = window(h, sat, mx, np.zeros_like(sat), WATER).astype(np.uint8) * 255
     water = cv2.bitwise_and(filled, water)
     return cv2.morphologyEx(water, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-
 
 def channel_mask(rgb, corridor=None):
     """河道掩膜：春季由中心线长出来，其余季节沿春季走廊在自己画面里收边。"""
@@ -101,7 +94,6 @@ def channel_mask(rgb, corridor=None):
     raw, _ = grow_from(seed, allowed)
     return finish(raw, h, sat, mx)
 
-
 def recolor(rgb, alpha):
     hsv = np.asarray(rgb.convert('HSV')).astype(np.float32) / 255.0
     h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
@@ -110,7 +102,6 @@ def recolor(rgb, alpha):
                     s * keep + np.clip(s * 0.92 + 0.06, 0, 1) * alpha,
                     v * keep + np.clip(v * 0.99 + 0.01, 0, 1) * alpha], -1)
     return Image.fromarray(np.uint8(np.clip(out * 255.0, 0, 255)), 'HSV').convert('RGB')
-
 
 def cut_pyramid(season, panel):
     for level in range(MAX_LEVEL + 1):
@@ -123,13 +114,11 @@ def cut_pyramid(season, panel):
                 reduced.crop((tx * TILE, ty * TILE, min(size[0], (tx + 1) * TILE),
                               min(size[1], (ty + 1) * TILE))).save(p, quality=92)
 
-
 def overlay(rgb, mask, color=(255.0, 0.0, 160.0)):
     out = np.asarray(rgb).astype(np.float32).copy()
     sel = mask > 127
     out[sel] = out[sel] * 0.3 + np.array(color) * 0.7
     return Image.fromarray(np.uint8(out))
-
 
 def main():
     ap = argparse.ArgumentParser()
@@ -156,7 +145,6 @@ def main():
             trial.save(OUT / 'atlas.png')
     if not args.debug:
         print('tiles and atlas.png rewritten with the blue channel')
-
 
 if __name__ == '__main__':
     main()

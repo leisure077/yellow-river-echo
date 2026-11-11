@@ -21,8 +21,12 @@ export const WATER_FLOW: string = 'flow';
 export const WATER_STILL: string = 'still';
 export const WATER_OFF: string = 'off';
 
-export const SCALE_STEPS: number[] = [0.85, 1, 1.20];
+// 字号三档：S / M / L。整条梯子整体上移了一格——原来的「大」档（×1.20）现在是「标准」，
+// 现场反馈这一屏的字还是偏小。小/大相对标准的 -15% / +20% 保持不变，切档的落差还是看得出来。
+export const SCALE_STEPS: number[] = [1.02, 1.20, 1.44];
 export const SCALE_LABELS: string[] = ['小', '标准', '大'];
+
+export const SCALE_DEFAULT: number = 1;
 
 export function fs(scale: number, base: number): number {
   let s = scale > 0 ? scale : 1;

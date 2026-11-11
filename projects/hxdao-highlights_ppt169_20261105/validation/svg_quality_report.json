@@ -1,0 +1,355 @@
+{
+  "schema": "ppt-master.svg-quality-report.v1",
+  "stage": "final",
+  "target": "C:\\Users\\16078\\Desktop\\OpenHarmony\\yellow-river-echo\\projects\\hxdao-highlights_ppt169_20261105",
+  "source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "99a5bcb84b7b5b274664219126a76ebc8b142ea709d0b6a8d15a216c016b5dec",
+    "file_count": 3,
+    "files": [
+      {
+        "file": "01_cover.svg",
+        "sha256": "58877ffcdd8150884686c52f412536335cd998f4abb9bf4364666eb07e3d1e35"
+      },
+      {
+        "file": "02_hl12.svg",
+        "sha256": "513a215fbaef23e8d9a3609af999dc00c6cee980983e6453795279369ea18856"
+      },
+      {
+        "file": "03_stack.svg",
+        "sha256": "56bca27cd7e47ea22e6c08d9356e787a64efd875ebe25dee19487e88238dffd1"
+      }
+    ]
+  },
+  "summary": {
+    "total": 3,
+    "passed": 0,
+    "warnings": 3,
+    "errors": 0
+  },
+  "issue_types": {},
+  "categories": {
+    "blocking": {
+      "count": 0,
+      "issues": []
+    },
+    "introduced": {
+      "count": 6,
+      "issues": [
+        {
+          "file": "01_cover.svg",
+          "message": "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (3 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[72]:font-family 'Microsoft YaHei' -> None; text[75]:font-family 'Microsoft YaHei' -> None; text[78]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+        },
+        {
+          "file": "01_cover.svg",
+          "message": "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (5 attribute(s)); examples: g[36]:transform 'rotate(-7 199.0 235.0)' -> 'rotate(-7 199 235)'; g[41]:transform 'rotate(6 468.0 221.0)' -> 'rotate(6 468 221)'; g[46]:transform 'rotate(5 169.0 520.0)' -> 'rotate(5 169 520)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+        },
+        {
+          "file": "02_hl12.svg",
+          "message": "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (7 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[43]:font-family 'Microsoft YaHei' -> None; text[57]:font-family 'Microsoft YaHei' -> None; text[65]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+        },
+        {
+          "file": "02_hl12.svg",
+          "message": "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (6 attribute(s)); examples: g[48]:transform 'rotate(-5 207.0 394.0)' -> 'rotate(-5 207 394)'; g[70]:transform 'rotate(6 829.0 330.0)' -> 'rotate(6 829 330)'; g[76]:transform 'rotate(-4 1023.0 330.0)' -> 'rotate(-4 1023 330)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+        },
+        {
+          "file": "03_stack.svg",
+          "message": "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (14 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[43]:font-family 'Microsoft YaHei' -> None; text[57]:font-family 'Microsoft YaHei' -> None; text[65]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+        },
+        {
+          "file": "03_stack.svg",
+          "message": "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (6 attribute(s)); examples: g[48]:transform 'rotate(-3 186.0 395.0)' -> 'rotate(-3 186 395)'; g[77]:transform 'rotate(-6 816.0 285.0)' -> 'rotate(-6 816 285)'; g[82]:transform 'rotate(5 964.0 283.0)' -> 'rotate(5 964 283)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+        }
+      ]
+    },
+    "inherited": {
+      "count": 0,
+      "issues": []
+    },
+    "source-import": {
+      "count": 0,
+      "summary": {
+        "warning_count": 0,
+        "by_code": {}
+      }
+    }
+  },
+  "drift": {
+    "colors": {},
+    "fonts": {},
+    "sizes": {}
+  },
+  "carrier_receipt": {
+    "scope": "informational-not-a-quota",
+    "pages": 3,
+    "totals": {
+      "text_elements": 75,
+      "image_placements": 20,
+      "icons": 0,
+      "svg_geometry_elements": 106,
+      "preset_shapes": 0,
+      "page_frame_elements": 10,
+      "marker_uses": 0,
+      "inline_emphasis_runs": 0,
+      "gradient_uses": 6,
+      "filter_uses": 17,
+      "text_effects": 0
+    },
+    "pages_with": {
+      "images": 3,
+      "icons": 0,
+      "presets": 0,
+      "charts": 0,
+      "tables": 0,
+      "formulas": 0,
+      "inline_emphasis_runs": 0,
+      "gradient_uses": 3,
+      "filter_uses": 3,
+      "text_effects": 0
+    },
+    "relationship_pages": null,
+    "geometry_elements": {
+      "circle": 4,
+      "ellipse": 0,
+      "line": 10,
+      "path": 0,
+      "polygon": 0,
+      "polyline": 0,
+      "rect": 92
+    },
+    "preset_names": {},
+    "native_objects": {
+      "chart": 0,
+      "formula_block": 0,
+      "formula_inline": 0,
+      "other": 0,
+      "table": 0
+    },
+    "image_page_max_frame_share_range": [
+      0.0903,
+      0.1264
+    ]
+  },
+  "project_issues": {
+    "template": [],
+    "animation": [],
+    "illustration": [],
+    "communication_trace": [],
+    "pptx_structure": []
+  },
+  "files": [
+    {
+      "file": "01_cover.svg",
+      "path": "c:\\Users\\16078\\Desktop\\OpenHarmony\\yellow-river-echo\\projects\\hxdao-highlights_ppt169_20261105\\svg_output\\01_cover.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (3 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[72]:font-family 'Microsoft YaHei' -> None; text[75]:font-family 'Microsoft YaHei' -> None; text[78]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)",
+        "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (5 attribute(s)); examples: g[36]:transform 'rotate(-7 199.0 235.0)' -> 'rotate(-7 199 235)'; g[41]:transform 'rotate(6 468.0 221.0)' -> 'rotate(6 468 221)'; g[46]:transform 'rotate(5 169.0 520.0)' -> 'rotate(5 169 520)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "carrier_receipt": {
+          "text_elements": 15,
+          "images": {
+            "placements": 6,
+            "files": [
+              "dragon.png",
+              "shot_ai.png",
+              "shot_course.png",
+              "shot_note.png",
+              "shot_quiz.png",
+              "shot_site.png"
+            ],
+            "max_frame_share": 0.0903
+          },
+          "icons": 0,
+          "effects": {
+            "inline_emphasis_runs": 0,
+            "gradient_uses": 2,
+            "filter_uses": 5,
+            "text_effects": 0
+          },
+          "geometry": {
+            "svg_elements": {
+              "rect": 31,
+              "circle": 0,
+              "ellipse": 0,
+              "line": 5,
+              "polyline": 0,
+              "polygon": 0,
+              "path": 0
+            },
+            "preset_shapes": 0,
+            "preset_names": {},
+            "page_frame_elements": 2,
+            "marker_uses": {
+              "start": 0,
+              "mid": 0,
+              "end": 0
+            }
+          },
+          "native_objects": {
+            "chart": 0,
+            "table": 0,
+            "formula_block": 0,
+            "formula_inline": 0,
+            "other": 0
+          }
+        },
+        "fonts": [
+          "Georgia",
+          "KaiTi",
+          "Microsoft YaHei"
+        ],
+        "text_elements": 15,
+        "tspan_elements": 1
+      },
+      "passed": true,
+      "source_sha256": "58877ffcdd8150884686c52f412536335cd998f4abb9bf4364666eb07e3d1e35"
+    },
+    {
+      "file": "02_hl12.svg",
+      "path": "c:\\Users\\16078\\Desktop\\OpenHarmony\\yellow-river-echo\\projects\\hxdao-highlights_ppt169_20261105\\svg_output\\02_hl12.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (7 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[43]:font-family 'Microsoft YaHei' -> None; text[57]:font-family 'Microsoft YaHei' -> None; text[65]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)",
+        "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (6 attribute(s)); examples: g[48]:transform 'rotate(-5 207.0 394.0)' -> 'rotate(-5 207 394)'; g[70]:transform 'rotate(6 829.0 330.0)' -> 'rotate(6 829 330)'; g[76]:transform 'rotate(-4 1023.0 330.0)' -> 'rotate(-4 1023 330)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "carrier_receipt": {
+          "text_elements": 16,
+          "images": {
+            "placements": 7,
+            "files": [
+              "ink_ridge.webp",
+              "shot_ai.png",
+              "shot_course.png",
+              "shot_filter.png",
+              "shot_note.png",
+              "shot_site.png",
+              "shot_sync.png"
+            ],
+            "max_frame_share": 0.1264
+          },
+          "icons": 0,
+          "effects": {
+            "inline_emphasis_runs": 0,
+            "gradient_uses": 2,
+            "filter_uses": 6,
+            "text_effects": 0
+          },
+          "geometry": {
+            "svg_elements": {
+              "rect": 29,
+              "circle": 0,
+              "ellipse": 0,
+              "line": 3,
+              "polyline": 0,
+              "polygon": 0,
+              "path": 0
+            },
+            "preset_shapes": 0,
+            "preset_names": {},
+            "page_frame_elements": 4,
+            "marker_uses": {
+              "start": 0,
+              "mid": 0,
+              "end": 0
+            }
+          },
+          "native_objects": {
+            "chart": 0,
+            "table": 0,
+            "formula_block": 0,
+            "formula_inline": 0,
+            "other": 0
+          }
+        },
+        "fonts": [
+          "Georgia",
+          "KaiTi",
+          "Microsoft YaHei"
+        ],
+        "text_elements": 16,
+        "tspan_elements": 6
+      },
+      "passed": true,
+      "source_sha256": "513a215fbaef23e8d9a3609af999dc00c6cee980983e6453795279369ea18856"
+    },
+    {
+      "file": "03_stack.svg",
+      "path": "c:\\Users\\16078\\Desktop\\OpenHarmony\\yellow-river-echo\\projects\\hxdao-highlights_ppt169_20261105\\svg_output\\03_stack.svg",
+      "exists": true,
+      "errors": [],
+      "warnings": [
+        "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (14 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[43]:font-family 'Microsoft YaHei' -> None; text[57]:font-family 'Microsoft YaHei' -> None; text[65]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)",
+        "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (6 attribute(s)); examples: g[48]:transform 'rotate(-3 186.0 395.0)' -> 'rotate(-3 186 395)'; g[77]:transform 'rotate(-6 816.0 285.0)' -> 'rotate(-6 816 285)'; g[82]:transform 'rotate(5 964.0 283.0)' -> 'rotate(5 964 283)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+      ],
+      "info": {
+        "viewbox": "0 0 1280 720",
+        "carrier_receipt": {
+          "text_elements": 44,
+          "images": {
+            "placements": 7,
+            "files": [
+              "dragon.png",
+              "shot_artifacts.png",
+              "shot_collect.png",
+              "shot_detail.png",
+              "shot_home.png",
+              "shot_sync.png",
+              "shot_timeline.png"
+            ],
+            "max_frame_share": 0.1077
+          },
+          "icons": 0,
+          "effects": {
+            "inline_emphasis_runs": 0,
+            "gradient_uses": 2,
+            "filter_uses": 6,
+            "text_effects": 0
+          },
+          "geometry": {
+            "svg_elements": {
+              "rect": 32,
+              "circle": 4,
+              "ellipse": 0,
+              "line": 2,
+              "polyline": 0,
+              "polygon": 0,
+              "path": 0
+            },
+            "preset_shapes": 0,
+            "preset_names": {},
+            "page_frame_elements": 4,
+            "marker_uses": {
+              "start": 0,
+              "mid": 0,
+              "end": 0
+            }
+          },
+          "native_objects": {
+            "chart": 0,
+            "table": 0,
+            "formula_block": 0,
+            "formula_inline": 0,
+            "other": 0
+          }
+        },
+        "fonts": [
+          "Consolas",
+          "Georgia",
+          "KaiTi",
+          "Microsoft YaHei"
+        ],
+        "text_elements": 44,
+        "tspan_elements": 4
+      },
+      "passed": true,
+      "source_sha256": "56bca27cd7e47ea22e6c08d9356e787a64efd875ebe25dee19487e88238dffd1"
+    }
+  ]
+}

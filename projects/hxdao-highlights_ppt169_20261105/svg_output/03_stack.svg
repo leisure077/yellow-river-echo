@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" lang="zh-CN" font-family="Microsoft YaHei" data-pptx-page-role="content">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#FCF7EC"/>
+      <stop offset="55%" stop-color="#F6EDDA"/>
+      <stop offset="100%" stop-color="#EADFC7"/>
+    </linearGradient>
+    <linearGradient id="rail" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241E18"/>
+      <stop offset="50%" stop-color="#B23A22"/>
+      <stop offset="100%" stop-color="#241E18"/>
+    </linearGradient>
+    <linearGradient id="inkFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#241E18" stop-opacity="0.82"/>
+      <stop offset="62%" stop-color="#241E18" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#241E18" stop-opacity="0.10"/>
+    </linearGradient>
+    <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.20"/>
+      <stop offset="45%" stop-color="#FFFFFF" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-18%" y="-18%" width="138%" height="140%">
+      <feDropShadow dx="4" dy="9" stdDeviation="9" flood-color="#241E18" flood-opacity="0.17"/>
+    </filter>
+    <clipPath id="c3-1" clipPathUnits="userSpaceOnUse"><rect x="69" y="183" width="234" height="424" rx="9"/></clipPath>
+    <clipPath id="c3-2" clipPathUnits="userSpaceOnUse"><rect x="746" y="180" width="140" height="210" rx="5"/></clipPath>
+    <clipPath id="c3-3" clipPathUnits="userSpaceOnUse"><rect x="894" y="176" width="140" height="214" rx="5"/></clipPath>
+    <clipPath id="c3-4" clipPathUnits="userSpaceOnUse"><rect x="1042" y="180" width="170" height="210" rx="5"/></clipPath>
+    <clipPath id="c3-5" clipPathUnits="userSpaceOnUse"><rect x="746" y="306" width="218" height="84" rx="5"/></clipPath>
+    <clipPath id="c3-6" clipPathUnits="userSpaceOnUse"><rect x="982" y="306" width="240" height="84" rx="5"/></clipPath>
+  </defs>
+  <rect id="page-base" data-pptx-role="background" x="0" y="0" width="1280" height="720" fill="url(#paper)"/>
+  <rect id="side-rail" data-pptx-role="decoration" x="0" y="0" width="12" height="720" fill="url(#rail)"/>
+  <g data-pptx-role="decoration" id="bg-ink" data-pptx-bounds="0 0 1280 720">
+    <image href="../images/dragon.png" x="1050" y="380" width="220" height="280" preserveAspectRatio="xMidYMid slice" opacity="0.06"/>
+  </g>
+  <g id="page-seal" data-pptx-bounds="46 36 68 72"><rect x="56" y="44" width="50" height="50" fill="#B23A22"/><rect x="61" y="49" width="40" height="40" fill="none" stroke="#FBF6E9" stroke-width="1.2" stroke-opacity="0.85"/><text x="81.0" y="78.5" font-family="KaiTi" font-size="25" font-weight="bold" fill="#FBF6E9" text-anchor="middle">栈</text></g>
+  <g id="page-header" data-pptx-bounds="116 28 1108 126">
+    <text x="120" y="88" font-family="KaiTi" font-size="33" font-weight="bold" fill="#241E18" letter-spacing="1">有护栏，有观测，技术栈清晰</text>
+    <text x="122" y="121" font-family="Microsoft YaHei" font-size="14.5" fill="#7C6A55">提示注入护栏 · 河工面板 40 条日志 · 10 层选型，每层都可单独替换</text>
+  </g>
+  <g data-pptx-role="decoration" id="page-rule" data-pptx-bounds="0 150 1280 12">
+    <line x1="56" y1="155" x2="1224" y2="155" stroke="#A9834A" stroke-width="1" stroke-opacity="0.5"/>
+    <rect x="116" y="152" width="150" height="3" fill="#B23A22"/>
+  </g>
+  <g id="hl3-shot" data-pptx-bounds="56 170 260 450">
+    <g transform="rotate(-3 186.0 395.0)"><rect x="62" y="176" width="248" height="438" rx="16" fill="#241E18" filter="url(#softShadow)"/><rect x="69" y="183" width="234" height="424" rx="9" fill="#FBF6E9"/><image href="../images/shot_collect.png" x="69" y="183" width="234" height="424" preserveAspectRatio="xMidYMid slice" clip-path="url(#c3-1)"/><rect x="69" y="183" width="234" height="424" rx="9" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="hl3-guard" data-pptx-bounds="338 170 378 218">
+    <rect x="338" y="170" width="378" height="218" fill="#FBF6E9" stroke="#B23A22" stroke-opacity="0.35"/>
+    <rect x="338" y="170" width="6" height="218" fill="#B23A22"/>
+<text x="360" y="212" font-family="KaiTi" font-size="16" font-weight="bold" fill="#B23A22" letter-spacing="2">亮点三 · 提示注入护栏</text><text x="360" y="238" font-family="Microsoft YaHei" font-size="10" fill="#4A4136">默认关闭，开启后只发摘要<tspan x="360" dy="18">【用户资料】前缀包裹，指令不执行</tspan><tspan x="360" dy="18">≤5 收藏 + ≤3 笔记 · 去重 ≤7</tspan><tspan x="360" dy="18">不写入知识库</tspan></text>  </g>
+  <g id="hl3-obs" data-pptx-bounds="338 404 378 216">
+    <rect x="338" y="404" width="378" height="216" fill="#241E18"/>
+    <rect x="338" y="404" width="6" height="216" fill="#4A7B8C"/>
+<text x="360" y="446" font-family="KaiTi" font-size="16" font-weight="bold" fill="#FBF6E9" letter-spacing="2">河工面板 · 可观测性</text><text x="360" y="472" font-family="Microsoft YaHei" font-size="10" fill="#E6D5B8">侧栏头像连续点击 5 次解锁<tspan x="360" dy="18">最近 40 条同步日志：时间 / 级别 / 原因</tspan></text>    <rect x="360" y="506" width="334" height="96" fill="#4A7B8C" fill-opacity="0.08"/>
+    <circle cx="368" cy="517" r="3" fill="#4A7B8C"/>
+    <text x="380" y="520" font-family="Consolas" font-size="8.4" fill="#E6D5B8">KV 存储就绪</text>
+    <circle cx="368" cy="537" r="3" fill="#4A7B8C"/>
+    <text x="380" y="540" font-family="Consolas" font-size="8.4" fill="#E6D5B8">设备扫描 0 台</text>
+    <circle cx="368" cy="557" r="3" fill="#4A7B8C"/>
+    <text x="380" y="560" font-family="Consolas" font-size="8.4" fill="#E6D5B8">PUSH_PULL × 3</text>
+    <circle cx="368" cy="577" r="3" fill="#B23A22"/>
+    <text x="380" y="580" font-family="Consolas" font-size="8.4" fill="#E6D5B8">kv.put 失败 × 2</text>
+  </g>
+  <g id="hl4-phones" data-pptx-bounds="738 170 488 230">
+<g transform="rotate(-6 816.0 285.0)"><rect x="742" y="176" width="148" height="218" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="746" y="180" width="140" height="210" rx="5" fill="#FBF6E9"/><image href="../images/shot_sync.png" x="746" y="180" width="140" height="210" preserveAspectRatio="xMidYMid slice" clip-path="url(#c3-2)"/><rect x="746" y="180" width="140" height="210" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(5 964.0 283.0)"><rect x="890" y="172" width="148" height="222" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="894" y="176" width="140" height="214" rx="5" fill="#FBF6E9"/><image href="../images/shot_home.png" x="894" y="176" width="140" height="214" preserveAspectRatio="xMidYMid slice" clip-path="url(#c3-3)"/><rect x="894" y="176" width="140" height="214" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(-3 1127.0 285.0)"><rect x="1038" y="176" width="178" height="218" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="1042" y="180" width="170" height="210" rx="5" fill="#FBF6E9"/><image href="../images/shot_detail.png" x="1042" y="180" width="170" height="210" preserveAspectRatio="xMidYMid slice" clip-path="url(#c3-4)"/><rect x="1042" y="180" width="170" height="210" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(4 855.0 348.0)"><rect x="742" y="302" width="226" height="92" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="746" y="306" width="218" height="84" rx="5" fill="#FBF6E9"/><image href="../images/shot_timeline.png" x="746" y="306" width="218" height="84" preserveAspectRatio="xMidYMid slice" clip-path="url(#c3-5)"/><rect x="746" y="306" width="218" height="84" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(-5 1102.0 348.0)"><rect x="978" y="302" width="248" height="92" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="982" y="306" width="240" height="84" rx="5" fill="#FBF6E9"/><image href="../images/shot_artifacts.png" x="982" y="306" width="240" height="84" preserveAspectRatio="xMidYMid slice" clip-path="url(#c3-6)"/><rect x="982" y="306" width="240" height="84" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>  </g>
+  <g id="stack-bar" data-pptx-bounds="738 410 488 210">
+    <rect x="738" y="410" width="488" height="210" fill="#241E18" opacity="0.92"/>
+    <rect x="738" y="410" width="6" height="210" fill="#B23A22"/>
+    <rect x="738" y="410" width="488" height="3" fill="#A9834A" fill-opacity="0.4"/>
+<text x="762" y="450" font-family="KaiTi" font-size="16" font-weight="bold" fill="#FBF6E9" letter-spacing="2">10 层技术栈 · 每层都可替换</text>    <text x="762" y="476" font-family="KaiTi" font-size="10" fill="#4A7B8C" font-weight="bold">UI</text>
+    <text x="788" y="476" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">ArkTS</text>
+    <text x="898" y="476" font-family="Consolas" font-size="7.8" fill="#7C6A55">应用层</text>
+    <text x="998" y="476" font-family="KaiTi" font-size="10" fill="#B23A22" font-weight="bold">RAG</text>
+    <text x="1024" y="476" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">Dify</text>
+    <text x="1134" y="476" font-family="Consolas" font-size="7.8" fill="#7C6A55">推理层</text>
+    <text x="762" y="504" font-family="KaiTi" font-size="10" fill="#4A7B8C" font-weight="bold">协议</text>
+    <text x="788" y="504" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">SSE</text>
+    <text x="898" y="504" font-family="Consolas" font-size="7.8" fill="#7C6A55">网络层</text>
+    <text x="998" y="504" font-family="KaiTi" font-size="10" fill="#B23A22" font-weight="bold">知识</text>
+    <text x="1024" y="504" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">23 篇</text>
+    <text x="1134" y="504" font-family="Consolas" font-size="7.8" fill="#7C6A55">数据层</text>
+    <text x="762" y="532" font-family="KaiTi" font-size="10" fill="#4A7B8C" font-weight="bold">治理</text>
+    <text x="788" y="532" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">白名单</text>
+    <text x="898" y="532" font-family="Consolas" font-size="7.8" fill="#7C6A55">安全层</text>
+    <text x="998" y="532" font-family="KaiTi" font-size="10" fill="#B23A22" font-weight="bold">护栏</text>
+    <text x="1024" y="532" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">提示注入</text>
+    <text x="1134" y="532" font-family="Consolas" font-size="7.8" fill="#7C6A55">防护层</text>
+    <text x="762" y="560" font-family="KaiTi" font-size="10" fill="#4A7B8C" font-weight="bold">稳定</text>
+    <text x="788" y="560" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">3 道闸</text>
+    <text x="898" y="560" font-family="Consolas" font-size="7.8" fill="#7C6A55">质量层</text>
+    <text x="998" y="560" font-family="KaiTi" font-size="10" fill="#B23A22" font-weight="bold">体验</text>
+    <text x="1024" y="560" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">50 ms</text>
+    <text x="1134" y="560" font-family="Consolas" font-size="7.8" fill="#7C6A55">渲染层</text>
+    <text x="762" y="588" font-family="KaiTi" font-size="10" fill="#4A7B8C" font-weight="bold">回跳</text>
+    <text x="788" y="588" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">siteId</text>
+    <text x="898" y="588" font-family="Consolas" font-size="7.8" fill="#7C6A55">导航层</text>
+    <text x="998" y="588" font-family="KaiTi" font-size="10" fill="#B23A22" font-weight="bold">观测</text>
+    <text x="1024" y="588" font-family="Microsoft YaHei" font-size="9.4" fill="#E6D5B8">40 条日志</text>
+    <text x="1134" y="588" font-family="Consolas" font-size="7.8" fill="#7C6A55">运维层</text>
+    <rect x="738" y="600" width="488" height="3" fill="#A9834A" fill-opacity="0.3"/>
+  </g>
+  <g id="page-footer" data-pptx-bounds="48 640 1184 64">
+    <line x1="56" y1="646" x2="1224" y2="646" stroke="#A9834A" stroke-width="1" stroke-opacity="0.45"/>
+    <text x="56" y="676" font-family="Microsoft YaHei" font-size="12" fill="#7C6A55" letter-spacing="1">黄河续响 · 河小导 AI 亮点</text>
+    <text x="1224" y="678" font-family="Georgia" font-size="16" fill="#B23A22" text-anchor="end">03</text>
+  </g>
+</svg>

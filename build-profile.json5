@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\16078\\.ohos\\config\\default_yellow-river-echo_TMLXqTktZrI1tL3-XeSqE2Lw9z3zyIWLDsc-zCTgPMo=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BA59E6840C8FA1A6D715E0579CA461AAA99A0615E1D4B111750EAA77425B32923990FF69AF54120",
+          "profile": "C:\\Users\\16078\\.ohos\\config\\default_yellow-river-echo_TMLXqTktZrI1tL3-XeSqE2Lw9z3zyIWLDsc-zCTgPMo=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\16078\\.ohos\\config\\default_yellow-river-echo_TMLXqTktZrI1tL3-XeSqE2Lw9z3zyIWLDsc-zCTgPMo=.p12",
+          "storePassword": "0000001B29A5485E7D04A1AA96B32E2EC03B26C3867FEE526618B814A5BAD40F6BD5BEEE1F3821ECC316B8"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",

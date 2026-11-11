@@ -9,13 +9,95 @@ import { ShopView } from '../view/ShopView';
 import { SocialView } from '../view/SocialView';
 import { MineView } from '../view/MineView';
 import { FloatingAssistant } from '../view/FloatingAssistant';
-import { INK, SUB, LOESS, CLAY, paletteOf, SCALE_LABELS, fs } from '../common/Theme';
+import { INK, SUB, LOESS, CLAY, PAPER, paletteOf, SCALE_LABELS, fs } from '../common/Theme';
 import { goArchive, goPottery, goTopic, goSync, goCourses, goQuiz, goGuide, goEngineer, closeDrawer, goCompose, goLogin, closeSignOutAsk } from '../common/Nav';
+import { warmMapAssets } from '../common/MapAssets';
+import { wideH, wideW, cellWidthPct, isLastInRow } from '../common/Breakpoint';
 
+// 退出登录是危险操作，面板里这一行单独标红
 const DANGER: string = '#C0392B';
 
+// 底栏图标：和首页宫格一套画法，全部用基础形叠出来，不引图片资源也不引 SymbolGlyph。
+// 尺寸 24×24vp（屋顶 28 宽）—— 图标摆在文字上方，再大就要把整栏顶到 70vp 以外。
+// 选中态只压外层透明度、不给每个形件重算颜色：Builder 的普通参数是快照，
+// 把颜色当参数传进去，切完档图标还是上一个 tab 的颜色。
+@Component
+struct TabGlyph {
+  @StorageLink('mainTab') tab: number = 0;
+  @Prop idx: number = 0;
+  @Prop kind: string = '';
+
+  build() {
+    Column() {
+      if (this.kind === 'house') {
+        Column() {
+          Polygon().width(28).height(9).points([[14, 0], [28, 9], [0, 9]]).fill(CLAY)
+          Row({ space: 3 }) {
+            Column().width(3).height(10).backgroundColor(CLAY)
+            Column().width(9).height(10).border({ width: 1.2, color: CLAY })
+            Column().width(3).height(10).backgroundColor(CLAY)
+          }
+          .height(10)
+          .margin({ top: 2 })
+          Column().width(28).height(3).backgroundColor(CLAY)
+        }
+        .width(28)
+        .height(24)
+      } else if (this.kind === 'coin') {
+        Stack() {
+          Circle().width(24).height(24).fill(CLAY)
+          Column().width(7).height(7).backgroundColor(PAPER)
+        }
+        .width(24)
+        .height(24)
+      } else if (this.kind === 'ding') {
+        Column({ space: 1.5 }) {
+          Row({ space: 12 }) {
+            Column().width(3).height(4).backgroundColor(CLAY)
+            Column().width(3).height(4).backgroundColor(CLAY)
+          }
+          .width(24)
+          .justifyContent(FlexAlign.Center)
+          Column().width(24).height(11)
+            .borderRadius({ topLeft: 3, topRight: 3, bottomLeft: 12, bottomRight: 12 })
+            .backgroundColor(CLAY)
+          Row({ space: 5 }) {
+            Column().width(3).height(6).backgroundColor(CLAY)
+            Column().width(3).height(6).backgroundColor(CLAY)
+            Column().width(3).height(6).backgroundColor(CLAY)
+          }
+          .width(24)
+          .justifyContent(FlexAlign.Center)
+        }
+        .width(24)
+        .height(24)
+      } else {
+        Stack() {
+          Column().width(24).height(24).borderRadius(5).backgroundColor(CLAY)
+          Column({ space: 3 }) {
+            Row({ space: 3 }) {
+              Column().width(6).height(6).borderRadius(1.5).backgroundColor(PAPER)
+              Column().width(6).height(6).borderRadius(1.5).backgroundColor(PAPER)
+            }
+            Row({ space: 3 }) {
+              Column().width(6).height(6).borderRadius(1.5).backgroundColor(PAPER)
+              Column().width(6).height(6).borderRadius(1.5).backgroundColor(PAPER)
+            }
+          }
+        }
+        .width(24)
+        .height(24)
+      }
+    }
+    .opacity(this.tab === this.idx ? 1 : 0.42)
+  }
+}
+
+// 字号档位胶囊组。做成组件而不是 @Builder：Builder 的普通参数是快照，
+// 点了「大」之后高亮不会跟着变（真机上实测到的高亮卡死）。
 @Component
 struct DrawerPicker {
+  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('studioRev') @Watch('refresh') rev: number = 0;
   @State cur: number = 0;
@@ -71,8 +153,10 @@ struct Index {
   @StorageLink('signOutAsk') signOutAsk: boolean = false;
   @StorageLink('studioRev') studioRev: number = 0;
   @StorageLink('textScale') ts: number = 1;
+  @StorageLink('bp') bp: string = 'sm';
   @State ready: boolean = false;
   @State createOpen: boolean = false;
+  // 彩蛋：连点头像 5 次才露出「河工面板」入口
   @State taps: number = 0;
   @State engineerUnlocked: boolean = false;
   private lastTap: number = 0;
@@ -83,20 +167,24 @@ struct Index {
       console.error('boot: ' + e.message);
     }).finally((): void => {
       this.ready = true;
+      // 首页站稳之后再异步预热地图那 4MB 核心资源，等用户真点进去时缓存已经满了。
+      // 延后一点是为了不和首屏自己的渲染抢主线程。
+      setTimeout((): void => {
+        warmMapAssets(ctx);
+      }, 1200);
     });
   }
 
   @Builder
-  footLabel(idx: number, title: string) {
+  footLabel(idx: number, title: string, art: string) {
     Column({ space: 3 }) {
+      TabGlyph({ idx: idx, kind: art })
       Text(title)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(this.tab === idx ? INK : SUB)
         .fontWeight(this.tab === idx ? FontWeight.Bold : FontWeight.Normal)
-      Circle().width(4).height(4)
-        .fill(this.tab === idx ? CLAY : Color.Transparent)
     }
-    .padding({ top: 8, bottom: 6 })
+    .padding({ top: 6, bottom: 5 })
     .onClick((): void => {
       this.tab = idx;
     })
@@ -122,6 +210,7 @@ struct Index {
 
   tapAvatar(): void {
     let now = Date.now();
+    // 隔太久就当重新开始数，别让人误触发；但也别要求 1 秒内点完 5 下
     if (now - this.lastTap > 1500) {
       this.taps = 0;
     }
@@ -207,6 +296,7 @@ struct Index {
 
           Divider().strokeWidth(1).color($r('app.color.line')).margin({ left: 16, right: 16, top: 6, bottom: 6 })
 
+          // 标题一行、胶囊一行：272vp 的边侧栏塞不下"标题 + 三个胶囊"同行，实测会切掉最后一档
           DrawerPicker()
 
           Row({ space: 12 }) {
@@ -233,13 +323,14 @@ struct Index {
           })
         }
         .width('100%')
+        // 原来底下那行版本小字删了，留点呼吸空间，别让最后一行贴着面板底
         .padding({ bottom: 16 })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
     }
-    .width(272)
+    .width(wideH(this.bp, 272, 300, 320))
     .height('100%')
     .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('app.color.card_bg'))
@@ -266,6 +357,8 @@ struct Index {
         .margin({ top: 10, bottom: 14 })
       Text('记点什么')
         .fontSize(fs(this.ts, 13)).fontColor(SUB)
+      // 四个入口两行排，宽度按 (100% - gap)/2 算，别用 layoutWeight，
+      // 否则换行后最后一格会被挤成半宽
       Flex({ wrap: FlexWrap.Wrap, justifyContent: FlexAlign.Start }) {
         Column() {
           this.createTile('✎', '写笔记', '挑一处遗址记两行', (): void => {
@@ -273,28 +366,28 @@ struct Index {
             goArchive(2);
           })
         }
-        .width('47.5%').margin({ right: '5%', bottom: 12 })
+        .width(cellWidthPct(this.bp, 2, 5)).margin({ right: isLastInRow(this.bp, 2, 0) ? 0 : '5%', bottom: 12 })
         Column() {
           this.createTile('⌣', '彩陶工坊', '拼一件自己的器物', (): void => {
             this.createOpen = false;
             goPottery();
           })
         }
-        .width('47.5%').margin({ bottom: 12 })
+        .width(cellWidthPct(this.bp, 2, 5)).margin({ right: isLastInRow(this.bp, 2, 1) ? 0 : '5%', bottom: 12 })
         Column() {
           this.createTile('⊚', '知识网络', '把关联摊开看', (): void => {
             this.createOpen = false;
             goTopic();
           })
         }
-        .width('47.5%').margin({ right: '5%', bottom: 12 })
+        .width(cellWidthPct(this.bp, 2, 5)).margin({ right: isLastInRow(this.bp, 2, 2) ? 0 : '5%', bottom: 12 })
         Column() {
           this.createTile('✦', '发动态', '说给河边的人听', (): void => {
             this.createOpen = false;
             goCompose();
           })
         }
-        .width('47.5%').margin({ bottom: 12 })
+        .width(cellWidthPct(this.bp, 2, 5)).margin({ right: isLastInRow(this.bp, 2, 3) ? 0 : '5%', bottom: 12 })
       }
       .width('100%')
       .padding({ left: 16, right: 16, top: 14, bottom: 14 })
@@ -329,6 +422,9 @@ struct Index {
     return StudioStore.get().accounts.length;
   }
 
+  // 退出登录：底部动作面板。切换账号 / 退出登录两条动作，危险的那条标红，
+  // 取消单独一张卡，点遮罩也能收回去。
+  // 面板挂在 Index 而不是 MineView：底栏是这一页的兄弟节点，写在「我的」里盖不住它
   @Builder
   signOutSheet() {
     Column() {
@@ -441,8 +537,8 @@ struct Index {
           .layoutWeight(1)
 
           Row() {
-            this.footLabel(0, '首页')
-            this.footLabel(1, '文创')
+            this.footLabel(0, '首页', 'house')
+            this.footLabel(1, '文创', 'coin')
             Column() {
               Text('+')
                 .fontSize(fs(this.ts, 24))
@@ -454,16 +550,16 @@ struct Index {
             .borderRadius(22)
             .justifyContent(FlexAlign.Center)
             .backgroundColor(CLAY)
-            .margin({ top: 4 })
+            .margin({ top: 6 })
             .shadow({ radius: 8, color: 'rgba(43,38,34,0.22)', offsetY: 3 })
             .onClick((): void => {
               this.createOpen = true;
             })
-            this.footLabel(2, '社群')
-            this.footLabel(3, '我的')
+            this.footLabel(2, '社群', 'ding')
+            this.footLabel(3, '我的', 'seal')
           }
-          .width('100%')
-          .height(58)
+          .width(wideW(this.bp, '100%', '62%', '46%'))
+          .height(wideH(this.bp, 68, 74, 80))
           .justifyContent(FlexAlign.SpaceAround)
           .alignItems(VerticalAlign.Top)
           .backgroundColor($r('app.color.card_bg'))
@@ -473,8 +569,9 @@ struct Index {
       .width('100%')
       .height('100%')
 
+      // 只在首页露出；底栏 68vp，再留 16vp 呼吸空间
       if (this.ready && this.tab === 0) {
-        FloatingAssistant({ bottomGap: 74, tag: 'home' })
+        FloatingAssistant({ bottomGap: wideH(this.bp, 84, 90, 96), tag: 'home' })
       }
 
       if (this.createOpen) {
@@ -509,6 +606,7 @@ struct Index {
 
       if (this.signOutAsk) {
         Column() {
+          // 遮罩：点空白处也能收回去
           Column().layoutWeight(1)
             .width('100%')
             .onClick((): void => {

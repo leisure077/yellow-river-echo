@@ -1,0 +1,186 @@
+{
+  "schema": "ppt-master.pptx-postflight-report.v1",
+  "status": "passed-with-warnings",
+  "output": {
+    "path": "C:\\Users\\16078\\Desktop\\OpenHarmony\\yellow-river-echo\\黄河续响-河小导AI亮点.pptx",
+    "bytes": 4162467
+  },
+  "source": {
+    "svg_slide_count": 3,
+    "layout_definition_count": 0,
+    "fingerprint": {
+      "algorithm": "sha256",
+      "digest": "99a5bcb84b7b5b274664219126a76ebc8b142ea709d0b6a8d15a216c016b5dec",
+      "file_count": 3,
+      "files": [
+        {
+          "file": "01_cover.svg",
+          "sha256": "58877ffcdd8150884686c52f412536335cd998f4abb9bf4364666eb07e3d1e35"
+        },
+        {
+          "file": "02_hl12.svg",
+          "sha256": "513a215fbaef23e8d9a3609af999dc00c6cee980983e6453795279369ea18856"
+        },
+        {
+          "file": "03_stack.svg",
+          "sha256": "56bca27cd7e47ea22e6c08d9356e787a64efd875ebe25dee19487e88238dffd1"
+        }
+      ]
+    },
+    "authoring_roundtrip": null
+  },
+  "package": {
+    "zip_integrity": "passed",
+    "corrupt_member": null,
+    "slides": 3,
+    "notes": 0,
+    "masters": 1,
+    "layouts": 1
+  },
+  "checks": {
+    "zip_integrity": "passed",
+    "slide_count": "passed",
+    "internal_relationships": "enforced-at-build",
+    "structured_package": "not-applicable",
+    "transitions": "enforced-at-build",
+    "animations": "enforced-at-build",
+    "project_svg_contract": "enforced-at-build",
+    "compatibility_normalization": "not-applicable",
+    "authoring_roundtrip": "not-applicable",
+    "quality_gate": "passed",
+    "quality_warnings": "warning",
+    "template_tokens": "passed",
+    "external_images": "passed",
+    "font_portability": "passed"
+  },
+  "quality": {
+    "status": "loaded",
+    "path": "c:\\Users\\16078\\Desktop\\OpenHarmony\\yellow-river-echo\\projects\\hxdao-highlights_ppt169_20261105\\validation\\svg_quality_report.json",
+    "schema": "ppt-master.svg-quality-report.v1",
+    "stage": "final",
+    "source_match": "passed",
+    "source_fingerprint": {
+      "algorithm": "sha256",
+      "digest": "99a5bcb84b7b5b274664219126a76ebc8b142ea709d0b6a8d15a216c016b5dec",
+      "file_count": 3,
+      "files": [
+        {
+          "file": "01_cover.svg",
+          "sha256": "58877ffcdd8150884686c52f412536335cd998f4abb9bf4364666eb07e3d1e35"
+        },
+        {
+          "file": "02_hl12.svg",
+          "sha256": "513a215fbaef23e8d9a3609af999dc00c6cee980983e6453795279369ea18856"
+        },
+        {
+          "file": "03_stack.svg",
+          "sha256": "56bca27cd7e47ea22e6c08d9356e787a64efd875ebe25dee19487e88238dffd1"
+        }
+      ]
+    },
+    "summary": {
+      "total": 3,
+      "passed": 0,
+      "warnings": 3,
+      "errors": 0
+    },
+    "categories": {
+      "blocking": {
+        "count": 0,
+        "issues": []
+      },
+      "introduced": {
+        "count": 6,
+        "issues": [
+          {
+            "file": "01_cover.svg",
+            "message": "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (3 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[72]:font-family 'Microsoft YaHei' -> None; text[75]:font-family 'Microsoft YaHei' -> None; text[78]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+          },
+          {
+            "file": "01_cover.svg",
+            "message": "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (5 attribute(s)); examples: g[36]:transform 'rotate(-7 199.0 235.0)' -> 'rotate(-7 199 235)'; g[41]:transform 'rotate(6 468.0 221.0)' -> 'rotate(6 468 221)'; g[46]:transform 'rotate(5 169.0 520.0)' -> 'rotate(5 169 520)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+          },
+          {
+            "file": "02_hl12.svg",
+            "message": "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (7 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[43]:font-family 'Microsoft YaHei' -> None; text[57]:font-family 'Microsoft YaHei' -> None; text[65]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+          },
+          {
+            "file": "02_hl12.svg",
+            "message": "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (6 attribute(s)); examples: g[48]:transform 'rotate(-5 207.0 394.0)' -> 'rotate(-5 207 394)'; g[70]:transform 'rotate(6 829.0 330.0)' -> 'rotate(6 829 330)'; g[76]:transform 'rotate(-4 1023.0 330.0)' -> 'rotate(-4 1023 330)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+          },
+          {
+            "file": "03_stack.svg",
+            "message": "Noncanonical compact authoring: Authoring SVG contains noncanonical or redundant inherited style declarations (14 change(s)); examples (group:attr None -> value hoists the shared value onto that group; child:attr value -> None drops the copy the child now inherits): text[43]:font-family 'Microsoft YaHei' -> None; text[57]:font-family 'Microsoft YaHei' -> None; text[65]:font-family 'Microsoft YaHei' -> None (advisory; normalize with `python3 scripts/compact_svg_styles.py <svg_output> --inplace`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+          },
+          {
+            "file": "03_stack.svg",
+            "message": "Noncanonical compact authoring: Authoring SVG contains safely compactable page-space metadata (6 attribute(s)); examples: g[48]:transform 'rotate(-3 186.0 395.0)' -> 'rotate(-3 186 395)'; g[77]:transform 'rotate(-6 816.0 285.0)' -> 'rotate(-6 816 285)'; g[82]:transform 'rotate(5 964.0 283.0)' -> 'rotate(5 964 283)' (advisory; normalize with `python3 scripts/compact_svg_coordinates.py <svg_output> --inplace --keep-native-frames`, re-stamp pages that carry Chart/Table fallbacks, and rerun the final gate, or leave the explicit form)"
+          }
+        ]
+      },
+      "inherited": {
+        "count": 0,
+        "issues": []
+      },
+      "source-import": {
+        "count": 0,
+        "summary": {
+          "warning_count": 0,
+          "by_code": {}
+        }
+      }
+    }
+  },
+  "resources": {
+    "unresolved_template_tokens": [],
+    "fonts": {
+      "stacks": [
+        "Consolas",
+        "Georgia",
+        "KaiTi",
+        "Microsoft YaHei"
+      ],
+      "generic_only_stacks": [],
+      "unsafe_exported_faces": []
+    },
+    "images": {
+      "data_uri": 0,
+      "local": 20,
+      "external": 0,
+      "external_references": []
+    }
+  },
+  "export_policy": {
+    "project_svg_contract": "strict",
+    "dangerous_normalization_count": 0
+  },
+  "deck_motion": {
+    "transition": {
+      "effect": "fade",
+      "effect_options": {},
+      "duration": 0.4,
+      "auto_advance": null,
+      "sound": null
+    },
+    "animation": {
+      "effect": "none",
+      "effect_request": null,
+      "duration": 0.4,
+      "stagger": 0.12,
+      "trigger": "after-previous"
+    },
+    "cli_overrides": {
+      "transition": false,
+      "transition_duration": false,
+      "auto_advance": false,
+      "transition_sound": false,
+      "animation": false,
+      "animation_duration": false,
+      "animation_stagger": false,
+      "animation_trigger": false
+    },
+    "narration_timings": false
+  },
+  "backup_path": null,
+  "conversion_trace_path": null
+}

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" lang="zh-CN" font-family="Microsoft YaHei" data-pptx-page-role="cover">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#FCF7EC"/>
+      <stop offset="55%" stop-color="#F6EDDA"/>
+      <stop offset="100%" stop-color="#EADFC7"/>
+    </linearGradient>
+    <linearGradient id="rail" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241E18"/>
+      <stop offset="50%" stop-color="#B23A22"/>
+      <stop offset="100%" stop-color="#241E18"/>
+    </linearGradient>
+    <linearGradient id="inkFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#241E18" stop-opacity="0.82"/>
+      <stop offset="62%" stop-color="#241E18" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#241E18" stop-opacity="0.10"/>
+    </linearGradient>
+    <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.20"/>
+      <stop offset="45%" stop-color="#FFFFFF" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-18%" y="-18%" width="138%" height="140%">
+      <feDropShadow dx="4" dy="9" stdDeviation="9" flood-color="#241E18" flood-opacity="0.17"/>
+    </filter>
+    <clipPath id="c1-1" clipPathUnits="userSpaceOnUse"><rect x="61" y="113" width="276" height="244" rx="6"/></clipPath>
+    <clipPath id="c1-2" clipPathUnits="userSpaceOnUse"><rect x="309" y="109" width="318" height="224" rx="6"/></clipPath>
+    <clipPath id="c1-3" clipPathUnits="userSpaceOnUse"><rect x="61" y="373" width="216" height="294" rx="6"/></clipPath>
+    <clipPath id="c1-4" clipPathUnits="userSpaceOnUse"><rect x="285" y="357" width="238" height="310" rx="6"/></clipPath>
+    <clipPath id="c1-5" clipPathUnits="userSpaceOnUse"><rect x="547" y="369" width="148" height="300" rx="6"/></clipPath>
+  </defs>
+  <rect id="page-base" data-pptx-role="background" x="0" y="0" width="1280" height="720" fill="url(#paper)"/>
+  <rect id="side-rail" data-pptx-role="decoration" x="0" y="0" width="12" height="720" fill="url(#rail)"/>
+  <g data-pptx-role="decoration" id="bg-ink" data-pptx-bounds="0 0 1280 720">
+    <image href="../images/dragon.png" x="920" y="380" width="260" height="320" preserveAspectRatio="xMidYMid slice" opacity="0.07"/>
+  </g>
+  <g id="cover-wall" data-pptx-bounds="48 100 640 580">
+<g transform="rotate(-7 199.0 235.0)"><rect x="56" y="108" width="286" height="254" rx="11" fill="#241E18" filter="url(#softShadow)"/><rect x="61" y="113" width="276" height="244" rx="6" fill="#FBF6E9"/><image href="../images/shot_ai.png" x="61" y="113" width="276" height="244" preserveAspectRatio="xMidYMid slice" clip-path="url(#c1-1)"/><rect x="61" y="113" width="276" height="244" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(6 468.0 221.0)"><rect x="304" y="104" width="328" height="234" rx="11" fill="#241E18" filter="url(#softShadow)"/><rect x="309" y="109" width="318" height="224" rx="6" fill="#FBF6E9"/><image href="../images/shot_course.png" x="309" y="109" width="318" height="224" preserveAspectRatio="xMidYMid slice" clip-path="url(#c1-2)"/><rect x="309" y="109" width="318" height="224" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(5 169.0 520.0)"><rect x="56" y="368" width="226" height="304" rx="11" fill="#241E18" filter="url(#softShadow)"/><rect x="61" y="373" width="216" height="294" rx="6" fill="#FBF6E9"/><image href="../images/shot_site.png" x="61" y="373" width="216" height="294" preserveAspectRatio="xMidYMid slice" clip-path="url(#c1-3)"/><rect x="61" y="373" width="216" height="294" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(-6 404.0 512.0)"><rect x="280" y="352" width="248" height="320" rx="11" fill="#241E18" filter="url(#softShadow)"/><rect x="285" y="357" width="238" height="310" rx="6" fill="#FBF6E9"/><image href="../images/shot_note.png" x="285" y="357" width="238" height="310" preserveAspectRatio="xMidYMid slice" clip-path="url(#c1-4)"/><rect x="285" y="357" width="238" height="310" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g><g transform="rotate(4 621.0 519.0)"><rect x="542" y="364" width="158" height="310" rx="11" fill="#241E18" filter="url(#softShadow)"/><rect x="547" y="369" width="148" height="300" rx="6" fill="#FBF6E9"/><image href="../images/shot_quiz.png" x="547" y="369" width="148" height="300" preserveAspectRatio="xMidYMid slice" clip-path="url(#c1-5)"/><rect x="547" y="369" width="148" height="300" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>  </g>
+  <g id="cover-panel" data-pptx-bounds="728 96 500 360">
+    <rect x="728" y="96" width="500" height="360" fill="#241E18" opacity="0.90"/>
+    <rect x="728" y="96" width="12" height="360" fill="#B23A22"/>
+    <rect x="750" y="126" width="208" height="4" fill="#B23A22"/>
+    <rect x="750" y="126" width="112" height="4" fill="#FBF6E9" fill-opacity="0.55"/>
+<text x="756" y="202" font-family="KaiTi" font-size="82" font-weight="bold" fill="#FBF6E9" letter-spacing="4">河小导</text><text x="756" y="252" font-family="KaiTi" font-size="21" fill="#EFE3CF" letter-spacing="1">随行的讲解员<tspan x="756" dy="34">可溯源 · 可观测 · 可回跳</tspan></text>    <line x1="756" y1="300" x2="1190" y2="300" stroke="#A9834A" stroke-width="1" stroke-opacity="0.45"/>
+    <rect x="756" y="318" width="142" height="28" rx="3" fill="#FBF6E9" fill-opacity="0.07"/>
+    <rect x="756" y="318" width="142" height="28" rx="3" fill="none" stroke="#C9A566" stroke-opacity="0.55"/>
+    <text x="827.0" y="337" font-family="Microsoft YaHei" font-size="10" fill="#EFE3CF" text-anchor="middle">ArkTS × Dify</text>
+    <rect x="906" y="318" width="82" height="28" rx="3" fill="#FBF6E9" fill-opacity="0.07"/>
+    <rect x="906" y="318" width="82" height="28" rx="3" fill="none" stroke="#C9A566" stroke-opacity="0.55"/>
+    <text x="947.0" y="337" font-family="Microsoft YaHei" font-size="10" fill="#EFE3CF" text-anchor="middle">SSE 流式</text>
+    <rect x="1030" y="318" width="52" height="28" rx="3" fill="#FBF6E9" fill-opacity="0.07"/>
+    <rect x="1030" y="318" width="52" height="28" rx="3" fill="none" stroke="#C9A566" stroke-opacity="0.55"/>
+    <text x="1056.0" y="337" font-family="Microsoft YaHei" font-size="10" fill="#EFE3CF" text-anchor="middle">可溯源</text>
+    <text x="1198" y="412" font-family="Georgia" font-size="120" fill="#B23A22" fill-opacity="0.20" text-anchor="end">01</text>
+  </g>
+  <g id="cover-strip" data-pptx-bounds="728 470 500 146">
+    <rect x="728" y="470" width="500" height="146" fill="#FBF6E9" stroke="#A9834A" stroke-opacity="0.35"/>
+    <rect x="728" y="470" width="6" height="146" fill="#4A7B8C"/>
+    <text x="748" y="500" font-family="Georgia" font-size="36" fill="#B23A22">23</text>
+    <text x="796" y="496" font-family="KaiTi" font-size="13" fill="#241E18">篇黄河文化知识</text>
+    <line x1="748" y1="514" x2="968" y2="514" stroke="#A9834A" stroke-width="0.6" stroke-opacity="0.35"/>
+    <text x="984" y="500" font-family="Georgia" font-size="36" fill="#B23A22">6</text>
+    <text x="1032" y="496" font-family="KaiTi" font-size="13" fill="#241E18">环节全链路</text>
+    <line x1="984" y1="514" x2="1204" y2="514" stroke="#A9834A" stroke-width="0.6" stroke-opacity="0.35"/>
+    <text x="748" y="562" font-family="Georgia" font-size="36" fill="#B23A22">3</text>
+    <text x="796" y="558" font-family="KaiTi" font-size="13" fill="#241E18">道超时闸</text>
+    <line x1="748" y1="576" x2="968" y2="576" stroke="#A9834A" stroke-width="0.6" stroke-opacity="0.35"/>
+    <text x="984" y="562" font-family="Georgia" font-size="36" fill="#B23A22">0</text>
+    <text x="1032" y="558" font-family="KaiTi" font-size="13" fill="#241E18">英文原文抛用户</text>
+    <line x1="984" y1="576" x2="1204" y2="576" stroke="#A9834A" stroke-width="0.6" stroke-opacity="0.35"/>
+  </g>
+  <g id="cover-seal" data-pptx-bounds="1132 618 128 72">
+    <rect x="1136" y="622" width="60" height="60" fill="#B23A22"/>
+    <rect x="1141" y="627" width="50" height="50" fill="none" stroke="#FBF6E9" stroke-width="1.3" stroke-opacity="0.8"/>
+    <text x="1166" y="660" font-family="KaiTi" font-size="32" font-weight="bold" fill="#FBF6E9" text-anchor="middle">导</text>
+  </g>
+</svg>

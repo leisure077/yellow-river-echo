@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
 import { Profile, AccountRec, AccProfile, WorkRec, CheckinRec, QuizRun, LocalComment, Post, CartLine } from '../model/Models';
 import { VerifyGate } from './VerifyGate';
-import { SCALE_STEPS } from '../common/Theme';
+import { SCALE_STEPS, SCALE_DEFAULT } from '../common/Theme';
 
 export class StudioStore {
   private static readonly inst: StudioStore = new StudioStore();
@@ -23,7 +23,8 @@ export class StudioStore {
   postComments: LocalComment[] = [];
   userPosts: Post[] = [];
   guideSeen: boolean = false;
-  scaleStep: number = 1;
+  // 默认就落最大档：现场演示离屏幕有距离，进去第一屏就得读得清
+  scaleStep: number = SCALE_DEFAULT;
   siteCheckins: CheckinRec[] = [];
   quizRuns: QuizRun[] = [];
   accOut: ((id: string, payload: string, ts: number) => void) | null = null;
@@ -60,7 +61,7 @@ export class StudioStore {
     this.followed = this.readArr('followed');
     this.postComments = this.readArr<LocalComment>('postComments');
     this.userPosts = this.readArr<Post>('userPosts');
-    this.scaleStep = this.clampStep(this.p.getSync('scaleStep', 1) as number);
+    this.scaleStep = this.clampStep(this.p.getSync('scaleStep', SCALE_DEFAULT) as number);
     this.siteCheckins = this.readArr<CheckinRec>('siteCheckins');
     this.quizRuns = this.readArr<QuizRun>('quizRuns');
     AppStorage.setOrCreate('textScale', SCALE_STEPS[this.scaleStep]);
@@ -69,7 +70,7 @@ export class StudioStore {
   private clampStep(n: number): number {
     let i = Math.floor(n);
     if (i < 0 || i >= SCALE_STEPS.length) {
-      return 1;
+      return SCALE_DEFAULT;
     }
     return i;
   }

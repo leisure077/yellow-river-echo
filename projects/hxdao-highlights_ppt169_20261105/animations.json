@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "defaults": {
+    "animation": {
+      "trigger": "after-previous",
+      "stagger": 0.12
+    }
+  },
+  "slides": {
+    "01_cover": {
+      "transition": { "effect": "fade", "duration": 0.5 },
+      "groups": {
+        "cover-wall": {  "effects": [{ "effect": "entrance_rise_up", "order": 1, "duration": 0.8 }] },
+        "cover-panel": { "effects": [{ "effect": "entrance_rise_up", "order": 2, "duration": 0.7 }] },
+        "cover-strip": { "effects": [{ "effect": "entrance_rise_up", "order": 3, "duration": 0.6 }] },
+        "cover-seal": {  "effects": [{ "effect": "entrance_zoom", "order": 4, "duration": 0.4 }] }
+      }
+    },
+    "02_hl12": {
+      "transition": { "effect": "fade", "duration": 0.4 },
+      "groups": {
+        "hl1-shot":    { "effects": [{ "effect": "entrance_zoom", "order": 1, "duration": 0.6 }] },
+        "sse-flow":    { "effects": [{ "effect": "entrance_faded_zoom", "order": 2, "duration": 0.6 }] },
+        "hl1-card":    { "effects": [{ "effect": "entrance_rise_up", "order": 3, "duration": 0.55 }] },
+        "hl2-shot-a":  { "effects": [{ "effect": "entrance_rise_up", "order": 4, "duration": 0.55 }] },
+        "hl2-shot-b":  { "effects": [{ "effect": "entrance_rise_up", "order": 5, "duration": 0.55 }] },
+        "hl2-shot-c":  { "effects": [{ "effect": "entrance_rise_up", "order": 6, "duration": 0.55 }] },
+        "hl2-title":   { "effects": [{ "effect": "entrance_fade", "order": 7, "duration": 0.4 }] },
+        "stab-gate":   { "effects": [{ "effect": "entrance_faded_zoom", "order": 8, "duration": 0.5 }] },
+        "hl2-shot-c2": { "effects": [{ "effect": "entrance_rise_up", "order": 9, "duration": 0.5 }] },
+        "hl2-shot-c3": { "effects": [{ "effect": "entrance_rise_up", "order": 10, "duration": 0.5 }] }
+      }
+    },
+    "03_stack": {
+      "transition": { "effect": "fade", "duration": 0.45 },
+      "groups": {
+        "hl3-shot":   { "effects": [{ "effect": "entrance_zoom", "order": 1, "duration": 0.6 }] },
+        "hl3-guard":  { "effects": [{ "effect": "entrance_faded_zoom", "order": 2, "duration": 0.55 }] },
+        "hl3-obs":    { "effects": [{ "effect": "entrance_rise_up", "order": 3, "duration": 0.55 }] },
+        "hl4-phones": { "effects": [{ "effect": "entrance_rise_up", "order": 4, "duration": 0.65 }] },
+        "stack-bar":  { "effects": [{ "effect": "entrance_rise_up", "order": 5, "duration": 0.6 }] }
+      }
+    }
+  }
+}

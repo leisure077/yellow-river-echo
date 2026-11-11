@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" lang="zh-CN" font-family="Microsoft YaHei" data-pptx-page-role="content">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#FCF7EC"/>
+      <stop offset="55%" stop-color="#F6EDDA"/>
+      <stop offset="100%" stop-color="#EADFC7"/>
+    </linearGradient>
+    <linearGradient id="rail" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241E18"/>
+      <stop offset="50%" stop-color="#B23A22"/>
+      <stop offset="100%" stop-color="#241E18"/>
+    </linearGradient>
+    <linearGradient id="inkFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#241E18" stop-opacity="0.82"/>
+      <stop offset="62%" stop-color="#241E18" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#241E18" stop-opacity="0.10"/>
+    </linearGradient>
+    <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.20"/>
+      <stop offset="45%" stop-color="#FFFFFF" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-18%" y="-18%" width="138%" height="140%">
+      <feDropShadow dx="4" dy="9" stdDeviation="9" flood-color="#241E18" flood-opacity="0.17"/>
+    </filter>
+    <clipPath id="c2-1" clipPathUnits="userSpaceOnUse"><rect x="69" y="183" width="276" height="422" rx="9"/></clipPath>
+    <clipPath id="c2-2" clipPathUnits="userSpaceOnUse"><rect x="742" y="180" width="174" height="300" rx="6"/></clipPath>
+    <clipPath id="c2-3" clipPathUnits="userSpaceOnUse"><rect x="936" y="180" width="174" height="300" rx="6"/></clipPath>
+    <clipPath id="c2-4" clipPathUnits="userSpaceOnUse"><rect x="1127" y="179" width="94" height="202" rx="5"/></clipPath>
+    <clipPath id="c2-5" clipPathUnits="userSpaceOnUse"><rect x="1007" y="547" width="100" height="70" rx="5"/></clipPath>
+    <clipPath id="c2-6" clipPathUnits="userSpaceOnUse"><rect x="1129" y="547" width="90" height="70" rx="5"/></clipPath>
+  </defs>
+  <rect id="page-base" data-pptx-role="background" x="0" y="0" width="1280" height="720" fill="url(#paper)"/>
+  <rect id="side-rail" data-pptx-role="decoration" x="0" y="0" width="12" height="720" fill="url(#rail)"/>
+  <g data-pptx-role="decoration" id="bg-ink" data-pptx-bounds="0 0 1280 720">
+    <image href="../images/ink_ridge.webp" x="0" y="500" width="320" height="220" preserveAspectRatio="xMidYMid slice" opacity="0.05"/>
+  </g>
+  <g id="page-seal" data-pptx-bounds="46 36 68 72"><rect x="56" y="44" width="50" height="50" fill="#B23A22"/><rect x="61" y="49" width="40" height="40" fill="none" stroke="#FBF6E9" stroke-width="1.2" stroke-opacity="0.85"/><text x="81.0" y="78.5" font-family="KaiTi" font-size="25" font-weight="bold" fill="#FBF6E9" text-anchor="middle">引</text></g>
+  <g id="page-header" data-pptx-bounds="116 28 1108 126">
+    <text x="120" y="88" font-family="KaiTi" font-size="33" font-weight="bold" fill="#241E18" letter-spacing="1">可溯源，让回答回到来源</text>
+    <text x="122" y="121" font-family="Microsoft YaHei" font-size="14.5" fill="#7C6A55">每一条回答自带 回跳 引用 · 23 篇知识库 · 56 字摘要 · siteId 直达详情</text>
+  </g>
+  <g data-pptx-role="decoration" id="page-rule" data-pptx-bounds="0 150 1280 12">
+    <line x1="56" y1="155" x2="1224" y2="155" stroke="#A9834A" stroke-width="1" stroke-opacity="0.5"/>
+    <rect x="116" y="152" width="150" height="3" fill="#B23A22"/>
+  </g>
+  <g id="hl1-shot" data-pptx-bounds="56 170 300 448">
+    <g transform="rotate(-5 207.0 394.0)"><rect x="62" y="176" width="290" height="436" rx="16" fill="#241E18" filter="url(#softShadow)"/><rect x="69" y="183" width="276" height="422" rx="9" fill="#FBF6E9"/><image href="../images/shot_ai.png" x="69" y="183" width="276" height="422" preserveAspectRatio="xMidYMid slice" clip-path="url(#c2-1)"/><rect x="69" y="183" width="276" height="422" rx="9" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="sse-flow" data-pptx-bounds="372 170 340 232">
+    <rect x="372" y="170" width="340" height="232" fill="#FBF6E9" stroke="#A9834A" stroke-opacity="0.35"/>
+    <rect x="372" y="170" width="6" height="232" fill="#4A7B8C"/>
+<text x="394" y="210" font-family="KaiTi" font-size="16" font-weight="bold" fill="#4A7B8C" letter-spacing="2">亮点一 · SSE 流式客户端</text><text x="394" y="236" font-family="Microsoft YaHei" font-size="10" fill="#4A4136">response_mode=streaming · pending 缓冲<tspan x="394" dy="18">按空行切事件 · 50 ms 合并打字机</tspan><tspan x="394" dy="18">conversation_id 持久化</tspan><tspan x="394" dy="18">TCP 分段，客户端自己管</tspan></text>  </g>
+  <g id="hl1-card" data-pptx-bounds="372 416 340 202">
+    <rect x="372" y="416" width="340" height="202" fill="#241E18"/>
+    <rect x="372" y="416" width="6" height="202" fill="#B23A22"/>
+<text x="394" y="456" font-family="KaiTi" font-size="16" font-weight="bold" fill="#FBF6E9" letter-spacing="1">可溯源 · 每条回答都有出处</text><text x="394" y="482" font-family="Microsoft YaHei" font-size="10" fill="#E6D5B8">引用 message_end.retriever_resources<tspan x="394" dy="18">白名单 s01–s20 / goods / courses / events</tspan><tspan x="394" dy="18">posts 整条丢弃 · 56 字摘要截断</tspan><tspan x="394" dy="18">siteId 回跳详情页</tspan></text>  </g>
+  <g id="hl2-shot-a" data-pptx-bounds="732 170 190 320">
+    <g transform="rotate(6 829.0 330.0)"><rect x="738" y="176" width="182" height="308" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="742" y="180" width="174" height="300" rx="6" fill="#FBF6E9"/><image href="../images/shot_site.png" x="742" y="180" width="174" height="300" preserveAspectRatio="xMidYMid slice" clip-path="url(#c2-2)"/><rect x="742" y="180" width="174" height="300" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="hl2-shot-b" data-pptx-bounds="926 170 190 320">
+    <g transform="rotate(-4 1023.0 330.0)"><rect x="932" y="176" width="182" height="308" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="936" y="180" width="174" height="300" rx="6" fill="#FBF6E9"/><image href="../images/shot_course.png" x="936" y="180" width="174" height="300" preserveAspectRatio="xMidYMid slice" clip-path="url(#c2-3)"/><rect x="936" y="180" width="174" height="300" rx="6" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="hl2-shot-c" data-pptx-bounds="1120 170 104 220">
+    <g transform="rotate(3 1174.0 280.0)"><rect x="1124" y="176" width="100" height="208" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="1127" y="179" width="94" height="202" rx="5" fill="#FBF6E9"/><image href="../images/shot_note.png" x="1127" y="179" width="94" height="202" preserveAspectRatio="xMidYMid slice" clip-path="url(#c2-4)"/><rect x="1127" y="179" width="94" height="202" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="hl2-title" data-pptx-bounds="732 506 500 28">
+    <text x="732" y="520" font-family="KaiTi" font-size="14" fill="#4A7B8C" font-weight="bold">亮点二 · 稳定可靠，不让界面一直转圈</text>
+    <line x1="732" y1="530" x2="1224" y2="530" stroke="#4A7B8C" stroke-width="0.8" stroke-opacity="0.3"/>
+  </g>
+  <g id="stab-gate" data-pptx-bounds="732 540 250 84">
+    <rect x="732" y="540" width="250" height="84" fill="#FBF6E9" stroke="#A9834A" stroke-opacity="0.35"/>
+    <rect x="732" y="540" width="250" height="3" fill="#B23A22"/>
+    <text x="748" y="578" font-family="Georgia" font-size="15" fill="#B23A22">8 s</text>
+    <text x="748" y="600" font-family="Microsoft YaHei" font-size="8.6" fill="#4A4136">连接超时</text>
+    <text x="826" y="578" font-family="Georgia" font-size="15" fill="#B23A22">90 s</text>
+    <text x="826" y="600" font-family="Microsoft YaHei" font-size="8.6" fill="#4A4136">读超时</text>
+    <text x="904" y="578" font-family="Georgia" font-size="15" fill="#B23A22">25 s</text>
+    <text x="904" y="600" font-family="Microsoft YaHei" font-size="8.6" fill="#4A4136">看门狗无数据</text>
+  </g>
+  <g id="hl2-shot-c2" data-pptx-bounds="1000 540 112 84">
+    <g transform="rotate(3 1057.0 582.0)"><rect x="1004" y="544" width="106" height="76" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="1007" y="547" width="100" height="70" rx="5" fill="#FBF6E9"/><image href="../images/shot_filter.png" x="1007" y="547" width="100" height="70" preserveAspectRatio="xMidYMid slice" clip-path="url(#c2-5)"/><rect x="1007" y="547" width="100" height="70" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="hl2-shot-c3" data-pptx-bounds="1122 540 100 84">
+    <g transform="rotate(-4 1174.0 582.0)"><rect x="1126" y="544" width="96" height="76" rx="10" fill="#241E18" filter="url(#softShadow)"/><rect x="1129" y="547" width="90" height="70" rx="5" fill="#FBF6E9"/><image href="../images/shot_sync.png" x="1129" y="547" width="90" height="70" preserveAspectRatio="xMidYMid slice" clip-path="url(#c2-6)"/><rect x="1129" y="547" width="90" height="70" rx="5" fill="none" stroke="#A9834A" stroke-width="0.8" stroke-opacity="0.55"/></g>
+  </g>
+  <g id="page-footer" data-pptx-bounds="48 640 1184 64">
+    <line x1="56" y1="646" x2="1224" y2="646" stroke="#A9834A" stroke-width="1" stroke-opacity="0.45"/>
+    <text x="56" y="676" font-family="Microsoft YaHei" font-size="12" fill="#7C6A55" letter-spacing="1">黄河续响 · 河小导 AI 亮点</text>
+    <text x="1224" y="678" font-family="Georgia" font-size="16" fill="#B23A22" text-anchor="end">02</text>
+  </g>
+</svg>

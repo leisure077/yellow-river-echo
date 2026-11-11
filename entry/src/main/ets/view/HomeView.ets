@@ -17,6 +17,7 @@ import {
   goActivity, goCheckin, goRoute, goQuiz,
   goTopic, goStudio, goExperience, openAssistantSheet
 } from '../common/Nav';
+import { padX, wideH, cellWidthPct, isLastInRow, tileWidthPct, gridCount } from '../common/Breakpoint';
 
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'box', 'coin', 'kiln'];
 
@@ -26,6 +27,8 @@ interface TileRec {
   act: () => void;
 }
 
+// 宫格印章的画法：全部用基础形叠出来，不引图片资源。
+// 每一枚都是"纸底 + 双线框 + 一件小器物"，按下会缩一下再弹回来。
 @Builder
 function artOf(kind: string, scale: number) {
   if (kind === 'scroll') {
@@ -163,9 +166,14 @@ function artOf(kind: string, scale: number) {
   }
 }
 
+// 宫格按钮：无框写实风——器物直接立在纸面上，脚下一道柔和落影托住，
+// 不描边、不加底板，像参考图那样"图 + 名"两截干净地浮着。按下沉一点再弹回。
 @Component
 struct RelicTile {
+  // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
   @StorageLink('textScale') ts: number = 1;
+  // 宽屏要一排铺开八枚，列数变了每枚的宽度就得跟着变
+  @StorageLink('bp') bp: string = 'sm';
   @Prop kind: string = '';
   @Prop title: string = '';
   act: () => void = (): void => {};
@@ -187,6 +195,7 @@ struct RelicTile {
   build() {
     Column({ space: 5 }) {
       Stack({ alignContent: Alignment.Bottom }) {
+        // 落影：一枚压扁的径向渐变椭圆，让器物像放在台面上而非贴纸
         Column()
           .width(34)
           .height(9)
@@ -206,11 +215,11 @@ struct RelicTile {
       .height(50)
 
       Text(this.title)
-        .fontSize(fs(this.ts, 11))
+        .fontSize(fs(this.ts, 12))
         .fontColor(INK)
         .maxLines(1)
     }
-    .width('25%')
+    .width(tileWidthPct(this.bp))
     .padding({ top: 6, bottom: 6 })
     .scale({ x: this.sc, y: this.sc })
     .onClick((): void => {
@@ -219,11 +228,16 @@ struct RelicTile {
   }
 }
 
+// 首页照故宫式排布：通栏海报 → 「黄河续响平台」大卡（实景打卡 / 数字文物双卡 + 我的档案行）
+// → 八枚功能印章宫格（两排，一排四枚）→ 为你推荐 → 文创市集。被四段版收掉的入口（测验、课程、
+// 知识网络）全部在宫格里回来，另加行程与颜色两个新工坊。河工、同步两枚已撤出首页，
+// 侧栏里仍然进得去。
 @Component
 export struct HomeView {
   @StorageLink('dataRev') @Watch('reload') dataRev: number = 0;
   @StorageLink('studioRev') studioRev: number = 0;
   @StorageLink('textScale') ts: number = 1;
+  @StorageLink('bp') @Watch('reload') bp: string = 'sm';
   @State kw: string = '';
   @State verse: Verse | undefined = undefined;
   @State reco: Suggestion[] = [];
@@ -235,16 +249,20 @@ export struct HomeView {
   @State noteN: number = 0;
   @State wSway: number = -7;
   @State mapFloat: boolean = false;
+  // 「问」按钮的红点：没用过助手才挂，用过永久收掉
   @StorageLink('assistantSeen') askSeen: boolean = false;
+  // 给右下角悬浮河小导发滚动信号：滚起来先收进边里，别压着内容
   private fabSignalAt: number = 0;
 
   aboutToAppear(): void {
     this.reload();
+    // 数字文物卡里的中央文物缓摆，暗示进去是个能转的 3D 展台
     animateTo({
       duration: 5200, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
       this.wSway = 7;
     });
+    // 地图窗里的红标轻轻浮，像导览图上正在定位的那一下
     animateTo({
       duration: 3000, curve: Curve.EaseInOut, iterations: -1, playMode: PlayMode.Alternate
     }, (): void => {
@@ -254,8 +272,10 @@ export struct HomeView {
 
   reload(): void {
     this.verse = verseOf(Date.now());
-    this.reco = SiteRepo.get().recommend(MemoryStore.get().favIds(), MemoryStore.get().views, 4, '');
-    this.hot = ContentRepo.get().hotGoods(4);
+    // 手机 2 列 ×2 行正好 4 张，宽屏列数变了要多取几张，否则最后一行空一半
+    let gridN = gridCount(this.bp, 2, 2);
+    this.reco = SiteRepo.get().recommend(MemoryStore.get().favIds(), MemoryStore.get().views, gridN, '');
+    this.hot = ContentRepo.get().hotGoods(gridN);
     this.events = ContentRepo.get().upcomingEvents(2);
     let all = SiteRepo.get().sites.slice();
     all.sort((a: SiteInfo, b: SiteInfo): number => siteU(a) - siteU(b));
@@ -287,6 +307,7 @@ export struct HomeView {
     return this.routeStops.length > 0 ? this.routeStops[0].name : '沿河遗存';
   }
 
+  // 今日一句那一帧的底图：用诗句所属遗址的配图，换个日期换张图
   verseCover(): string {
     let v = this.verse;
     if (v === undefined) {
@@ -303,6 +324,7 @@ export struct HomeView {
     return StudioStore.get().unread(ContentRepo.get().feed().length);
   }
 
+  // 点开邮件图标就当这一屏动态都看过了，角标跟着收掉
   readFeed(): void {
     let ids: string[] = [];
     for (let p of ContentRepo.get().feed()) {
@@ -337,6 +359,7 @@ export struct HomeView {
     ];
   }
 
+  // 顶栏叠在海报上：半透明圆片托住白色符号，海报的色彩能透上来
   @Builder
   topBar() {
     Row({ space: 8 }) {
@@ -354,10 +377,10 @@ export struct HomeView {
 
       TextInput({ placeholder: '搜遗址、器物或纹样', text: this.kw })
         .height(34)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(INK)
         .placeholderColor(SUB)
-        .placeholderFont({ size: fs(this.ts, 13) })
+        .placeholderFont({ size: fs(this.ts, 14) })
         .backgroundColor('rgba(245,239,228,0.92)')
         .borderRadius(17)
         .border({ width: 1, color: 'rgba(229,218,198,0.9)' })
@@ -372,7 +395,7 @@ export struct HomeView {
 
       Stack({ alignContent: Alignment.TopEnd }) {
         Text('问')
-          .fontSize(fs(this.ts, 13))
+          .fontSize(fs(this.ts, 14))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Medium)
           .width(32)
@@ -380,10 +403,12 @@ export struct HomeView {
           .borderRadius(16)
           .backgroundColor(CLAY)
           .textAlign(TextAlign.Center)
+        // 右上角这颗和右下角的球是同一个开关：assistantSheet 一置真，弹的都是同一个 FloatingAssistant
           .onClick((): void => {
             openAssistantSheet();
           })
         if (!this.askSeen) {
+          // 还没用过助手时挂个红点，用过一次就永久收掉（askSeen 落在 preferences）
           Circle()
             .width(9)
             .height(9)
@@ -407,7 +432,7 @@ export struct HomeView {
           .textAlign(TextAlign.Center)
         if (this.unread() > 0) {
           Text(`${this.unread()}`)
-            .fontSize(fs(this.ts, 9))
+            .fontSize(fs(this.ts, 10))
             .fontColor(Color.White)
             .backgroundColor(CLAY)
             .borderRadius(7)
@@ -426,6 +451,7 @@ export struct HomeView {
     .hitTestBehavior(HitTestMode.Transparent)
   }
 
+  // 海报上压一层由透到暗的渐变：白字直接压在示意图上会糊，垫一层才立得住
   @Builder
   scrim() {
     Column()
@@ -449,12 +475,12 @@ export struct HomeView {
       this.scrim()
       Column({ space: 3 }) {
         Text(title)
-          .fontSize(fs(this.ts, 19))
+          .fontSize(fs(this.ts, 20))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Bold)
           .letterSpacing(2)
         Text(lead)
-          .fontSize(fs(this.ts, 11))
+          .fontSize(fs(this.ts, 12))
           .fontColor('#EFE6D6')
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -468,6 +494,7 @@ export struct HomeView {
     .onClick(act)
   }
 
+  // 今日一句收进海报第二帧：首页少一张卡，诗句反而更醒目
   @Builder
   verseFrame() {
     Stack({ alignContent: Alignment.BottomStart }) {
@@ -479,29 +506,29 @@ export struct HomeView {
       Column({ space: 6 }) {
         Row({ space: 6 }) {
           Text('今日一句')
-            .fontSize(fs(this.ts, 9))
+            .fontSize(fs(this.ts, 10))
             .fontColor('#3A2A1E')
             .backgroundColor(LOESS)
             .borderRadius(7)
             .padding({ left: 6, right: 6, top: 2, bottom: 2 })
           Text(this.verse!.real ? '库内收录' : '拟咏')
-            .fontSize(fs(this.ts, 9))
+            .fontSize(fs(this.ts, 10))
             .fontColor('#F0E7D8')
             .borderRadius(7)
             .border({ width: 1, color: 'rgba(240,231,216,0.6)' })
             .padding({ left: 5, right: 5, top: 1, bottom: 1 })
         }
         Text(this.verse!.text)
-          .fontSize(fs(this.ts, 16))
+          .fontSize(fs(this.ts, 17))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Medium)
-          .lineHeight(fs(this.ts, 24))
+          .lineHeight(fs(this.ts, 25))
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Row({ space: 6 }) {
-          Text(this.verse!.from).fontSize(fs(this.ts, 10)).fontColor('#E3D8C6')
+          Text(this.verse!.from).fontSize(fs(this.ts, 11)).fontColor('#E3D8C6')
           Blank()
-          Text(verseSiteName(this.verse!) + ' ›').fontSize(fs(this.ts, 10)).fontColor('#F4E9D8')
+          Text(verseSiteName(this.verse!) + ' ›').fontSize(fs(this.ts, 11)).fontColor('#F4E9D8')
         }
         .width('100%')
       }
@@ -516,6 +543,7 @@ export struct HomeView {
     })
   }
 
+  // 通栏海报：四帧轮播，右下角一枚 n/4 的页码片，照参考图那个位置
   @Builder
   hero() {
     Stack({ alignContent: Alignment.BottomEnd }) {
@@ -544,7 +572,7 @@ export struct HomeView {
       })
 
       Text(`${this.heroIdx + 1}/4`)
-        .fontSize(fs(this.ts, 10))
+        .fontSize(fs(this.ts, 11))
         .fontColor('#F0E7D8')
         .backgroundColor('rgba(43,38,34,0.55)')
         .borderRadius(10)
@@ -553,10 +581,11 @@ export struct HomeView {
         .hitTestBehavior(HitTestMode.None)
     }
     .width('100%')
-    .height(286)
+    .height(wideH(this.bp, 286, 330, 380))
     .clip(true)
   }
 
+  // 大卡右上角的视觉锚点：一束简牍＋一道编绳＋一枚陶印
   @Builder
   archiveArt() {
     Stack({ alignContent: Alignment.BottomEnd }) {
@@ -576,21 +605,23 @@ export struct HomeView {
     .opacity(0.92)
   }
 
+  // 地图导览子卡：卡里开一扇「地图窗」，露一段手绘导览图 + 一枚浮动的红标，
+  // 点整卡进 ArkWeb 手绘地图（发现/建筑/展览/打卡/餐饮/文创/卫生间/游客服务全在里头）
   @Builder
   mapCard() {
     Column({ space: 7 }) {
       Text('地图导览')
-        .fontSize(fs(this.ts, 15))
+        .fontSize(fs(this.ts, 16))
         .fontColor(Color.White)
         .fontWeight(FontWeight.Bold)
         .letterSpacing(1)
       Text('八类地点 · 手绘导览')
-        .fontSize(fs(this.ts, 9))
+        .fontSize(fs(this.ts, 10))
         .fontColor('rgba(233,242,240,0.85)')
       Stack({ alignContent: Alignment.Center }) {
         Image($rawfile('experience/atlas.png'))
           .width('100%')
-          .height(52)
+          .height(wideH(this.bp, 52, 68, 84))
           .objectFit(ImageFit.Cover)
           .borderRadius(8)
           .translate({ y: this.mapFloat ? -3 : 3 })
@@ -600,12 +631,12 @@ export struct HomeView {
           .translate({ x: 26, y: this.mapFloat ? -16 : -8 })
       }
       .width('100%')
-      .height(52)
+      .height(wideH(this.bp, 52, 68, 84))
       .clip(true)
       .border({ width: 1, color: 'rgba(255,255,255,0.35)' })
 
       Text('打开导览 ›')
-        .fontSize(fs(this.ts, 10))
+        .fontSize(fs(this.ts, 11))
         .fontColor('#E9F2F0')
     }
     .alignItems(HorizontalAlign.Start)
@@ -618,39 +649,42 @@ export struct HomeView {
     })
   }
 
+  // 数字文物入口卡：整卡一个入口，卡里三件文物做微缩 3D 展台（中央件缓摆），
+  // 底色调成纸色让文物边缘自然融进卡面，点整卡进展台页
   @Builder
   workshopCard() {
     Column({ space: 6 }) {
       Text('数字文物')
-        .fontSize(fs(this.ts, 15))
+        .fontSize(fs(this.ts, 16))
         .fontColor(INK)
         .fontWeight(FontWeight.Bold)
         .letterSpacing(1)
       Text('3D 展台 · 彩陶 · 教程')
-        .fontSize(fs(this.ts, 9))
+        .fontSize(fs(this.ts, 10))
         .fontColor(SUB)
       Stack({ alignContent: Alignment.Center }) {
+        // 展台净底：与文物图烘进去的纸色同值，边缘才融得干净
         Column()
           .width('100%')
-          .height(58)
+          .height(wideH(this.bp, 58, 74, 92))
           .borderRadius(8)
           .backgroundColor('#F5EFE4')
         Image(coverRes('relic_qingtong'))
-          .width(30).height(36).objectFit(ImageFit.Contain)
-          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: 38 }).translate({ x: -25 })
+          .width(wideH(this.bp, 30, 38, 46)).height(wideH(this.bp, 36, 44, 54)).objectFit(ImageFit.Contain)
+          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: 38 }).translate({ x: wideH(this.bp, -25, -31, -37) })
         Image(coverRes('relic_sancai'))
-          .width(30).height(36).objectFit(ImageFit.Contain)
-          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: -38 }).translate({ x: 25 })
+          .width(wideH(this.bp, 30, 38, 46)).height(wideH(this.bp, 36, 44, 54)).objectFit(ImageFit.Contain)
+          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: -38 }).translate({ x: wideH(this.bp, 25, 31, 37) })
         Image(coverRes('relic_caitao'))
-          .width(48).height(52).objectFit(ImageFit.Contain)
+          .width(wideH(this.bp, 48, 60, 72)).height(wideH(this.bp, 52, 66, 80)).objectFit(ImageFit.Contain)
           .rotate({ x: 0, y: 1, z: 0, angle: this.wSway })
           .zIndex(5)
       }
       .width('100%')
-      .height(58)
+      .height(wideH(this.bp, 58, 74, 92))
       Row({ space: 4 }) {
-        Text('进展台').fontSize(fs(this.ts, 10)).fontColor(CLAY)
-        Text('›').fontSize(fs(this.ts, 11)).fontColor(CLAY)
+        Text('进展台').fontSize(fs(this.ts, 11)).fontColor(CLAY)
+        Text('›').fontSize(fs(this.ts, 12)).fontColor(CLAY)
       }
     }
     .alignItems(HorizontalAlign.Start)
@@ -664,13 +698,14 @@ export struct HomeView {
     })
   }
 
+  // 档案大卡：标题「黄河续响平台」，双卡 + 我的档案行，卡顶压住海报下沿
   @Builder
   todayCard() {
     Column({ space: 11 }) {
       Row() {
         Column({ space: 2 }) {
           Text('黄河续响平台')
-            .fontSize(fs(this.ts, 19))
+            .fontSize(fs(this.ts, 20))
             .fontColor(INK)
             .fontWeight(FontWeight.Bold)
             .letterSpacing(2)
@@ -694,12 +729,12 @@ export struct HomeView {
         }
         .width(16).height(16)
         Text('我的档案 · 收藏与笔记')
-          .fontSize(fs(this.ts, 12))
+          .fontSize(fs(this.ts, 13))
           .fontColor(INK)
           .fontWeight(FontWeight.Medium)
         Blank()
         Text(`${this.favN} 藏 · ${this.noteN} 笔 ›`)
-          .fontSize(fs(this.ts, 11))
+          .fontSize(fs(this.ts, 12))
           .fontColor(SUB)
       }
       .width('100%')
@@ -733,16 +768,16 @@ export struct HomeView {
   head(title: string, hint: string, act: () => void) {
     Row() {
       Text(title)
-        .fontSize(fs(this.ts, 16))
+        .fontSize(fs(this.ts, 17))
         .fontColor(INK)
         .fontWeight(FontWeight.Medium)
       Blank()
       if (hint.length > 0) {
         Text(hint)
-          .fontSize(fs(this.ts, 11))
+          .fontSize(fs(this.ts, 12))
           .fontColor(SUB)
         Text(' ›')
-          .fontSize(fs(this.ts, 13))
+          .fontSize(fs(this.ts, 14))
           .fontColor(SUB)
       }
     }
@@ -751,6 +786,7 @@ export struct HomeView {
     .onClick(act)
   }
 
+  // 为你推荐：两列图卡，每张都写清为什么推给你
   @Builder
   recoCard(sg: Suggestion, i: number) {
     Column({ space: 5 }) {
@@ -760,7 +796,7 @@ export struct HomeView {
           .height('100%')
           .objectFit(ImageFit.Cover)
         Text(sg.site.eras[0])
-          .fontSize(fs(this.ts, 9))
+          .fontSize(fs(this.ts, 10))
           .fontColor('#F0E7D8')
           .backgroundColor('rgba(43,38,34,0.42)')
           .borderRadius(7)
@@ -768,45 +804,46 @@ export struct HomeView {
           .margin(8)
       }
       .width('100%')
-      .height(104)
+      .height(wideH(this.bp, 104, 120, 136))
       .borderRadius(10)
       .clip(true)
 
       Text(sg.site.name)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(INK)
         .fontWeight(FontWeight.Medium)
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(`${sg.site.city} · ${sg.site.types.join('/')}`)
-        .fontSize(fs(this.ts, 10))
+        .fontSize(fs(this.ts, 11))
         .fontColor(SUB)
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
+      // 有偏好才写"为什么推给你"；冷启动四张卡理由是同一句，写出来像 bug，不如放摘要
       if (sg.score > 0) {
         Text(sg.reason)
-          .fontSize(fs(this.ts, 10))
+          .fontSize(fs(this.ts, 11))
           .fontColor(CLAY)
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       } else {
         Text(sg.site.summary)
-          .fontSize(fs(this.ts, 10))
+          .fontSize(fs(this.ts, 11))
           .fontColor(SUB)
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
     }
-    .width('48%')
+    .width(cellWidthPct(this.bp, 2, 4))
     .alignItems(HorizontalAlign.Start)
     .padding({ top: 8, left: 8, right: 8, bottom: 10 })
     .backgroundColor($r('app.color.card_bg'))
     .borderRadius(12)
-    .margin({ right: i % 2 === 0 ? '4%' : 0, bottom: 10 })
+    .margin({ right: isLastInRow(this.bp, 2, i) ? 0 : '4%', bottom: 10 })
     .onClick((): void => {
       goDetail(sg.site.id);
     })
@@ -830,6 +867,7 @@ export struct HomeView {
     .alignItems(HorizontalAlign.Start)
   }
 
+  // 文创市集：商品有实拍图就贴图，没图的才让 ArtCover 现画
   @Builder
   shopCard(g: Goods, i: number) {
     Column({ space: 5 }) {
@@ -837,23 +875,24 @@ export struct HomeView {
         ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 2, label: g.cat, img: g.img })
       }
       .width('100%')
-      .height(104)
+      .height(wideH(this.bp, 104, 120, 136))
       .borderRadius(10)
       .clip(true)
 
       Text(g.name)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(INK)
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: 6 }) {
         Text('¥' + moneyText(g.price))
-          .fontSize(fs(this.ts, 12))
+          .fontSize(fs(this.ts, 13))
           .fontColor(CLAY)
           .fontWeight(FontWeight.Medium)
+        // 出土地那串字给不了固定宽度就会顶出格子，压进剩余空间里省略
         Text(g.origin)
-          .fontSize(fs(this.ts, 10))
+          .fontSize(fs(this.ts, 11))
           .fontColor(RIVER)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -862,12 +901,12 @@ export struct HomeView {
       }
       .width('100%')
     }
-    .width('48%')
+    .width(cellWidthPct(this.bp, 2, 4))
     .alignItems(HorizontalAlign.Start)
     .padding({ top: 8, left: 8, right: 8, bottom: 10 })
     .backgroundColor($r('app.color.card_bg'))
     .borderRadius(12)
-    .margin({ right: i % 2 === 0 ? '4%' : 0, bottom: 10 })
+    .margin({ right: isLastInRow(this.bp, 2, i) ? 0 : '4%', bottom: 10 })
     .onClick((): void => {
       switchTab(1);
     })
@@ -905,7 +944,8 @@ export struct HomeView {
               this.shopGrid()
             }
             .width('100%')
-            .padding({ left: 14, right: 14, bottom: 92 })
+            // 留出右下角悬浮河小导的位置，滚到底时页脚不会被它压住
+            .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14), bottom: 92 })
             .alignItems(HorizontalAlign.Start)
           }
           .width('100%')
@@ -917,6 +957,7 @@ export struct HomeView {
           if (yOffset === 0) {
             return;
           }
+          // 每帧都写 AppStorage 没必要，80ms 一次足够让悬浮球判定"还在滚"
           let now = Date.now();
           if (now - this.fabSignalAt < 80) {
             return;

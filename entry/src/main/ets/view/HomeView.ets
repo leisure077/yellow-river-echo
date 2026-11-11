@@ -212,7 +212,7 @@ struct RelicTile {
       .height(50)
 
       Text(this.title)
-        .fontSize(fs(this.ts, 11))
+        .fontSize(fs(this.ts, 12))
         .fontColor(INK)
         .maxLines(1)
     }
@@ -371,10 +371,10 @@ export struct HomeView {
 
       TextInput({ placeholder: '搜遗址、器物或纹样', text: this.kw })
         .height(34)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(INK)
         .placeholderColor(SUB)
-        .placeholderFont({ size: fs(this.ts, 13) })
+        .placeholderFont({ size: fs(this.ts, 14) })
         .backgroundColor('rgba(245,239,228,0.92)')
         .borderRadius(17)
         .border({ width: 1, color: 'rgba(229,218,198,0.9)' })
@@ -389,7 +389,7 @@ export struct HomeView {
 
       Stack({ alignContent: Alignment.TopEnd }) {
         Text('问')
-          .fontSize(fs(this.ts, 13))
+          .fontSize(fs(this.ts, 14))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Medium)
           .width(32)
@@ -426,7 +426,7 @@ export struct HomeView {
           .textAlign(TextAlign.Center)
         if (this.unread() > 0) {
           Text(`${this.unread()}`)
-            .fontSize(fs(this.ts, 9))
+            .fontSize(fs(this.ts, 10))
             .fontColor(Color.White)
             .backgroundColor(CLAY)
             .borderRadius(7)
@@ -469,12 +469,12 @@ export struct HomeView {
       this.scrim()
       Column({ space: 3 }) {
         Text(title)
-          .fontSize(fs(this.ts, 19))
+          .fontSize(fs(this.ts, 20))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Bold)
           .letterSpacing(2)
         Text(lead)
-          .fontSize(fs(this.ts, 11))
+          .fontSize(fs(this.ts, 12))
           .fontColor('#EFE6D6')
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -500,29 +500,29 @@ export struct HomeView {
       Column({ space: 6 }) {
         Row({ space: 6 }) {
           Text('今日一句')
-            .fontSize(fs(this.ts, 9))
+            .fontSize(fs(this.ts, 10))
             .fontColor('#3A2A1E')
             .backgroundColor(LOESS)
             .borderRadius(7)
             .padding({ left: 6, right: 6, top: 2, bottom: 2 })
           Text(this.verse!.real ? '库内收录' : '拟咏')
-            .fontSize(fs(this.ts, 9))
+            .fontSize(fs(this.ts, 10))
             .fontColor('#F0E7D8')
             .borderRadius(7)
             .border({ width: 1, color: 'rgba(240,231,216,0.6)' })
             .padding({ left: 5, right: 5, top: 1, bottom: 1 })
         }
         Text(this.verse!.text)
-          .fontSize(fs(this.ts, 16))
+          .fontSize(fs(this.ts, 17))
           .fontColor(Color.White)
           .fontWeight(FontWeight.Medium)
-          .lineHeight(fs(this.ts, 24))
+          .lineHeight(fs(this.ts, 25))
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Row({ space: 6 }) {
-          Text(this.verse!.from).fontSize(fs(this.ts, 10)).fontColor('#E3D8C6')
+          Text(this.verse!.from).fontSize(fs(this.ts, 11)).fontColor('#E3D8C6')
           Blank()
-          Text(verseSiteName(this.verse!) + ' ›').fontSize(fs(this.ts, 10)).fontColor('#F4E9D8')
+          Text(verseSiteName(this.verse!) + ' ›').fontSize(fs(this.ts, 11)).fontColor('#F4E9D8')
         }
         .width('100%')
       }
@@ -566,7 +566,7 @@ export struct HomeView {
       })
 
       Text(`${this.heroIdx + 1}/4`)
-        .fontSize(fs(this.ts, 10))
+        .fontSize(fs(this.ts, 11))
         .fontColor('#F0E7D8')
         .backgroundColor('rgba(43,38,34,0.55)')
         .borderRadius(10)
@@ -605,12 +605,12 @@ export struct HomeView {
   mapCard() {
     Column({ space: 7 }) {
       Text('地图导览')
-        .fontSize(fs(this.ts, 15))
+        .fontSize(fs(this.ts, 16))
         .fontColor(Color.White)
         .fontWeight(FontWeight.Bold)
         .letterSpacing(1)
       Text('八类地点 · 手绘导览')
-        .fontSize(fs(this.ts, 9))
+        .fontSize(fs(this.ts, 10))
         .fontColor('rgba(233,242,240,0.85)')
       Stack({ alignContent: Alignment.Center }) {
         Image($rawfile('experience/atlas.png'))
@@ -630,7 +630,7 @@ export struct HomeView {
       .border({ width: 1, color: 'rgba(255,255,255,0.35)' })
 
       Text('打开导览 ›')
-        .fontSize(fs(this.ts, 10))
+        .fontSize(fs(this.ts, 11))
         .fontColor('#E9F2F0')
     }
     .alignItems(HorizontalAlign.Start)
@@ -649,12 +649,12 @@ export struct HomeView {
   workshopCard() {
     Column({ space: 6 }) {
       Text('数字文物')
-        .fontSize(fs(this.ts, 15))
+        .fontSize(fs(this.ts, 16))
         .fontColor(INK)
         .fontWeight(FontWeight.Bold)
         .letterSpacing(1)
       Text('3D 展台 · 彩陶 · 教程')
-        .fontSize(fs(this.ts, 9))
+        .fontSize(fs(this.ts, 10))
         .fontColor(SUB)
       Stack({ alignContent: Alignment.Center }) {
         // 展台净底：与文物图烘进去的纸色同值，边缘才融得干净
@@ -677,8 +677,8 @@ export struct HomeView {
       .width('100%')
       .height(58)
       Row({ space: 4 }) {
-        Text('进展台').fontSize(fs(this.ts, 10)).fontColor(CLAY)
-        Text('›').fontSize(fs(this.ts, 11)).fontColor(CLAY)
+        Text('进展台').fontSize(fs(this.ts, 11)).fontColor(CLAY)
+        Text('›').fontSize(fs(this.ts, 12)).fontColor(CLAY)
       }
     }
     .alignItems(HorizontalAlign.Start)
@@ -699,7 +699,7 @@ export struct HomeView {
       Row() {
         Column({ space: 2 }) {
           Text('黄河续响平台')
-            .fontSize(fs(this.ts, 19))
+            .fontSize(fs(this.ts, 20))
             .fontColor(INK)
             .fontWeight(FontWeight.Bold)
             .letterSpacing(2)
@@ -723,12 +723,12 @@ export struct HomeView {
         }
         .width(16).height(16)
         Text('我的档案 · 收藏与笔记')
-          .fontSize(fs(this.ts, 12))
+          .fontSize(fs(this.ts, 13))
           .fontColor(INK)
           .fontWeight(FontWeight.Medium)
         Blank()
         Text(`${this.favN} 藏 · ${this.noteN} 笔 ›`)
-          .fontSize(fs(this.ts, 11))
+          .fontSize(fs(this.ts, 12))
           .fontColor(SUB)
       }
       .width('100%')
@@ -762,16 +762,16 @@ export struct HomeView {
   head(title: string, hint: string, act: () => void) {
     Row() {
       Text(title)
-        .fontSize(fs(this.ts, 16))
+        .fontSize(fs(this.ts, 17))
         .fontColor(INK)
         .fontWeight(FontWeight.Medium)
       Blank()
       if (hint.length > 0) {
         Text(hint)
-          .fontSize(fs(this.ts, 11))
+          .fontSize(fs(this.ts, 12))
           .fontColor(SUB)
         Text(' ›')
-          .fontSize(fs(this.ts, 13))
+          .fontSize(fs(this.ts, 14))
           .fontColor(SUB)
       }
     }
@@ -790,7 +790,7 @@ export struct HomeView {
           .height('100%')
           .objectFit(ImageFit.Cover)
         Text(sg.site.eras[0])
-          .fontSize(fs(this.ts, 9))
+          .fontSize(fs(this.ts, 10))
           .fontColor('#F0E7D8')
           .backgroundColor('rgba(43,38,34,0.42)')
           .borderRadius(7)
@@ -803,14 +803,14 @@ export struct HomeView {
       .clip(true)
 
       Text(sg.site.name)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(INK)
         .fontWeight(FontWeight.Medium)
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
       Text(`${sg.site.city} · ${sg.site.types.join('/')}`)
-        .fontSize(fs(this.ts, 10))
+        .fontSize(fs(this.ts, 11))
         .fontColor(SUB)
         .width('100%')
         .maxLines(1)
@@ -818,14 +818,14 @@ export struct HomeView {
       // 有偏好才写"为什么推给你"；冷启动四张卡理由是同一句，写出来像 bug，不如放摘要
       if (sg.score > 0) {
         Text(sg.reason)
-          .fontSize(fs(this.ts, 10))
+          .fontSize(fs(this.ts, 11))
           .fontColor(CLAY)
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       } else {
         Text(sg.site.summary)
-          .fontSize(fs(this.ts, 10))
+          .fontSize(fs(this.ts, 11))
           .fontColor(SUB)
           .width('100%')
           .maxLines(2)
@@ -874,19 +874,19 @@ export struct HomeView {
       .clip(true)
 
       Text(g.name)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(INK)
         .width('100%')
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
       Row({ space: 6 }) {
         Text('¥' + moneyText(g.price))
-          .fontSize(fs(this.ts, 12))
+          .fontSize(fs(this.ts, 13))
           .fontColor(CLAY)
           .fontWeight(FontWeight.Medium)
         // 出土地那串字给不了固定宽度就会顶出格子，压进剩余空间里省略
         Text(g.origin)
-          .fontSize(fs(this.ts, 10))
+          .fontSize(fs(this.ts, 11))
           .fontColor(RIVER)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })

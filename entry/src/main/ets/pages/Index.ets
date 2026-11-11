@@ -9,11 +9,87 @@ import { ShopView } from '../view/ShopView';
 import { SocialView } from '../view/SocialView';
 import { MineView } from '../view/MineView';
 import { FloatingAssistant } from '../view/FloatingAssistant';
-import { INK, SUB, LOESS, CLAY, paletteOf, SCALE_LABELS, fs } from '../common/Theme';
+import { INK, SUB, LOESS, CLAY, PAPER, paletteOf, SCALE_LABELS, fs } from '../common/Theme';
 import { goArchive, goPottery, goTopic, goSync, goCourses, goQuiz, goGuide, goEngineer, closeDrawer, goCompose, goLogin, closeSignOutAsk } from '../common/Nav';
 
 // 退出登录是危险操作，面板里这一行单独标红
 const DANGER: string = '#C0392B';
+
+// 底栏图标：和首页宫格一套画法，全部用基础形叠出来，不引图片资源也不引 SymbolGlyph。
+// 尺寸压在 20×16vp —— 底栏只有 58vp，再大就要把文字顶出栏外。
+// 选中态只压外层透明度、不给每个形件重算颜色：Builder 的普通参数是快照，
+// 把颜色当参数传进去，切完档图标还是上一个 tab 的颜色。
+@Component
+struct TabGlyph {
+  @StorageLink('mainTab') tab: number = 0;
+  @Prop idx: number = 0;
+  @Prop kind: string = '';
+
+  build() {
+    Column() {
+      if (this.kind === 'house') {
+        Column() {
+          Polygon().width(20).height(7).points([[10, 0], [20, 7], [0, 7]]).fill(CLAY)
+          Row({ space: 2 }) {
+            Column().width(2).height(6).backgroundColor(CLAY)
+            Column().width(6).height(6).border({ width: 1, color: CLAY })
+            Column().width(2).height(6).backgroundColor(CLAY)
+          }
+          .height(6)
+          .margin({ top: 1 })
+          Column().width(20).height(1.5).backgroundColor(CLAY)
+        }
+        .width(20)
+        .height(16)
+      } else if (this.kind === 'coin') {
+        Stack() {
+          Circle().width(16).height(16).fill(CLAY)
+          Column().width(5).height(5).backgroundColor(PAPER)
+        }
+        .width(16)
+        .height(16)
+      } else if (this.kind === 'ding') {
+        Column({ space: 1 }) {
+          Row({ space: 9 }) {
+            Column().width(2).height(3).backgroundColor(CLAY)
+            Column().width(2).height(3).backgroundColor(CLAY)
+          }
+          .width(16)
+          .justifyContent(FlexAlign.Center)
+          Column().width(16).height(7)
+            .borderRadius({ topLeft: 2, topRight: 2, bottomLeft: 8, bottomRight: 8 })
+            .backgroundColor(CLAY)
+          Row({ space: 3 }) {
+            Column().width(2).height(3).backgroundColor(CLAY)
+            Column().width(2).height(3).backgroundColor(CLAY)
+            Column().width(2).height(3).backgroundColor(CLAY)
+          }
+          .width(16)
+          .justifyContent(FlexAlign.Center)
+        }
+        .width(16)
+        .height(16)
+      } else {
+        Stack() {
+          Column().width(16).height(16).borderRadius(3).backgroundColor(CLAY)
+          Column({ space: 2 }) {
+            Row({ space: 2 }) {
+              Column().width(4).height(4).borderRadius(1).backgroundColor(PAPER)
+              Column().width(4).height(4).borderRadius(1).backgroundColor(PAPER)
+            }
+            Row({ space: 2 }) {
+              Column().width(4).height(4).borderRadius(1).backgroundColor(PAPER)
+              Column().width(4).height(4).borderRadius(1).backgroundColor(PAPER)
+            }
+          }
+        }
+        .width(16)
+        .height(16)
+      }
+    }
+    .opacity(this.tab === this.idx ? 1 : 0.42)
+  }
+}
 
 // 字号档位胶囊组。做成组件而不是 @Builder：Builder 的普通参数是快照，
 // 点了「大」之后高亮不会跟着变（真机上实测到的高亮卡死）。
@@ -92,14 +168,13 @@ struct Index {
   }
 
   @Builder
-  footLabel(idx: number, title: string) {
+  footLabel(idx: number, title: string, art: string) {
     Column({ space: 3 }) {
       Text(title)
-        .fontSize(fs(this.ts, 13))
+        .fontSize(fs(this.ts, 14))
         .fontColor(this.tab === idx ? INK : SUB)
         .fontWeight(this.tab === idx ? FontWeight.Bold : FontWeight.Normal)
-      Circle().width(4).height(4)
-        .fill(this.tab === idx ? CLAY : Color.Transparent)
+      TabGlyph({ idx: idx, kind: art })
     }
     .padding({ top: 8, bottom: 6 })
     .onClick((): void => {
@@ -454,8 +529,8 @@ struct Index {
           .layoutWeight(1)
 
           Row() {
-            this.footLabel(0, '首页')
-            this.footLabel(1, '文创')
+            this.footLabel(0, '首页', 'house')
+            this.footLabel(1, '文创', 'coin')
             Column() {
               Text('+')
                 .fontSize(fs(this.ts, 24))
@@ -472,8 +547,8 @@ struct Index {
             .onClick((): void => {
               this.createOpen = true;
             })
-            this.footLabel(2, '社群')
-            this.footLabel(3, '我的')
+            this.footLabel(2, '社群', 'ding')
+            this.footLabel(3, '我的', 'seal')
           }
           .width('100%')
           .height(58)

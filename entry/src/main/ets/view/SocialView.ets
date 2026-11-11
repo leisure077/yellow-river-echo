@@ -6,6 +6,7 @@ import { SiteRepo } from '../service/SiteRepo';
 import { Post, PostComment } from '../model/Models';
 import { fs, INK, SUB, CLAY, agoText, likeText, paletteOf, eraPalette, coverRes } from '../common/Theme';
 import { openDrawer, goDetail, goSync, goPost } from '../common/Nav';
+import { padX, wideH, frTemplate } from '../common/Breakpoint';
 
 // 社区页：推荐流 + 本机提醒。流里既有随包带的动态，也有这台设备自己发出去的动态。
 @Component
@@ -15,6 +16,7 @@ export struct SocialView {
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
   @StorageLink('dataRev') dataRev: number = 0;
   @StorageLink('syncRev') syncRev: number = 0;
+  @StorageLink('bp') bp: string = 'sm';
   @State sub: number = 0;
   @State topic: string = '';
   @State openIds: string[] = [];
@@ -143,7 +145,9 @@ export struct SocialView {
       n += id.charCodeAt(i);
     }
     let hs: number[] = [216, 158, 196, 174, 208, 146];
-    return hs[n % hs.length];
+    let h = hs[n % hs.length];
+    // 宽屏一列能到三百多 vp 宽，图还按手机那套高度就会摊成一条横幅，按比例抬一档
+    return wideH(this.bp, h, Math.round(h * 1.25), Math.round(h * 1.4));
   }
 
   // 瀑布流卡片：图在上、文字压在下，作者和点赞收在最后一行
@@ -454,7 +458,7 @@ export struct SocialView {
         this.subTab('消息', 1)
       }
       .width('100%')
-      .padding({ left: 14, right: 14, top: 12, bottom: 8 })
+      .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14), top: 12, bottom: 8 })
 
       if (this.sub === 0) {
         if (ContentRepo.get().feed().length > 0) {
@@ -465,7 +469,7 @@ export struct SocialView {
                 this.topicChip(t, t)
               }, (t: string): string => t)
             }
-            .padding({ left: 14, right: 14, top: 2, bottom: 8 })
+            .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14), top: 2, bottom: 8 })
           }
           .scrollable(ScrollDirection.Horizontal)
           .scrollBar(BarState.Off)
@@ -489,12 +493,12 @@ export struct SocialView {
               }
             }, (p: Post): string => this.rowKey(p))
           }
-          .columnsTemplate('1fr 1fr')
+          .columnsTemplate(frTemplate(this.bp, 2))
           .columnsGap(9)
           .rowsGap(9)
           .layoutWeight(1)
           .scrollBar(BarState.Off)
-          .padding({ left: 12, right: 12, top: 2, bottom: 10 })
+          .padding({ left: padX(this.bp, 12), right: padX(this.bp, 12), top: 2, bottom: 10 })
         }
       } else {
         Scroll() {

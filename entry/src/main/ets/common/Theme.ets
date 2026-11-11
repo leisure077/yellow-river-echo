@@ -23,10 +23,13 @@ export const WATER_FLOW: string = 'flow';
 export const WATER_STILL: string = 'still';
 export const WATER_OFF: string = 'off';
 
-// 字号三档：S / M / L。档位差要一眼看得出来，所以拉到 -15% / +20%，
-// 再小就只是"好像变了又好像没变"，切完还得回详情页确认。
-export const SCALE_STEPS: number[] = [0.85, 1, 1.20];
+// 字号三档：S / M / L。整条梯子整体上移了一格——原来的「大」档（×1.20）现在是「标准」，
+// 现场反馈这一屏的字还是偏小。小/大相对标准的 -15% / +20% 保持不变，切档的落差还是看得出来。
+export const SCALE_STEPS: number[] = [1.02, 1.20, 1.44];
 export const SCALE_LABELS: string[] = ['小', '标准', '大'];
+// 进应用的第一屏就按这一档走（最大档）。现场演示人离屏幕有距离，第一屏就得读得清；
+// 用户在设置里切过档之后仍以他存的值为准，这里只是读不到时的落点。
+export const SCALE_DEFAULT: number = SCALE_STEPS.length - 1;
 
 // 全局字号缩放。缩放档必须由组件自己持有的 @StorageLink('textScale') 传进来：
 // ArkUI 只重画「表达式里真读过那个状态」的元素，在函数里偷偷 get 一下 AppStorage

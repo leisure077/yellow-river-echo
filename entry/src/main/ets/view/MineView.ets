@@ -10,6 +10,7 @@ import { BackupService } from '../service/BackupService';
 import { ArtCover } from './ArtCover';
 import { fs, INK, SUB, LOESS, CLAY, fmtTime, agoText, moneyText, coverRes, coverOf, paletteOf } from '../common/Theme';
 import { openDrawer, goSync, goTopic, goCourses, goPottery, goDetail, goNote, goArchive, goGoods, switchTab, openSignOutAsk } from '../common/Nav';
+import { padX, rowSize } from '../common/Breakpoint';
 
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'tower', 'cave', 'scroll', 'coin', 'box', 'bridge', 'kiln'];
 
@@ -33,6 +34,7 @@ export struct MineView {
   @StorageLink('dataRev') @Watch('syncCount') dataRev: number = 0;
   @StorageLink('syncRev') @Watch('syncCount') syncRev: number = 0;
   @StorageLink('studioRev') @Watch('syncCount') studioRev: number = 0;
+  @StorageLink('bp') bp: string = 'sm';
   @State busy: boolean = false;
   @State sub: number = 0;
   @State bioEdit: boolean = false;
@@ -135,8 +137,26 @@ export struct MineView {
     return out;
   }
 
+  // 一行没铺满要补空位，否则最后一格的 layoutWeight 会把卡片拉宽。
+  // 列数是问断点要的，手机 3 列时补位数量和原来写死的分支一模一样。
+  blanks(rowLen: number, cols: number): number[] {
+    let out: number[] = [];
+    for (let i = rowLen; i < cols; i++) {
+      out.push(i);
+    }
+    return out;
+  }
+
+  workCols(): number {
+    return rowSize(this.bp, 3);
+  }
+
+  goodCols(): number {
+    return rowSize(this.bp, 2);
+  }
+
   workRows(): WorkRec[][] {
-    return this.chunk(StudioStore.get().works, 3);
+    return this.chunk(StudioStore.get().works, this.workCols());
   }
 
   favSites(): SiteInfo[] {
@@ -153,7 +173,7 @@ export struct MineView {
   }
 
   favRows(): SiteInfo[][] {
-    return this.chunk(this.favSites(), 3);
+    return this.chunk(this.favSites(), this.workCols());
   }
 
   likedGoods(): Goods[] {
@@ -170,7 +190,7 @@ export struct MineView {
   }
 
   goodRows(): Goods[][] {
-    return this.chunk(this.likedGoods(), 2);
+    return this.chunk(this.likedGoods(), this.goodCols());
   }
 
   @Builder
@@ -406,7 +426,7 @@ export struct MineView {
       }
       .width('100%')
       .height(48)
-      .padding({ left: 14, right: 14 })
+      .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14) })
 
       Scroll() {
         Column({ space: 12 }) {
@@ -443,14 +463,11 @@ export struct MineView {
                   ForEach(this.workRows(), (row: WorkRec[], ri: number): void => {
                     Row({ space: 8 }) {
                       ForEach(row, (w: WorkRec, i: number): void => {
-                        this.workCell(w, ri * 3 + i)
+                        this.workCell(w, ri * this.workCols() + i)
                       }, (w: WorkRec): string => w.id)
-                      if (row.length === 1) {
+                      ForEach(this.blanks(row.length, this.workCols()), (k: number): void => {
                         Column().layoutWeight(1)
-                        Column().layoutWeight(1)
-                      } else if (row.length === 2) {
-                        Column().layoutWeight(1)
-                      }
+                      }, (k: number): string => 'wb' + k)
                     }
                     .width('100%')
                   }, (row: WorkRec[]): string => 'wr_' + row[0].id)
@@ -469,12 +486,9 @@ export struct MineView {
                       ForEach(row, (s: SiteInfo): void => {
                         this.favCell(s)
                       }, (s: SiteInfo): string => s.id)
-                      if (row.length === 1) {
+                      ForEach(this.blanks(row.length, this.workCols()), (k: number): void => {
                         Column().layoutWeight(1)
-                        Column().layoutWeight(1)
-                      } else if (row.length === 2) {
-                        Column().layoutWeight(1)
-                      }
+                      }, (k: number): string => 'fb' + k)
                     }
                     .width('100%')
                   }, (row: SiteInfo[]): string => 'fr_' + row[0].id)
@@ -504,11 +518,11 @@ export struct MineView {
                   ForEach(this.goodRows(), (row: Goods[], ri: number): void => {
                     Row({ space: 8 }) {
                       ForEach(row, (g: Goods, i: number): void => {
-                        this.goodCell(g, ri * 2 + i)
+                        this.goodCell(g, ri * this.goodCols() + i)
                       }, (g: Goods): string => 'lr_' + g.id)
-                      if (row.length === 1) {
+                      ForEach(this.blanks(row.length, this.goodCols()), (k: number): void => {
                         Column().layoutWeight(1)
-                      }
+                      }, (k: number): string => 'gb' + k)
                     }
                     .width('100%')
                   }, (row: Goods[]): string => 'gr_' + row[0].id)
@@ -585,7 +599,7 @@ export struct MineView {
             .margin({ top: 8, bottom: 18 })
         }
         .width('100%')
-        .padding({ left: 14, right: 14 })
+        .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14) })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)

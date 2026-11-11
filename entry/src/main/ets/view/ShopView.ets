@@ -4,6 +4,7 @@ import { StudioStore } from '../service/StudioStore';
 import { ArtCover } from './ArtCover';
 import { fs, INK, SUB, CLAY, LOESS, LINE, moneyText, likeText } from '../common/Theme';
 import { goGoods, goWishlist } from '../common/Nav';
+import { padX, wideH, frTemplate } from '../common/Breakpoint';
 
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'box', 'coin', 'kiln'];
 
@@ -14,6 +15,7 @@ export struct ShopView {
   @StorageLink('textScale') ts: number = 1;
   @StorageLink('dataRev') @Watch('reload') dataRev: number = 0;
   @StorageLink('studioRev') @Watch('syncMine') studioRev: number = 0;
+  @StorageLink('bp') bp: string = 'sm';
   @State kw: string = '';
   @State cat: string = '全部';
   @State hotFirst: boolean = true;
@@ -108,7 +110,7 @@ export struct ShopView {
       })
     }
     .width('100%')
-    .padding({ left: 14, right: 14, top: 8, bottom: 6 })
+    .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14), top: 8, bottom: 6 })
   }
 
   @Builder
@@ -143,7 +145,7 @@ export struct ShopView {
           ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 1, img: g.img })
         }
         .width('100%')
-        .height(134)
+        .height(wideH(this.bp, 134, 168, 186))
 
         Row({ space: 6 }) {
           Text(this.cartIds.indexOf(g.id) >= 0 ? '♥ 已在清单' : '♡ 收藏')
@@ -173,7 +175,7 @@ export struct ShopView {
         .padding({ left: 8, right: 8, bottom: 8 })
       }
       .width('100%')
-      .height(134)
+      .height(wideH(this.bp, 134, 168, 186))
       .borderRadius({ topLeft: 10, topRight: 10 })
       .clip(true)
       .onClick((): void => {
@@ -260,12 +262,12 @@ export struct ShopView {
             }
           }, (g: Goods): string => g.id)
         }
-        .columnsTemplate('1fr 1fr')
+        .columnsTemplate(frTemplate(this.bp, 2))
         .columnsGap(10)
         .rowsGap(12)
         .layoutWeight(1)
         .scrollBar(BarState.Off)
-        .padding({ left: 14, right: 14, top: 4, bottom: 16 })
+        .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14), top: 4, bottom: 16 })
       }
     }
     .width('100%')

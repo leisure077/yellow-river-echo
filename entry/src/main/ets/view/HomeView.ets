@@ -17,6 +17,7 @@ import {
   goActivity, goCheckin, goRoute, goQuiz,
   goTopic, goStudio, goExperience, openAssistantSheet
 } from '../common/Nav';
+import { padX, wideH, cellWidthPct, isLastInRow, tileWidthPct, gridCount } from '../common/Breakpoint';
 
 const SHAPES: string[] = ['pot', 'jar', 'ding', 'tile', 'stele', 'box', 'coin', 'kiln'];
 
@@ -171,6 +172,8 @@ function artOf(kind: string, scale: number) {
 struct RelicTile {
   // 字号档位变了要整页重画：不持有这行，切档后这一页还是老字号
   @StorageLink('textScale') ts: number = 1;
+  // 宽屏要一排铺开八枚，列数变了每枚的宽度就得跟着变
+  @StorageLink('bp') bp: string = 'sm';
   @Prop kind: string = '';
   @Prop title: string = '';
   act: () => void = (): void => {};
@@ -216,7 +219,7 @@ struct RelicTile {
         .fontColor(INK)
         .maxLines(1)
     }
-    .width('25%')
+    .width(tileWidthPct(this.bp))
     .padding({ top: 6, bottom: 6 })
     .scale({ x: this.sc, y: this.sc })
     .onClick((): void => {
@@ -234,6 +237,7 @@ export struct HomeView {
   @StorageLink('dataRev') @Watch('reload') dataRev: number = 0;
   @StorageLink('studioRev') studioRev: number = 0;
   @StorageLink('textScale') ts: number = 1;
+  @StorageLink('bp') @Watch('reload') bp: string = 'sm';
   @State kw: string = '';
   @State verse: Verse | undefined = undefined;
   @State reco: Suggestion[] = [];
@@ -268,8 +272,10 @@ export struct HomeView {
 
   reload(): void {
     this.verse = verseOf(Date.now());
-    this.reco = SiteRepo.get().recommend(MemoryStore.get().favIds(), MemoryStore.get().views, 4, '');
-    this.hot = ContentRepo.get().hotGoods(4);
+    // 手机 2 列 ×2 行正好 4 张，宽屏列数变了要多取几张，否则最后一行空一半
+    let gridN = gridCount(this.bp, 2, 2);
+    this.reco = SiteRepo.get().recommend(MemoryStore.get().favIds(), MemoryStore.get().views, gridN, '');
+    this.hot = ContentRepo.get().hotGoods(gridN);
     this.events = ContentRepo.get().upcomingEvents(2);
     let all = SiteRepo.get().sites.slice();
     all.sort((a: SiteInfo, b: SiteInfo): number => siteU(a) - siteU(b));
@@ -575,7 +581,7 @@ export struct HomeView {
         .hitTestBehavior(HitTestMode.None)
     }
     .width('100%')
-    .height(286)
+    .height(wideH(this.bp, 286, 330, 380))
     .clip(true)
   }
 
@@ -615,7 +621,7 @@ export struct HomeView {
       Stack({ alignContent: Alignment.Center }) {
         Image($rawfile('experience/atlas.png'))
           .width('100%')
-          .height(52)
+          .height(wideH(this.bp, 52, 68, 84))
           .objectFit(ImageFit.Cover)
           .borderRadius(8)
           .translate({ y: this.mapFloat ? -3 : 3 })
@@ -625,7 +631,7 @@ export struct HomeView {
           .translate({ x: 26, y: this.mapFloat ? -16 : -8 })
       }
       .width('100%')
-      .height(52)
+      .height(wideH(this.bp, 52, 68, 84))
       .clip(true)
       .border({ width: 1, color: 'rgba(255,255,255,0.35)' })
 
@@ -660,22 +666,22 @@ export struct HomeView {
         // 展台净底：与文物图烘进去的纸色同值，边缘才融得干净
         Column()
           .width('100%')
-          .height(58)
+          .height(wideH(this.bp, 58, 74, 92))
           .borderRadius(8)
           .backgroundColor('#F5EFE4')
         Image(coverRes('relic_qingtong'))
-          .width(30).height(36).objectFit(ImageFit.Contain)
-          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: 38 }).translate({ x: -25 })
+          .width(wideH(this.bp, 30, 38, 46)).height(wideH(this.bp, 36, 44, 54)).objectFit(ImageFit.Contain)
+          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: 38 }).translate({ x: wideH(this.bp, -25, -31, -37) })
         Image(coverRes('relic_sancai'))
-          .width(30).height(36).objectFit(ImageFit.Contain)
-          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: -38 }).translate({ x: 25 })
+          .width(wideH(this.bp, 30, 38, 46)).height(wideH(this.bp, 36, 44, 54)).objectFit(ImageFit.Contain)
+          .opacity(0.72).rotate({ x: 0, y: 1, z: 0, angle: -38 }).translate({ x: wideH(this.bp, 25, 31, 37) })
         Image(coverRes('relic_caitao'))
-          .width(48).height(52).objectFit(ImageFit.Contain)
+          .width(wideH(this.bp, 48, 60, 72)).height(wideH(this.bp, 52, 66, 80)).objectFit(ImageFit.Contain)
           .rotate({ x: 0, y: 1, z: 0, angle: this.wSway })
           .zIndex(5)
       }
       .width('100%')
-      .height(58)
+      .height(wideH(this.bp, 58, 74, 92))
       Row({ space: 4 }) {
         Text('进展台').fontSize(fs(this.ts, 11)).fontColor(CLAY)
         Text('›').fontSize(fs(this.ts, 12)).fontColor(CLAY)
@@ -798,7 +804,7 @@ export struct HomeView {
           .margin(8)
       }
       .width('100%')
-      .height(104)
+      .height(wideH(this.bp, 104, 120, 136))
       .borderRadius(10)
       .clip(true)
 
@@ -832,12 +838,12 @@ export struct HomeView {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
     }
-    .width('48%')
+    .width(cellWidthPct(this.bp, 2, 4))
     .alignItems(HorizontalAlign.Start)
     .padding({ top: 8, left: 8, right: 8, bottom: 10 })
     .backgroundColor($r('app.color.card_bg'))
     .borderRadius(12)
-    .margin({ right: i % 2 === 0 ? '4%' : 0, bottom: 10 })
+    .margin({ right: isLastInRow(this.bp, 2, i) ? 0 : '4%', bottom: 10 })
     .onClick((): void => {
       goDetail(sg.site.id);
     })
@@ -869,7 +875,7 @@ export struct HomeView {
         ArtCover({ palette: g.palette, shape: this.shapeOf(g.id), seed: i + 2, label: g.cat, img: g.img })
       }
       .width('100%')
-      .height(104)
+      .height(wideH(this.bp, 104, 120, 136))
       .borderRadius(10)
       .clip(true)
 
@@ -895,12 +901,12 @@ export struct HomeView {
       }
       .width('100%')
     }
-    .width('48%')
+    .width(cellWidthPct(this.bp, 2, 4))
     .alignItems(HorizontalAlign.Start)
     .padding({ top: 8, left: 8, right: 8, bottom: 10 })
     .backgroundColor($r('app.color.card_bg'))
     .borderRadius(12)
-    .margin({ right: i % 2 === 0 ? '4%' : 0, bottom: 10 })
+    .margin({ right: isLastInRow(this.bp, 2, i) ? 0 : '4%', bottom: 10 })
     .onClick((): void => {
       switchTab(1);
     })
@@ -939,7 +945,7 @@ export struct HomeView {
             }
             .width('100%')
             // 留出右下角悬浮河小导的位置，滚到底时页脚不会被它压住
-            .padding({ left: 14, right: 14, bottom: 92 })
+            .padding({ left: padX(this.bp, 14), right: padX(this.bp, 14), bottom: 92 })
             .alignItems(HorizontalAlign.Start)
           }
           .width('100%')

@@ -12,7 +12,7 @@ import { FloatingAssistant } from '../view/FloatingAssistant';
 import { INK, SUB, LOESS, CLAY, PAPER, paletteOf, SCALE_LABELS, fs } from '../common/Theme';
 import { goArchive, goPottery, goTopic, goSync, goCourses, goQuiz, goGuide, goEngineer, closeDrawer, goCompose, goLogin, closeSignOutAsk } from '../common/Nav';
 import { warmMapAssets } from '../common/MapAssets';
-import { wideH, wideW, cellWidthPct, isLastInRow } from '../common/Breakpoint';
+import { wideH, cellWidthPct, isLastInRow } from '../common/Breakpoint';
 
 // 退出登录是危险操作，面板里这一行单独标红
 const DANGER: string = '#C0392B';
@@ -536,8 +536,8 @@ struct Index {
           }
           .layoutWeight(1)
 
-          // 底栏背景要横贯整屏，宽屏只把「图标+文字」这一段收在中间。
-          // 早先是整条 Row 收到 62%/46%，结果平板上两头露出页面底色，看着像没画完。
+          // 外层满宽画背景和分隔线，五个 tab 交给内层 SpaceAround 均匀铺满整条底栏。
+          // 早先是整条 Row 按断点收到 62%/46%，平板上两头露出页面底色，看着像没画完。
           Row() {
             Row() {
               this.footLabel(0, '首页', 'house')
@@ -561,7 +561,7 @@ struct Index {
               this.footLabel(2, '社群', 'ding')
               this.footLabel(3, '我的', 'seal')
             }
-            .width(wideW(this.bp, '100%', '62%', '46%'))
+            .width('100%')
             .height('100%')
             .justifyContent(FlexAlign.SpaceAround)
             .alignItems(VerticalAlign.Top)

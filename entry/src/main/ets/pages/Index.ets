@@ -536,32 +536,39 @@ struct Index {
           }
           .layoutWeight(1)
 
+          // 底栏背景要横贯整屏，宽屏只把「图标+文字」这一段收在中间。
+          // 早先是整条 Row 收到 62%/46%，结果平板上两头露出页面底色，看着像没画完。
           Row() {
-            this.footLabel(0, '首页', 'house')
-            this.footLabel(1, '文创', 'coin')
-            Column() {
-              Text('+')
-                .fontSize(fs(this.ts, 24))
-                .fontColor('#FFFFFF')
-                .fontWeight(FontWeight.Bold)
+            Row() {
+              this.footLabel(0, '首页', 'house')
+              this.footLabel(1, '文创', 'coin')
+              Column() {
+                Text('+')
+                  .fontSize(fs(this.ts, 24))
+                  .fontColor('#FFFFFF')
+                  .fontWeight(FontWeight.Bold)
+              }
+              .width(44)
+              .height(44)
+              .borderRadius(22)
+              .justifyContent(FlexAlign.Center)
+              .backgroundColor(CLAY)
+              .margin({ top: 6 })
+              .shadow({ radius: 8, color: 'rgba(43,38,34,0.22)', offsetY: 3 })
+              .onClick((): void => {
+                this.createOpen = true;
+              })
+              this.footLabel(2, '社群', 'ding')
+              this.footLabel(3, '我的', 'seal')
             }
-            .width(44)
-            .height(44)
-            .borderRadius(22)
-            .justifyContent(FlexAlign.Center)
-            .backgroundColor(CLAY)
-            .margin({ top: 6 })
-            .shadow({ radius: 8, color: 'rgba(43,38,34,0.22)', offsetY: 3 })
-            .onClick((): void => {
-              this.createOpen = true;
-            })
-            this.footLabel(2, '社群', 'ding')
-            this.footLabel(3, '我的', 'seal')
+            .width(wideW(this.bp, '100%', '62%', '46%'))
+            .height('100%')
+            .justifyContent(FlexAlign.SpaceAround)
+            .alignItems(VerticalAlign.Top)
           }
-          .width(wideW(this.bp, '100%', '62%', '46%'))
+          .width('100%')
           .height(wideH(this.bp, 68, 74, 80))
-          .justifyContent(FlexAlign.SpaceAround)
-          .alignItems(VerticalAlign.Top)
+          .justifyContent(FlexAlign.Center)
           .backgroundColor($r('app.color.card_bg'))
           .border({ width: { top: 1 }, color: $r('app.color.line') })
         }
